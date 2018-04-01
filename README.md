@@ -133,4 +133,4 @@ In the case of needing to set integer-based keys (without using array-only funct
 A number of common tests have been written [here](addons/sourcemod/scripting/json_test.sp).
 
 ## License
-[MIT](https://choosealicense.com/licenses/mit/)
+[GNU General Public License v3.0](https://choosealicense.com/licenses/gpl-3.0/)

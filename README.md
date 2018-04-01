@@ -125,9 +125,13 @@ OtherClass obj_coerced = view_as<OtherClass>(obj);
 
 ### Other Stuff
 A key can be hidden from the encoder, but still used for data storage. This is useful for 'secret' information.
-`obj.SetKeyHidden("my secret key", true);`
+```c
+obj.SetKeyHidden("my secret key", true);
+```
 In the case of needing to set integer-based keys (without using array-only functionality), you can use SetStringIndexed (and so on), which accepts an int as the key and converts it to a string internally.
-`obj.SetStringIndexed(5, "hello");`
+```c
+obj.SetStringIndexed(5, "hello");
+```
 
 ## Testing
 A number of common tests have been written [here](addons/sourcemod/scripting/json_test.sp).

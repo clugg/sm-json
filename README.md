@@ -123,6 +123,25 @@ JSON_Object obj = json_decode("{\"myfloat\":73.570000,\"myobject\":[],\"myhandle
 OtherClass obj_coerced = view_as<OtherClass>(obj);
 ```
 
+### Iterating Objects
+You can iterate through the keys in a JSON_Object due to the fact that it's a `StringMap` and as such you can fetch a `StringMapSnapshot` from it.
+```c
+char key[JSON_BUFFER_LENGTH];
+bool is_array = obj.IsArray;
+StringMapSnapshot snap = obj.Snapshot();
+for (int i = 0; i < obj.Length; ++i) {
+    if (is_array) {
+        obj.GetIndexString(key, sizeof(key), i);
+    } else {
+        snap.GetKey(i, key, sizeof(key));
+        if (json_is_meta_key(key)) continue;  // skip meta-keys
+    }
+
+    JSON_CELL_TYPE type = obj.GetKeyType(key);
+    // do whatever you want with type, key information
+}
+```
+
 ### Other Stuff
 A key can be hidden from the encoder, but still used for data storage. This is useful for 'secret' information.
 ```c

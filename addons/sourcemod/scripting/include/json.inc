@@ -263,6 +263,7 @@ stock JSON_Object json_decode(const char[] buffer, JSON_Object result = null, in
  */
 void json_cleanup(JSON_Object obj) {
     char key[JSON_BUFFER_SIZE];
+    bool is_array = obj.IsArray;
     StringMapSnapshot snap = obj.Snapshot();
     for (int i = 0; i < snap.Length; ++i) {
         snap.GetKey(i, key, sizeof(key));
@@ -279,4 +280,8 @@ void json_cleanup(JSON_Object obj) {
     }
 
     obj.Clear();
+
+    if (is_array) {
+        obj.SetValue(JSON_ARRAY_INDEX_KEY, 0);
+    }
 }

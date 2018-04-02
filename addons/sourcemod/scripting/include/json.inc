@@ -272,8 +272,10 @@ void json_cleanup(JSON_Object obj) {
         if (type != Type_Object) continue;
 
         JSON_Object nested_obj = obj.GetObject(key);
-        nested_obj.Cleanup();
-        delete nested_obj;
+        if (nested_obj != null) {
+            nested_obj.Cleanup();
+            delete nested_obj;
+        }
     }
 
     obj.Clear();

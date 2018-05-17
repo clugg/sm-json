@@ -292,7 +292,7 @@ stock JSON_Object json_decode(const char[] buffer, JSON_Object result = null, in
 /**
  * Recursively cleans up JSON_Objects and any objects referenced within.
  *
- * @param obj       Object to clean up.
+ * @param obj       JSON_Object to clean up.
  */
 void json_cleanup(JSON_Object obj) {
     char key[JSON_BUFFER_SIZE];

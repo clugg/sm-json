@@ -313,6 +313,7 @@ void json_cleanup(JSON_Object obj) {
     }
 
     obj.Clear();
+    delete snap;
 
     if (is_array) {
         obj.SetValue(JSON_ARRAY_INDEX_KEY, 0);

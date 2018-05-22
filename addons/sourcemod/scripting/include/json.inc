@@ -292,7 +292,7 @@ stock JSON_Object json_decode(const char[] buffer, JSON_Object result = null, in
 /**
  * Recursively cleans up JSON_Objects and any objects referenced within.
  *
- * @param obj       Object to clean up.
+ * @param obj       JSON_Object to clean up.
  */
 void json_cleanup(JSON_Object obj) {
     char key[JSON_BUFFER_SIZE];
@@ -313,6 +313,7 @@ void json_cleanup(JSON_Object obj) {
     }
 
     obj.Clear();
+    delete snap;
 
     if (is_array) {
         obj.SetValue(JSON_ARRAY_INDEX_KEY, 0);

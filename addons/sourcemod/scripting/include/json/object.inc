@@ -45,7 +45,7 @@ methodmap JSON_Object < StringMap {
     /**
      * Creates a new JSON_Object.
      *
-     * @param is_array      Should the object created be an array? [optional, default: true]
+     * @param is_array      Should the object created be an array? [optional, default: false]
      * @return A new JSON_Object.
      */
     public JSON_Object(bool is_array = false) {

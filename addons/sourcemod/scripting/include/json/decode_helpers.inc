@@ -92,7 +92,7 @@ stock bool json_is_int(const char[] buffer) {
  * @return          True if buffer contains a float, false otherwise.
  */
 stock bool json_is_float(const char[] buffer) {
-    bool decimal = false;
+    bool has_decimal = false;
     int length = strlen(buffer);
     if (buffer[0] != '+' && buffer[0] != '-' && buffer[0] != '.' && !IsCharNumeric(buffer[0])) {
         return false;
@@ -100,11 +100,11 @@ stock bool json_is_float(const char[] buffer) {
 
     for (int i = 0; i < length; ++i) {
         if (buffer[i] == '.') {
-            if (decimal) {
+            if (has_decimal) {
                 return false;
             }
 
-            decimal = true;
+            has_decimal = true;
         } else if (!IsCharNumeric(buffer[i])) {
             return false;
         }

@@ -66,7 +66,7 @@ enum JSON_CELL_TYPE {
 /**
  * Multi-dimensional char array mapping characters to their escaped form
  */
-char JSON_STRING_NORMAL[][]  = {"\"",   "\\",   "/",   "\b",  "\f",  "\n",  "\r",  "\t"};
+char JSON_STRING_NORMAL[][]  = {"\"",   "\\",   "/",   "\b",  "\f",  "\n",  "\r",  "\t" };
 char JSON_STRING_ESCAPED[][] = {"\\\"", "\\\\", "\\/", "\\b", "\\f", "\\n", "\\r", "\\t"};
 
 /**
@@ -101,8 +101,8 @@ public void json_unescape_string(char[] buffer, int maxlen) {
  * @return      True when it is a meta-key, false otherwise.
  */
 stock bool json_is_meta_key(char[] key) {
-    return String_EndsWith(key, JSON_META_TYPE_KEY) ||
-            String_EndsWith(key, JSON_META_LENGTH_KEY) ||
-            String_EndsWith(key, JSON_META_HIDDEN_KEY) ||
+    return json_string_endswith(key, JSON_META_TYPE_KEY) ||
+            json_string_endswith(key, JSON_META_LENGTH_KEY) ||
+            json_string_endswith(key, JSON_META_HIDDEN_KEY) ||
             StrEqual(key, JSON_ARRAY_INDEX_KEY);
 }

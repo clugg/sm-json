@@ -44,7 +44,7 @@
  * @param needle         String to check that haystack starts with.
  * @return               True if haystack begins with needle, false otherwise.
  */
-stock bool String_StartsWith(const char[] haystack, const char[] needle) {
+stock bool json_string_startswith(const char[] haystack, const char[] needle) {
     int haystack_length = strlen(haystack);
     int needle_length = strlen(needle);
     if (needle_length > haystack_length) return false;
@@ -64,7 +64,7 @@ stock bool String_StartsWith(const char[] haystack, const char[] needle) {
  * @param needle         String to check that haystack ends with.
  * @return               True if haystack ends with needle, false otherwise.
  */
-stock bool String_EndsWith(const char[] haystack, const char[] needle) {
+stock bool json_string_endswith(const char[] haystack, const char[] needle) {
     int haystack_length = strlen(haystack);
     int needle_length = strlen(needle);
     if (needle_length > haystack_length) return false;

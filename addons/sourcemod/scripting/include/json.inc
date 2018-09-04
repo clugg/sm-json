@@ -53,8 +53,8 @@
 stock void json_encode(JSON_Object obj, char[] output, int maxlen) {
     char[] key = new char[maxlen];
     bool is_array = obj.IsArray;
+    bool is_empty = true;
     int builder_size;
-    int keys_used = 0;
 
     // used in key iterator
     int str_length = 1;
@@ -151,13 +151,13 @@ stock void json_encode(JSON_Object obj, char[] output, int maxlen) {
         StrCat(builder, builder_size, ",");
         StrCat(output, maxlen, builder);
 
-        keys_used += 1;
+        is_empty = false;
     }
 
     delete snap;
 
-    if (keys_used == 0) {
-        // empty objects and arrays, just chuck a comma in so it gets replaced later
+    if (is_empty) {
+        // append a comma so that it is replaced with closing bracket
         StrCat(output, maxlen, ",");
     }
 

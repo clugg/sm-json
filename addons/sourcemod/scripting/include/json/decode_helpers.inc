@@ -262,7 +262,14 @@ stock bool json_extract_string(const char[] buffer, int maxlen, int &pos, char[]
 
     ++pos;
     int start = pos;
-    while (!(buffer[pos] == '"' && buffer[pos - 1] != '\\') && pos < maxlen) {
+    // count preceding backslashes to check if quote is escaped
+    int search_pos = pos;
+    int preceding_backslashes = 0;
+    while (buffer[--search_pos] == '\\' && search_pos > 0) {
+        ++preceding_backslashes;
+    }
+
+    while (!(buffer[pos] == '"' && preceding_backslashes % 2 == 0) && pos < maxlen) {
         ++pos;
     }
     int end = pos - 1;

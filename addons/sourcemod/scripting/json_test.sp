@@ -208,4 +208,6 @@ public void OnPluginStart()
     invalid_obj = json_decode("{\"test\"}"); malformed_error(invalid_obj, 4);
     invalid_obj = json_decode("[\"test\":true]"); malformed_error(invalid_obj, 5);
     invalid_obj = json_decode("{'test':true}"); malformed_error(invalid_obj, 6);
+    invalid_obj = json_decode("[\"test\"data\"]"); malformed_error(invalid_obj, 7);
+    invalid_obj = json_decode("[\"test\\\\\"data\"]"); malformed_error(invalid_obj, 8);
 }

@@ -177,6 +177,12 @@ stock JSON_Object json_decode(const char[] buffer, JSON_Object result = null, in
     int length = strlen(buffer);
     bool is_array = false;
 
+    // skip preceding whitespace
+    if (!json_skip_whitespace(buffer, length, pos)) {
+        LogError("json_decode: buffer ended early at %d", pos);
+        return null;
+    }
+
     if (json_is_object(buffer[pos])) {
         is_array = false;
     } else if (json_is_array(buffer[pos])) {

@@ -171,9 +171,10 @@ stock void json_encode(JSON_Object obj, char[] output, int maxlen) {
  * @param buffer    Buffer to decode.
  * @param result    Object to store output in. Setting this allows loading over an existing JSON_Object, 'refreshing' it as opposed to creating a new one. [optional, default: null]
  * @param pos       Current position of the decoder as a bytes offset into the buffer.
+ * @param depth     Current depth of the decoder as child elements in the object.
  * @return          JSON_Object representation of buffer, or null if decoding failed (buffer didn't contain valid JSON).
  */
-stock JSON_Object json_decode(const char[] buffer, JSON_Object result = null, int &pos = 0) {
+stock JSON_Object json_decode(const char[] buffer, JSON_Object result = null, int &pos = 0, int depth = 0) {
     int length = strlen(buffer);
     bool is_array = false;
 
@@ -236,7 +237,7 @@ stock JSON_Object json_decode(const char[] buffer, JSON_Object result = null, in
         if (json_is_object(buffer[pos]) || json_is_array(buffer[pos])) {
             JSON_Object current = (!is_array) ? result.GetObject(key) : null;
 
-            JSON_Object value = json_decode(buffer, current, pos);
+            JSON_Object value = json_decode(buffer, current, pos, depth + 1);
             if (value == null) return null;  // drop back a call, the recursive decode failed
 
             if (is_array) {
@@ -305,6 +306,13 @@ stock JSON_Object json_decode(const char[] buffer, JSON_Object result = null, in
             LogError("json_decode: buffer ended early at %d", pos);
             return null;
         }
+    }
+
+    // skip remaining whitespace and ensure we're at the end of the buffer
+    ++pos;
+    if (json_skip_whitespace(buffer, length, pos) && depth == 0) {
+        LogError("json_decode: unexpected data after end of structure at %d", pos);
+        return null;
     }
 
     return result;

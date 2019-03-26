@@ -73,16 +73,30 @@ stock bool json_is_string(const char[] buffer) {
  * @return          True if buffer contains an int, false otherwise.
  */
 stock bool json_is_int(const char[] buffer) {
+    bool starts_with_zero = false;
+    bool has_numeric = false;
+
     int length = strlen(buffer);
-    if (buffer[0] != '+' && buffer[0] != '-' && !IsCharNumeric(buffer[0])) {
-        return false;
-    }
-
     for (int i = 0; i < length; ++i) {
-        if (!IsCharNumeric(buffer[i])) return false;
+        // allow minus as first character only
+        if (i == 0 && buffer[i] == '-') {
+            continue;
+        }
+
+        if (IsCharNumeric(buffer[i])) {
+            if (buffer[i] == '0' && !has_numeric) {
+                starts_with_zero = true;
+            } else {
+                has_numeric = true;
+            }
+        } else {
+            return false;
+        }
     }
 
-    return true;
+    // buffer must start with zero and have no other numerics before decimal
+    // OR not start with zero and have other numerics
+    return ((starts_with_zero && !has_numeric) || (!starts_with_zero && has_numeric));
 }
 
 /**
@@ -92,25 +106,51 @@ stock bool json_is_int(const char[] buffer) {
  * @return          True if buffer contains a float, false otherwise.
  */
 stock bool json_is_float(const char[] buffer) {
-    bool has_decimal = false;
-    int length = strlen(buffer);
-    if (buffer[0] != '+' && buffer[0] != '-' && buffer[0] != '.' && !IsCharNumeric(buffer[0])) {
-        return false;
-    }
+    bool has_numeric = false;
+    bool starts_with_zero = false;
+    bool after_decimal = false;
+    bool has_numeric_after_decimal = false;
 
+    int length = strlen(buffer);
     for (int i = 0; i < length; ++i) {
-        if (buffer[i] == '.') {
-            if (has_decimal) {
+        // allow minus as first character only
+        if (i == 0 && buffer[i] == '-') {
+            continue;
+        }
+
+        // if we haven't encountered a decimal yet
+        if (!after_decimal) {
+            if (buffer[i] == '.') {
+                after_decimal = true;
+
+                // if we encounter a decimal before any numbers
+                if (!has_numeric) {
+                    return false;
+                }
+            } else if (IsCharNumeric(buffer[i])) {
+                if (buffer[i] == '0' && !has_numeric) {
+                    starts_with_zero = true;
+                } else {
+                    has_numeric = true;
+                }
+            } else {
                 return false;
             }
-
-            has_decimal = true;
-        } else if (!IsCharNumeric(buffer[i])) {
-            return false;
+        } else {
+            // after decimal has been encountered, allow any numerics
+            if (IsCharNumeric(buffer[i])) {
+                has_numeric_after_decimal = true;
+            } else {
+                return false;
+            }
         }
     }
 
-    return true;
+    // buffer must start with zero and have no other numerics before decimal
+    // OR not start with zero and have other numerics
+    // AND there must be a decimal AND there must be numerics after decimal
+    return ((starts_with_zero && !has_numeric) || (!starts_with_zero && has_numeric))
+            && after_decimal && has_numeric_after_decimal;
 }
 
 /**

@@ -256,6 +256,11 @@ stock JSON_Object json_decode(const char[] buffer, JSON_Object result = null, in
                 return null;
             }
 
+            if (strlen(string) == 0) {
+                LogError("json_decode: empty type encountered at %d", pos);
+                return null;
+            }
+
             if (json_is_int(string)) {
                 int value = json_extract_int(string);
                 if (is_array) {
@@ -283,6 +288,9 @@ stock JSON_Object json_decode(const char[] buffer, JSON_Object result = null, in
                 } else {
                     result.SetHandle(key, null);
                 }
+            } else {
+                LogError("json_decode: unknown type encountered at %d", pos);
+                return null;
             }
         }
 

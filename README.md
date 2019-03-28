@@ -1,4 +1,7 @@
 # sm-json
+
+**This project is currently unstable. I am currently refactoring the parser, so things may not work as expected. I recommend using [SMJansson](https://forums.alliedmods.net/showthread.php?t=184604) or [REST in Pawn](https://forums.alliedmods.net/showthread.php?t=298024) for the time being.**
+
 Provides a pure SourcePawn implementation of JSON encoding and decoding. Also offers a nice way of implementing objects using `StringMap` inheritance coupled with `methodmap`s.
 
 Follows the JSON specification ([RFC7159](https://tools.ietf.org/html/rfc7159)) almost perfectly. Currently, the following is not supported:

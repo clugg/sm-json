@@ -67,8 +67,8 @@ methodmap JSON_Object < StringMap {
         int dummy_int;
         char dummy_str[1];
 
-        return this.GetValue(key, dummy_int) ||
-            this.GetString(key, dummy_str, sizeof(dummy_str));
+        return this.GetValue(key, dummy_int)
+            || this.GetString(key, dummy_str, sizeof(dummy_str));
     }
 
     /**
@@ -495,9 +495,9 @@ methodmap JSON_Object < StringMap {
      * @returns         True on success, false otherwise.
      */
     public bool SetString(const char[] key, const char[] value, bool replace = true) {
-        return this.SetString(key, value, replace) &&
-            this.SetKeyType(key, Type_String) &&
-            this.SetKeyLength(key, strlen(value));
+        return this.SetString(key, value, replace)
+            && this.SetKeyType(key, Type_String)
+            && this.SetKeyLength(key, strlen(value));
     }
 
     /**
@@ -524,8 +524,8 @@ methodmap JSON_Object < StringMap {
      * @returns         True on success, false otherwise.
      */
     public bool SetInt(const char[] key, int value, bool replace = true) {
-        return this.SetValue(key, value, replace) &&
-            this.SetKeyType(key, Type_Int);
+        return this.SetValue(key, value, replace)
+            && this.SetKeyType(key, Type_Int);
     }
 
     /**
@@ -552,8 +552,8 @@ methodmap JSON_Object < StringMap {
      * @returns         True on success, false otherwise.
      */
     public bool SetFloat(const char[] key, float value, bool replace = true) {
-        return this.SetValue(key, value, replace) &&
-            this.SetKeyType(key, Type_Float);
+        return this.SetValue(key, value, replace)
+            && this.SetKeyType(key, Type_Float);
     }
 
     /**
@@ -580,8 +580,8 @@ methodmap JSON_Object < StringMap {
      * @returns         True on success, false otherwise.
      */
     public bool SetBool(const char[] key, bool value, bool replace = true) {
-        return this.SetValue(key, value, replace) &&
-            this.SetKeyType(key, Type_Bool);
+        return this.SetValue(key, value, replace)
+            && this.SetKeyType(key, Type_Bool);
     }
 
     /**
@@ -608,8 +608,8 @@ methodmap JSON_Object < StringMap {
      * @returns         True on success, false otherwise.
      */
     public bool SetHandle(const char[] key, Handle value = null, bool replace = true) {
-        return this.SetValue(key, value, replace) &&
-            this.SetKeyType(key, Type_Null);
+        return this.SetValue(key, value, replace)
+            && this.SetKeyType(key, Type_Null);
     }
 
     /**
@@ -636,8 +636,8 @@ methodmap JSON_Object < StringMap {
      * @returns         True on success, false otherwise.
      */
     public bool SetObject(const char[] key, JSON_Object value, bool replace = true) {
-        return this.SetValue(key, value, replace) &&
-            this.SetKeyType(key, Type_Object);
+        return this.SetValue(key, value, replace)
+            && this.SetKeyType(key, Type_Object);
     }
 
     /**
@@ -667,8 +667,8 @@ methodmap JSON_Object < StringMap {
      * @returns         True on success, false otherwise.
      */
     public bool PushString(const char[] value) {
-        return this.SetStringIndexed(this.CurrentIndex, value) &&
-            this.IncrementIndex();
+        return this.SetStringIndexed(this.CurrentIndex, value)
+            && this.IncrementIndex();
     }
 
     /**
@@ -678,8 +678,8 @@ methodmap JSON_Object < StringMap {
      * @returns         True on success, false otherwise.
      */
     public bool PushInt(int value) {
-        return this.SetIntIndexed(this.CurrentIndex, value) &&
-            this.IncrementIndex();
+        return this.SetIntIndexed(this.CurrentIndex, value)
+            && this.IncrementIndex();
     }
 
     /**
@@ -689,8 +689,8 @@ methodmap JSON_Object < StringMap {
      * @returns         True on success, false otherwise.
      */
     public bool PushFloat(float value) {
-        return this.SetFloatIndexed(this.CurrentIndex, value) &&
-            this.IncrementIndex();
+        return this.SetFloatIndexed(this.CurrentIndex, value)
+            && this.IncrementIndex();
     }
 
     /**
@@ -700,8 +700,8 @@ methodmap JSON_Object < StringMap {
      * @returns         True on success, false otherwise.
      */
     public bool PushBool(bool value) {
-        return this.SetBoolIndexed(this.CurrentIndex, value) &&
-            this.IncrementIndex();
+        return this.SetBoolIndexed(this.CurrentIndex, value)
+            && this.IncrementIndex();
     }
 
     /**
@@ -711,8 +711,8 @@ methodmap JSON_Object < StringMap {
      * @returns         True on success, false otherwise.
      */
     public bool PushHandle(Handle value = null) {
-        return this.SetHandleIndexed(this.CurrentIndex, value) &&
-            this.IncrementIndex();
+        return this.SetHandleIndexed(this.CurrentIndex, value)
+            && this.IncrementIndex();
     }
 
     /**
@@ -722,8 +722,8 @@ methodmap JSON_Object < StringMap {
      * @returns         True on success, false otherwise.
      */
     public bool PushObject(JSON_Object value) {
-        return this.SetObjectIndexed(this.CurrentIndex, value) &&
-            this.IncrementIndex();
+        return this.SetObjectIndexed(this.CurrentIndex, value)
+            && this.IncrementIndex();
     }
 
     /**

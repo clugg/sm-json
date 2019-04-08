@@ -284,7 +284,7 @@ bool it_should_support_basic_methodmaps()
     PrintToServer("%s", json_encode_output);
     delete player;
 
-    return true;  // check json_encode_output length
+    return true;
 }
 
 bool it_should_support_nested_methodmaps()
@@ -327,6 +327,27 @@ bool it_should_not_decode(char[] data)
         PrintToServer("WARNING: malformed JSON was parsed as valid: %s", json_encode_output);
         return false;
     }
+
+    return true;
+}
+
+bool it_should_pretty_print()
+{
+    JSON_Object child_arr = new JSON_Object(true);
+    child_arr.PushInt(1);
+
+    JSON_Object child_obj = new JSON_Object();
+    child_obj.SetHandle("im_indented", null);
+    child_obj.SetHandle("second_depth", child_arr);
+
+    JSON_Object parent_obj = new JSON_Object();
+    parent_obj.SetBool("pretty_printing", true);
+    parent_obj.SetObject("first_depth", child_obj);
+
+    parent_obj.Encode(json_encode_output, sizeof(json_encode_output), true);
+    PrintToServer("%s", json_encode_output);
+    parent_obj.Cleanup();
+    delete parent_obj;
 
     return true;
 }
@@ -408,6 +429,9 @@ public void OnPluginStart()
         PrintToServer("it_should_not_decode %s", should_not_decode[i]);
         check_test(it_should_not_decode(should_not_decode[i]));
     }
+
+    PrintToServer("it_should_pretty_print");
+    check_test(it_should_pretty_print());
 
     PrintToServer("");
     PrintToServer("%d OK, %d FAILED", passed, failed);

@@ -305,9 +305,13 @@ stock bool json_extract_string(const char[] buffer, int maxlen, int &pos, char[]
     // extracts a string which needs to be quote-escaped
     strcopy(output, output_maxlen, "");
 
+    // increment past opening quote
     ++pos;
+
+    // set start to position of first character in string
     int start = pos;
 
+    // while we haven't hit the end of the buffer
     while (pos < maxlen) {
         if (buffer[pos] != '"') {
             ++pos;
@@ -317,30 +321,38 @@ stock bool json_extract_string(const char[] buffer, int maxlen, int &pos, char[]
         // count preceding backslashes to check if quote is escaped
         int search_pos = pos;
         int preceding_backslashes = 0;
-        while (buffer[--search_pos] == '\\' && search_pos > 0) {
+        while (search_pos > 0 && buffer[--search_pos] == '\\') {
             ++preceding_backslashes;
         }
 
+        // if we have an even number of backslashes, the quote is not escaped
         if (preceding_backslashes % 2 == 0) {
             break;
         }
 
+        // otherwise, pass over the quote as it must be escaped
         ++pos;
     }
-    int end = pos - 1;
+
+    // set end to the current position
+    int end = pos;
 
     // jump 1 ahead since we ended on " instead of an ending char
     ++pos;
 
     // skip trailing whitespace
-    json_skip_whitespace(buffer, maxlen, pos);
+    if (!json_skip_whitespace(buffer, maxlen, pos)) {
+        return false;
+    }
 
+    // if we haven't reached an ending character at the end of the cell
+    // there is likely junk data not encapsulated by a string
     if (!json_is_at_end(buffer, pos, is_array)) {
         return false;
     }
 
-    // copy only from start with length end - start + 2 (+2 for NULL terminator and something else)
-    strcopy(output, end - start + 2, buffer[start]);
+    // copy only from start with length end - start + NULL
+    strcopy(output, end - start + 1, buffer[start]);
     json_unescape_string(output, maxlen);
 
     return pos < maxlen;

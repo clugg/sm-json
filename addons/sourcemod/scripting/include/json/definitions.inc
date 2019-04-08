@@ -66,8 +66,8 @@ enum JSON_CELL_TYPE {
 /**
  * Multi-dimensional char array mapping characters to their escaped form
  */
-char JSON_STRING_NORMAL[][]  = {"\"",   "\\",   "/",   "\b",  "\f",  "\n",  "\r",  "\t" };
-char JSON_STRING_ESCAPED[][] = {"\\\"", "\\\\", "\\/", "\\b", "\\f", "\\n", "\\r", "\\t"};
+char JSON_STRING_NORMAL[][]  = {"\\",   "\"",   "/",   "\b",  "\f",  "\n",  "\r",  "\t" };
+char JSON_STRING_ESCAPED[][] = {"\\\\", "\\\"", "\\/", "\\b", "\\f", "\\n", "\\r", "\\t"};
 
 /**
  * Escapes a string based on the rules defined in json/definitions.inc

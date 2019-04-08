@@ -12,7 +12,7 @@
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License, version 3.0, as published by the
  * Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
@@ -143,7 +143,7 @@ methodmap JSON_Object < StringMap {
      *                  is not an array or the index does not exist.
      */
     public bool RemoveIndexed(int index) {
-        char key[JSON_INDEX_BUFFER_LENGTH];
+        char key[JSON_INDEX_BUFFER_SIZE];
         if (!this.GetIndexString(key, sizeof(key), index)) return false;
 
         return this.Remove(key);
@@ -175,7 +175,7 @@ methodmap JSON_Object < StringMap {
      * @return          Value type for index provided, or Type_Invalid if it does not exist.
      */
     public JSON_CELL_TYPE GetKeyTypeIndexed(int index) {
-        char key[JSON_INDEX_BUFFER_LENGTH];
+        char key[JSON_INDEX_BUFFER_SIZE];
         if (!this.GetIndexString(key, sizeof(key), index)) return Type_Invalid;
 
         return this.GetKeyType(key);
@@ -203,7 +203,7 @@ methodmap JSON_Object < StringMap {
      * @return          Length of string at index provided, or -1 if it is not a string/does not exist.
      */
     public int GetKeyLengthIndexed(int index) {
-        char key[JSON_INDEX_BUFFER_LENGTH];
+        char key[JSON_INDEX_BUFFER_SIZE];
         if (!this.GetIndexString(key, sizeof(key), index)) return -1;
 
         return this.GetKeyLength(key);
@@ -231,7 +231,7 @@ methodmap JSON_Object < StringMap {
      * @return          Whether or not the index should be hidden.
      */
     public bool GetKeyHiddenIndexed(int index) {
-        char key[JSON_INDEX_BUFFER_LENGTH];
+        char key[JSON_INDEX_BUFFER_SIZE];
         if (!this.GetIndexString(key, sizeof(key), index)) return false;
 
         return this.GetKeyHidden(key);
@@ -264,7 +264,7 @@ methodmap JSON_Object < StringMap {
      * @return          True on success, false otherwise.
      */
     public bool SetKeyTypeIndexed(int index, JSON_CELL_TYPE value) {
-        char key[JSON_INDEX_BUFFER_LENGTH];
+        char key[JSON_INDEX_BUFFER_SIZE];
         if (!this.GetIndexString(key, sizeof(key), index)) return false;
 
         return this.SetKeyType(key, value);
@@ -293,7 +293,7 @@ methodmap JSON_Object < StringMap {
      * @return            True on success, false otherwise.
      */
     public bool SetKeyLengthIndexed(int index, int length) {
-        char key[JSON_INDEX_BUFFER_LENGTH];
+        char key[JSON_INDEX_BUFFER_SIZE];
         if (!this.GetIndexString(key, sizeof(key), index)) return false;
 
         return this.SetKeyLength(key, length);
@@ -322,7 +322,7 @@ methodmap JSON_Object < StringMap {
      * @return            True on success, false otherwise.
      */
     public bool SetKeyHiddenIndexed(int index, bool hidden) {
-        char key[JSON_INDEX_BUFFER_LENGTH];
+        char key[JSON_INDEX_BUFFER_SIZE];
         if (!this.GetIndexString(key, sizeof(key), index)) return false;
 
         return this.SetKeyHidden(key, hidden);
@@ -350,7 +350,7 @@ methodmap JSON_Object < StringMap {
      * @returns         Value stored at index.
      */
     public int GetIntIndexed(int index) {
-        char key[JSON_INDEX_BUFFER_LENGTH];
+        char key[JSON_INDEX_BUFFER_SIZE];
         if (!this.GetIndexString(key, sizeof(key), index)) return -1;
 
         return this.GetInt(key);
@@ -374,7 +374,7 @@ methodmap JSON_Object < StringMap {
      * @returns         Value stored at index.
      */
     public float GetFloatIndexed(int index) {
-        char key[JSON_INDEX_BUFFER_LENGTH];
+        char key[JSON_INDEX_BUFFER_SIZE];
         if (!this.GetIndexString(key, sizeof(key), index)) return -0.0;
 
         return this.GetFloat(key);
@@ -398,7 +398,7 @@ methodmap JSON_Object < StringMap {
      * @returns         Value stored at index.
      */
     public bool GetBoolIndexed(int index) {
-        char key[JSON_INDEX_BUFFER_LENGTH];
+        char key[JSON_INDEX_BUFFER_SIZE];
         if (!this.GetIndexString(key, sizeof(key), index)) return false;
 
         return this.GetBool(key);
@@ -422,7 +422,7 @@ methodmap JSON_Object < StringMap {
      * @returns         Value stored at index.
      */
     public Handle GetHandleIndexed(int index) {
-        char key[JSON_INDEX_BUFFER_LENGTH];
+        char key[JSON_INDEX_BUFFER_SIZE];
         if (!this.GetIndexString(key, sizeof(key), index)) return null;
 
         return this.GetHandle(key);
@@ -445,7 +445,7 @@ methodmap JSON_Object < StringMap {
      * @returns         Value stored at index.
      */
     public JSON_Object GetObjectIndexed(int index) {
-        char key[JSON_INDEX_BUFFER_LENGTH];
+        char key[JSON_INDEX_BUFFER_SIZE];
         if (!this.GetIndexString(key, sizeof(key), index)) return null;
 
         return this.GetObject(key);
@@ -476,7 +476,7 @@ methodmap JSON_Object < StringMap {
      * @returns         True on success, false otherwise.
      */
     public bool SetStringIndexed(int index, const char[] value, bool replace = true) {
-        char key[JSON_INDEX_BUFFER_LENGTH];
+        char key[JSON_INDEX_BUFFER_SIZE];
         if (!this.GetIndexString(key, sizeof(key), index)) return false;
 
         return this.SetString(key, value, replace);
@@ -502,7 +502,7 @@ methodmap JSON_Object < StringMap {
      * @returns         True on success, false otherwise.
      */
     public bool SetIntIndexed(int index, int value, bool replace = true) {
-        char key[JSON_INDEX_BUFFER_LENGTH];
+        char key[JSON_INDEX_BUFFER_SIZE];
         if (!this.GetIndexString(key, sizeof(key), index)) return false;
 
         return this.SetInt(key, value, replace);
@@ -528,7 +528,7 @@ methodmap JSON_Object < StringMap {
      * @returns         True on success, false otherwise.
      */
     public bool SetFloatIndexed(int index, float value, bool replace = true) {
-        char key[JSON_INDEX_BUFFER_LENGTH];
+        char key[JSON_INDEX_BUFFER_SIZE];
         if (!this.GetIndexString(key, sizeof(key), index)) return false;
 
         return this.SetFloat(key, value, replace);
@@ -554,7 +554,7 @@ methodmap JSON_Object < StringMap {
      * @returns         True on success, false otherwise.
      */
     public bool SetBoolIndexed(int index, bool value, bool replace = true) {
-        char key[JSON_INDEX_BUFFER_LENGTH];
+        char key[JSON_INDEX_BUFFER_SIZE];
         if (!this.GetIndexString(key, sizeof(key), index)) return false;
 
         return this.SetBool(key, value, replace);
@@ -580,7 +580,7 @@ methodmap JSON_Object < StringMap {
      * @returns         True on success, false otherwise.
      */
     public bool SetHandleIndexed(int index, Handle value = null, bool replace = true) {
-        char key[JSON_INDEX_BUFFER_LENGTH];
+        char key[JSON_INDEX_BUFFER_SIZE];
         if (!this.GetIndexString(key, sizeof(key), index)) return false;
 
         return this.SetHandle(key, value, replace);
@@ -606,7 +606,7 @@ methodmap JSON_Object < StringMap {
      * @returns         True on success, false otherwise.
      */
     public bool SetObjectIndexed(int index, JSON_Object value, bool replace = true) {
-        char key[JSON_INDEX_BUFFER_LENGTH];
+        char key[JSON_INDEX_BUFFER_SIZE];
         if (!this.GetIndexString(key, sizeof(key), index)) return false;
 
         return this.SetObject(key, value, replace);

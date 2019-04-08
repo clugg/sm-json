@@ -86,8 +86,13 @@ stock bool json_is_int(const char[] buffer) {
         }
 
         if (IsCharNumeric(buffer[i])) {
-            if (buffer[i] == '0' && !has_numeric) {
-                starts_with_zero = true;
+            if (buffer[i] == '0') {
+                if (starts_with_zero) {
+                    // detect repeating leading zeros
+                    return false;
+                } else if (!has_numeric) {
+                    starts_with_zero = true;
+                }
             } else {
                 has_numeric = true;
             }
@@ -123,15 +128,20 @@ stock bool json_is_float(const char[] buffer) {
         // if we haven't encountered a decimal yet
         if (!after_decimal) {
             if (buffer[i] == '.') {
-                after_decimal = true;
-
                 // if we encounter a decimal before any numbers
-                if (!has_numeric) {
+                if (!has_numeric && !starts_with_zero) {
                     return false;
                 }
+
+                after_decimal = true;
             } else if (IsCharNumeric(buffer[i])) {
-                if (buffer[i] == '0' && !has_numeric) {
-                    starts_with_zero = true;
+                if (buffer[i] == '0') {
+                    if (starts_with_zero) {
+                        // detect repeating leading zeros
+                        return false;
+                    } else if (!has_numeric) {
+                        starts_with_zero = true;
+                    }
                 } else {
                     has_numeric = true;
                 }

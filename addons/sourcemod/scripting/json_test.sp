@@ -43,9 +43,19 @@ public Plugin myinfo = {
     author = "clug",
     description = "Tests dumping and loading JSON objects.",
     version = "1.0.0",
-    url = "http://intradark.com/"
+    url = "https://github.com/clugg/sm-json"
 };
 
+/**
+ * @section Globals
+ */
+char json_encode_output[JSON_BUFFER_SIZE];
+int passed = 0;
+int failed = 0;
+
+/**
+ * @section Methodmaps
+ */
 
 methodmap Weapon < JSON_Object {
     public Weapon() {
@@ -82,132 +92,323 @@ methodmap Player < JSON_Object {
     }
 }
 
+/**
+ * @section Helpers
+ */
 
-void malformed_error(JSON_Object obj, int line = 0) {
-    if (obj != null) {
-        char output[JSON_BUFFER_SIZE];
-        obj.Encode(output, sizeof(output));
-        PrintToServer("json-malformed-tests: WARNING malformed JSON #%d was parsed as valid: %s", line, output);
+void check_test(bool result)
+{
+    if (result) {
+        PrintToServer("\tOK");
+        ++passed;
+    } else {
+        PrintToServer("\tFAILED");
+        ++failed;
     }
+
+    PrintToServer("");
+}
+
+/**
+ * @section Tests
+ **/
+
+bool it_should_encode_empty_objects()
+{
+    JSON_Object obj = new JSON_Object();
+
+    obj.Encode(json_encode_output, sizeof(json_encode_output));
+    PrintToServer("%s", json_encode_output);
+    delete obj;
+
+    return StrEqual(json_encode_output, "{}");
+}
+
+bool it_should_encode_empty_arrays()
+{
+    JSON_Object arr = new JSON_Object(true);
+
+    arr.Encode(json_encode_output, sizeof(json_encode_output));
+    PrintToServer("%s", json_encode_output);
+    delete arr;
+
+    return StrEqual(json_encode_output, "[]");
+}
+
+bool it_should_support_objects()
+{
+    JSON_Object obj = new JSON_Object();
+    obj.SetString("str", "leet");
+    obj.SetString("escaped_str", "\"leet\"");
+    obj.SetInt("int", 9001);
+    obj.SetInt("negative_int", -9001);
+    obj.SetInt("zero", 0);
+    obj.SetInt("negative_zero", -0);
+    obj.SetFloat("float", 13.37);
+    obj.SetFloat("negative_float", -13.37);
+    obj.SetFloat("float_zero", 0.0);
+    obj.SetFloat("negative_float_zero", -0.0);
+    obj.SetBool("true", true);
+    obj.SetBool("false", false);
+    obj.SetHandle("handle", null);
+
+    obj.Encode(json_encode_output, sizeof(json_encode_output));
+    PrintToServer("%s", json_encode_output);
+
+    JSON_Object decoded_obj = json_decode(json_encode_output);
+    bool success = decoded_obj != null;
+    delete obj;
+    delete decoded_obj;
+
+    return success;
+}
+
+bool it_should_support_arrays()
+{
+    JSON_Object arr = new JSON_Object(true);
+    arr.PushString("leet");
+    arr.PushString("\"leet\"");
+    arr.PushInt(9001);
+    arr.PushInt(-9001);
+    arr.PushInt(0);
+    arr.PushInt(-0);
+    arr.PushFloat(13.37);
+    arr.PushFloat(-13.37);
+    arr.PushFloat(0.0);
+    arr.PushFloat(-0.0);
+    arr.PushBool(true);
+    arr.PushBool(false);
+    arr.PushHandle(null);
+
+    arr.Encode(json_encode_output, sizeof(json_encode_output));
+    PrintToServer("%s", json_encode_output);
+
+    JSON_Object decoded_arr = json_decode(json_encode_output);
+    bool success = decoded_arr != null;
+    delete arr;
+    delete decoded_arr;
+
+    return success;
+}
+
+bool it_should_reload_an_object()
+{
+    JSON_Object obj = new JSON_Object();
+
+    obj.SetBool("loaded", true);
+    obj.Decode("{\"reloaded\": true}");
+    obj.Encode(json_encode_output, sizeof(json_encode_output));
+    PrintToServer("%s", json_encode_output);
+    bool success = obj.HasKey("loaded")
+        && obj.HasKey("reloaded");
+    delete obj;
+
+    return success;
+}
+
+bool it_should_support_objects_nested_in_objects()
+{
+    JSON_Object nested_obj = new JSON_Object();
+    nested_obj.SetBool("nested", true);
+
+    JSON_Object obj = new JSON_Object();
+    obj.SetBool("nested", false);
+    obj.SetObject("object", nested_obj);
+
+    obj.Encode(json_encode_output, sizeof(json_encode_output));
+    PrintToServer("%s", json_encode_output);
+    bool success = obj.GetObject("object").GetBool("nested");
+    obj.Cleanup();
+    delete obj;
+
+    return success;
+}
+
+bool it_should_support_objects_nested_in_arrays()
+{
+    JSON_Object nested_obj = new JSON_Object();
+    nested_obj.SetBool("nested", true);
+
+    JSON_Object arr = new JSON_Object(true);
+    arr.PushObject(nested_obj);
+
+    arr.Encode(json_encode_output, sizeof(json_encode_output));
+    PrintToServer("%s", json_encode_output);
+    bool success = arr.GetObjectIndexed(0).GetBool("nested");
+    arr.Cleanup();
+    delete arr;
+
+    return success;
+}
+
+bool it_should_support_arrays_nested_in_objects()
+{
+    JSON_Object nested_arr = new JSON_Object(true);
+    nested_arr.PushBool(true);
+
+    JSON_Object obj = new JSON_Object();
+    obj.SetObject("array", nested_arr);
+
+    obj.Encode(json_encode_output, sizeof(json_encode_output));
+    PrintToServer("%s", json_encode_output);
+    bool success = obj.GetObject("array").GetBoolIndexed(0);
+    obj.Cleanup();
+    delete obj;
+
+    return success;
+}
+
+bool it_should_support_arrays_nested_in_arrays()
+{
+    JSON_Object nested_arr = new JSON_Object(true);
+    nested_arr.PushBool(true);
+
+    JSON_Object arr = new JSON_Object(true);
+    arr.PushObject(nested_arr);
+
+    arr.Encode(json_encode_output, sizeof(json_encode_output));
+    PrintToServer("%s", json_encode_output);
+    bool success = arr.GetObjectIndexed(0).GetBoolIndexed(0);
+    arr.Cleanup();
+    delete arr;
+
+    return success;
+}
+
+bool it_should_support_basic_methodmaps()
+{
+    Player player = new Player();
+    player.id = 1;
+
+    player.Encode(json_encode_output, sizeof(json_encode_output));
+    PrintToServer("%s", json_encode_output);
+    delete player;
+
+    return true;  // check json_encode_output length
+}
+
+bool it_should_support_nested_methodmaps()
+{
+    Weapon weapon = new Weapon();
+    weapon.SetName("ak47");
+
+    Player player = new Player();
+    player.id = 1;
+    player.weapon = weapon;
+    player.weapon.id = 2;  // demonstrating nested property setters
+
+    player.Encode(json_encode_output, sizeof(json_encode_output));
+    PrintToServer("%s", json_encode_output);
+    bool success = player.weapon.id == 2;
+    player.Cleanup();
+    delete player;
+
+    return success;
+}
+
+bool it_should_decode(char[] data)
+{
+    JSON_Object obj = json_decode(data);
+    if (obj == null) {
+        return false;
+    }
+
+    obj.Encode(json_encode_output, sizeof(json_encode_output));
+    PrintToServer("%s", json_encode_output);
+
+    return true;
+}
+
+bool it_should_not_decode(char[] data)
+{
+    JSON_Object obj = json_decode(data);
+    if (obj != null) {
+        obj.Encode(json_encode_output, sizeof(json_encode_output));
+        PrintToServer("WARNING: malformed JSON was parsed as valid: %s", json_encode_output);
+        return false;
+    }
+
+    return true;
 }
 
 
 public void OnPluginStart()
 {
-    char output[JSON_BUFFER_SIZE];
+    PrintToServer("Running tests...");
+    PrintToServer("");
 
-    /* empty-object-test */
-    JSON_Object test_obj = new JSON_Object();
-    // encode
-    test_obj.Encode(output, sizeof(output));
-    PrintToServer("json-empty-object-test: %s", output);
+    PrintToServer("it_should_encode_empty_objects");
+    check_test(it_should_encode_empty_objects());
 
-    /* object-test */
-    test_obj.SetString("test_str", "leet");
-    test_obj.SetInt("test_str", 9001);
-    test_obj.SetFloat("test_float", 13.37);
-    test_obj.SetBool("test_bool", true);
-    test_obj.SetHandle("test_handle", null);
-    // encode
-    test_obj.Encode(output, sizeof(output));
-    PrintToServer("json-object-test: %s", output);
+    PrintToServer("it_should_encode_empty_arrays");
+    check_test(it_should_encode_empty_arrays());
 
-    /* object-indexed-test */
-    test_obj.SetStringIndexed(1, "teel");
-    test_obj.SetIntIndexed(2, -9001);
-    test_obj.SetFloatIndexed(4, -13.47);
-    test_obj.SetBoolIndexed(8, false);
-    test_obj.SetHandleIndexed(16, null);
-    // encode
-    test_obj.Encode(output, sizeof(output));
-    PrintToServer("json-object-indexed-test: %s", output);
+    PrintToServer("it_should_support_objects");
+    check_test(it_should_support_objects());
 
-    /* object-reload-test */
-    test_obj.Decode("{\"reloaded\": true}");
-    // encode
-    test_obj.Encode(output, sizeof(output));
-    PrintToServer("json-object-reload-test: %s", output);
+    PrintToServer("it_should_support_arrays");
+    check_test(it_should_support_arrays());
 
-    /* empty-array-test */
-    JSON_Object test_arr = new JSON_Object(true);
-    // encode
-    test_arr.Encode(output, sizeof(output));
-    PrintToServer("json-empty-array-test: %s", output);
+    PrintToServer("it_should_reload_an_object");
+    check_test(it_should_reload_an_object());
 
-    /* array-test */
-    test_arr.PushString("leet");
-    test_arr.PushInt(9001);
-    test_arr.PushFloat(13.37);
-    test_arr.PushBool(true);
-    test_arr.PushHandle(null);
-    // encode
-    test_arr.Encode(output, sizeof(output));
-    PrintToServer("json-array-test: %s", output);
+    PrintToServer("it_should_support_objects_nested_in_objects");
+    check_test(it_should_support_objects_nested_in_objects());
 
-    /* nested-object-object-test */
-    JSON_Object nest_obj = new JSON_Object();
-    nest_obj.SetBool("nested", true);
-    test_obj.SetObject("object", nest_obj);
-    // encode
-    test_obj.Encode(output, sizeof(output));
-    PrintToServer("json-nested-object-object-test: %s", output);
-    test_obj.Remove("object");
+    PrintToServer("it_should_support_objects_nested_in_arrays");
+    check_test(it_should_support_objects_nested_in_arrays());
 
-    /* nested-object-array-test */
-    test_obj.SetObject("array", test_arr);
-    // encode
-    test_obj.Encode(output, sizeof(output));
-    PrintToServer("json-nested-object-array-test: %s", output);
-    test_obj.Remove("array");
+    PrintToServer("it_should_support_arrays_nested_in_objects");
+    check_test(it_should_support_arrays_nested_in_objects());
 
-    /* nested-array-object-test */
-    test_arr.PushObject(test_obj);
-    // encode
-    test_arr.Encode(output, sizeof(output));
-    PrintToServer("json-nested-array-object-test: %s", output);
+    PrintToServer("it_should_support_objects_nested_in_objects");
+    check_test(it_should_support_arrays_nested_in_arrays());
 
-    /* nested-array-array-test */
-    JSON_Object nest_arr = new JSON_Object(true);
-    nest_arr.PushString("nested");
-    test_arr.PushObject(nest_arr);
-    // encode
-    test_arr.Encode(output, sizeof(output));
-    PrintToServer("json-nested-array-array-test: %s", output);
+    PrintToServer("it_should_support_basic_methodmaps");
+    check_test(it_should_support_basic_methodmaps());
 
-    // cleanup
-    test_arr.Cleanup();  // will clean up test_obj, nest_obj and nest_arr too as they are children
-    delete test_arr;
+    PrintToServer("it_should_support_nested_methodmaps");
+    check_test(it_should_support_nested_methodmaps());
 
-    /* methodmap-test */
-    Player player = new Player();
-    player.id = 1;
-    // encode
-    player.Encode(output, sizeof(output));
-    PrintToServer("json-methodmap-test: %s", output);
+    char should_decode[][] = {
+        "[]", "{}",
+        "[{}]", "[[]]",
+        "{\"object\":{}}", "{\"array\":[]}",
+        " [\"whitespace_before_array\"]",
+        "[\"whitespace_after_array\"] ",
+        "{\n\t\"lots_of_whitespace\" : true\n}",
+        "[\"nicely\\\"escaped\\\"string\"]",
+    };
+    for (int i = 0; i < sizeof(should_decode); ++i) {
+        PrintToServer("it_should_decode %s", should_decode[i]);
+        check_test(it_should_decode(should_decode[i]));
+    }
 
-    /* nested-methodmap-test */
-    Weapon weapon = new Weapon();
-    weapon.SetName("ak47");
+    char should_not_decode[][] = {
+        "", "\"string\"", "0", "0.0", "true", "false", "null",
+        "[", "]",
+        "{", "}",
+        "{[", "]}",
+        "[{", "}]",
+        "{\"key_without_value\"}",
+        "[\"key_in_array\":true]",
+        "{'using_single_quotes':true}",
+        "['using_single_quotes']",
+        "[\"badly\"escaped\"string\"]",
+        "[\"badly\\\\\"escaped\\\\\"string\"]",
+        "[0,]", "[,0]", "[,0,]",
+        "[.1]", "[1.]",
+        "[00]", "[-00]",
+        "[01]", "[-01]",
+        "[00.01]", "[-00.01]",
+        "junk before array[]", "[]junk after array",
+        "junk before object{}", "{}junk after object"
+    };
+    for (int i = 0; i < sizeof(should_not_decode); ++i) {
+        PrintToServer("it_should_not_decode %s", should_not_decode[i]);
+        check_test(it_should_not_decode(should_not_decode[i]));
+    }
 
-    player.weapon = weapon;
-    player.weapon.id = 5;  // demonstrating nested property setters
-    // encode
-    player.Encode(output, sizeof(output));
-    PrintToServer("json-methodmap-test: %s", output);
-
-    // cleanup
-    player.Cleanup();
-    delete player;
-
-    /* malformed-tests */
-    PrintToServer("Running json-malformed-tests...");
-    JSON_Object invalid_obj;
-    invalid_obj = json_decode(""); malformed_error(invalid_obj, 1);
-    invalid_obj = json_decode("{]"); malformed_error(invalid_obj, 2);
-    invalid_obj = json_decode("[}"); malformed_error(invalid_obj, 3);
-    invalid_obj = json_decode("{\"test\"}"); malformed_error(invalid_obj, 4);
-    invalid_obj = json_decode("[\"test\":true]"); malformed_error(invalid_obj, 5);
-    invalid_obj = json_decode("{'test':true}"); malformed_error(invalid_obj, 6);
-    invalid_obj = json_decode("[\"test\"data\"]"); malformed_error(invalid_obj, 7);
-    invalid_obj = json_decode("[\"test\\\\\"data\"]"); malformed_error(invalid_obj, 8);
+    PrintToServer("");
+    PrintToServer("%d OK, %d FAILED", passed, failed);
 }

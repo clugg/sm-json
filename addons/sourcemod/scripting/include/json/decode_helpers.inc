@@ -51,8 +51,10 @@
  * @returns         True if buffer[pos] is whitespace, false otherwise.
  */
 stock bool json_is_whitespace(const char[] buffer, int &pos) {
-    return buffer[pos] == ' ' || buffer[pos] == '\t' ||
-        buffer[pos] == '\r' || buffer[pos] == '\n';
+    return buffer[pos] == ' '
+        || buffer[pos] == '\t'
+        || buffer[pos] == '\r'
+        || buffer[pos] == '\n';
 }
 
 /**
@@ -160,8 +162,8 @@ stock bool json_is_float(const char[] buffer) {
  * @returns         True if buffer contains a bool, false otherwise.
  */
 stock bool json_is_bool(const char[] buffer) {
-    return StrEqual(buffer, "true") ||
-        StrEqual(buffer, "false");
+    return StrEqual(buffer, "true")
+        || StrEqual(buffer, "false");
 }
 
 /**
@@ -229,10 +231,10 @@ stock bool json_is_array_end(const char[] buffer) {
  * @returns         True if buffer[pos] is a valid data end point, false otherwise.
  */
 stock bool json_is_at_end(const char[] buffer, int &pos, bool is_array) {
-    return buffer[pos] == ',' ||
-        (!is_array && buffer[pos] == ':') ||
-        json_is_object_end(buffer[pos]) ||
-        json_is_array_end(buffer[pos]);
+    return buffer[pos] == ','
+        || (!is_array && buffer[pos] == ':')
+        || json_is_object_end(buffer[pos])
+        || json_is_array_end(buffer[pos]);
 }
 
 /**
@@ -314,11 +316,11 @@ stock bool json_extract_string(const char[] buffer, int maxlen, int &pos, char[]
     // while we haven't hit the end of the buffer
     while (pos < maxlen) {
         // check for unescaped control characters
-        if (buffer[pos] == '\b' ||
-            buffer[pos] == '\f' ||
-            buffer[pos] == '\n' ||
-            buffer[pos] == '\r' ||
-            buffer[pos] == '\t') {
+        if (buffer[pos] == '\b'
+            || buffer[pos] == '\f'
+            || buffer[pos] == '\n'
+            || buffer[pos] == '\r'
+            || buffer[pos] == '\t') {
             return false;
         }
 

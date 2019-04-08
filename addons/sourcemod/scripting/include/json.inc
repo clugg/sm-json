@@ -207,104 +207,128 @@ stock JSON_Object json_decode(const char[] buffer, JSON_Object result = null, in
         return null;
     }
 
-    if (result == null) result = new JSON_Object(is_array);
+    if (result == null) {
+        result = new JSON_Object(is_array);
+    }
 
+    bool empty_checked = false;
     char key[JSON_BUFFER_SIZE];
-    char string[JSON_BUFFER_SIZE];
-    ++pos;
-    bool first = true;
+    char cell[JSON_BUFFER_SIZE];
+
+    // while we haven't reached the end of our structure
     while ((!is_array && !json_is_object_end(buffer[pos])) ||
-            (is_array && !json_is_array_end(buffer[pos]))) {
-        if (first) {
-            first = false;
-        } else {
-            ++pos;
+        (is_array && !json_is_array_end(buffer[pos]))) {
+        // pos is either an opening structure or comma, so increment past it
+        ++pos;
+
+        // if we are at the end of an object or array
+        // and haven't checked for empty yet, we can stop here (empty structure)
+        if (((!is_array && json_is_object_end(buffer[pos])) ||
+            (is_array && json_is_array_end(buffer[pos]))) &&
+            !empty_checked) {
+            break;
         }
 
+        empty_checked = true;
+
+        // skip any whitespace preceding the element
         if (!json_skip_whitespace(buffer, length, pos)) {
             LogError("json_decode: buffer ended early at %d", pos);
             return null;
         }
 
+        // if dealing with an object, look for the key
         if (!is_array) {
             if (!json_is_string(buffer[pos])) {
                 LogError("json_decode: expected key string at %d", pos);
                 return null;
             }
 
-            json_extract_string(buffer, length, pos, key, sizeof(key), is_array);  // fetch object key first
+            // extract the key from the buffer
+            json_extract_string(buffer, length, pos, key, sizeof(key), is_array);
+
+            // skip any whitespace following the key
             if (!json_skip_whitespace(buffer, length, pos)) {
                 LogError("json_decode: buffer ended early at %d", pos);
                 return null;
             }
+
+            // ensure that we find a colon
             if (buffer[pos++] != ':') {
                 LogError("json_decode: expected colon after key at %d", pos);
                 return null;
             }
-        }
 
-        if (!json_skip_whitespace(buffer, length, pos)) {
-            LogError("json_decode: buffer ended early at %d", pos);
-            return null;
+            // skip any whitespace following the colon
+            if (!json_skip_whitespace(buffer, length, pos)) {
+                LogError("json_decode: buffer ended early at %d", pos);
+                return null;
+            }
         }
 
         if (json_is_object(buffer[pos]) || json_is_array(buffer[pos])) {
+            // if we are dealing with an object or array
+            // fetch the existing object if one exists at the key
             JSON_Object current = (!is_array) ? result.GetObject(key) : null;
 
+            // decode recursively
             JSON_Object value = json_decode(buffer, current, pos, depth + 1);
-            if (value == null) return null;  // drop back a call, the recursive decode failed
+
+            // decoding failed, error will be logged in json_decode
+            if (value == null) {
+                return null;
+            }
 
             if (is_array) {
                 result.PushObject(value);
             } else {
                 result.SetObject(key, value);
             }
-            // increment past end bracket
-            ++pos;
         } else if (json_is_string(buffer[pos])) {
-            if (!json_extract_string(buffer, length, pos, string, sizeof(string), is_array)) {
+            // if we are dealing with a string, attempt to extract it
+            if (!json_extract_string(buffer, length, pos, cell, sizeof(cell), is_array)) {
                 LogError("json_decode: couldn't extract string at %d", pos);
                 return null;
             }
 
             if (is_array) {
-                result.PushString(string);
+                result.PushString(cell);
             } else {
-                result.SetString(key, string);
+                result.SetString(key, cell);
             }
         } else {
-            if (!json_extract_until_end(buffer, length, pos, string, sizeof(string), is_array)) {
+            if (!json_extract_until_end(buffer, length, pos, cell, sizeof(cell), is_array)) {
                 LogError("json_decode: couldn't extract until end at %d", pos);
                 return null;
             }
 
-            if (strlen(string) == 0) {
-                LogError("json_decode: empty type encountered at %d", pos);
+            if (strlen(cell) == 0) {
+                LogError("json_decode: empty cell encountered at %d", pos);
                 return null;
             }
 
-            if (json_is_int(string)) {
-                int value = json_extract_int(string);
+            if (json_is_int(cell)) {
+                int value = json_extract_int(cell);
                 if (is_array) {
                     result.PushInt(value);
                 } else {
                     result.SetInt(key, value);
                 }
-            } else if (json_is_float(string)) {
-                float value = json_extract_float(string);
+            } else if (json_is_float(cell)) {
+                float value = json_extract_float(cell);
                 if (is_array) {
                     result.PushFloat(value);
                 } else {
                     result.SetFloat(key, value);
                 }
-            } else if (json_is_bool(string)) {
-                bool value = json_extract_bool(string);
+            } else if (json_is_bool(cell)) {
+                bool value = json_extract_bool(cell);
                 if (is_array) {
                     result.PushBool(value);
                 } else {
                     result.SetBool(key, value);
                 }
-            } else if (json_is_null(string)) {
+            } else if (json_is_null(cell)) {
                 if (is_array) {
                     result.PushHandle(null);
                 } else {
@@ -335,18 +359,25 @@ stock JSON_Object json_decode(const char[] buffer, JSON_Object result = null, in
 /**
  * Recursively cleans up JSON_Objects and any objects referenced within.
  *
- * @param obj       JSON_Object to clean up.
+ * @param obj JSON_Object to clean up.
  */
 void json_cleanup(JSON_Object obj) {
     char key[JSON_BUFFER_SIZE];
     bool is_array = obj.IsArray;
+
     StringMapSnapshot snap = obj.Snapshot();
     for (int i = 0; i < snap.Length; ++i) {
+        // ignore meta keys
         snap.GetKey(i, key, sizeof(key));
-        if (json_is_meta_key(key)) continue;
+        if (json_is_meta_key(key)) {
+            continue;
+        }
 
+        // only clean up objects
         JSON_CELL_TYPE type = obj.GetKeyType(key);
-        if (type != Type_Object) continue;
+        if (type != Type_Object) {
+            continue;
+        }
 
         JSON_Object nested_obj = obj.GetObject(key);
         if (nested_obj != null) {

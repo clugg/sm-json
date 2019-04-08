@@ -335,7 +335,7 @@ stock JSON_Object json_decode(const char[] buffer, JSON_Object result = null, in
                     result.SetHandle(key, null);
                 }
             } else {
-                LogError("json_decode: unknown type encountered at %d", pos);
+                LogError("json_decode: unknown type encountered at %d: %s", pos, cell);
                 return null;
             }
         }

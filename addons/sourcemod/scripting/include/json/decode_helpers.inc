@@ -313,6 +313,16 @@ stock bool json_extract_string(const char[] buffer, int maxlen, int &pos, char[]
 
     // while we haven't hit the end of the buffer
     while (pos < maxlen) {
+        // check for unescaped control characters
+        if (buffer[pos] == '\b' ||
+            buffer[pos] == '\f' ||
+            buffer[pos] == '\n' ||
+            buffer[pos] == '\r' ||
+            buffer[pos] == '\t') {
+            return false;
+        }
+
+        // pass over any non-quote character
         if (buffer[pos] != '"') {
             ++pos;
             continue;

@@ -160,7 +160,7 @@ child_arr.PushInt(1);
 
 JSON_Object child_obj = new JSON_Object();
 child_obj.SetHandle("im_indented", null);
-child_obj.SetHandle("second_depth", child_arr);
+child_obj.SetObject("second_depth", child_arr);
 
 JSON_Object parent_obj = new JSON_Object();
 parent_obj.SetBool("pretty_printing", true);
@@ -176,7 +176,9 @@ delete parent_obj;
 {
     "first_depth": {
         "im_indented": null,
-        "second_depth": null
+        "second_depth": [
+            1
+        ]
     },
     "pretty_printing": true
 }

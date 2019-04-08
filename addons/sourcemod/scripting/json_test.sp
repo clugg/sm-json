@@ -338,7 +338,7 @@ bool it_should_pretty_print()
 
     JSON_Object child_obj = new JSON_Object();
     child_obj.SetHandle("im_indented", null);
-    child_obj.SetHandle("second_depth", child_arr);
+    child_obj.SetObject("second_depth", child_arr);
 
     JSON_Object parent_obj = new JSON_Object();
     parent_obj.SetBool("pretty_printing", true);

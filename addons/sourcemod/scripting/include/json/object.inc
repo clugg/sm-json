@@ -63,11 +63,11 @@ methodmap JSON_Object < StringMap {
      * @return      True if the key exists, false otherwise.
      */
     public bool HasKey(const char[] key) {
-        int int_value;
-        char str_value[1];
+        int dummy_int;
+        char dummy_str[1];
 
-        return this.GetValue(key, int_value) ||
-                this.GetString(key, str_value, sizeof(str_value));
+        return this.GetValue(key, dummy_int) ||
+                this.GetString(key, dummy_str, sizeof(dummy_str));
     }
 
     /**

@@ -354,6 +354,25 @@ methodmap JSON_Object < StringMap {
      * @section Object getters.
      */
 
+    // GetString is implemented natively by StringMap
+
+    /**
+     * Retrieves the string stored at an index.
+     *
+     * @param index     Index to retrieve string value for.
+     * @param value     String buffer to store output.
+     * @param maxlen    Maximum size of string buffer.
+     * @returns         True on success. False if the key is not set, or the key is set as a value or array (not a string).
+     */
+    public bool GetStringIndexed(int index, char[] value, int max_size) {
+        char key[JSON_INDEX_BUFFER_SIZE];
+        if (!this.GetIndexString(key, sizeof(key), index)) {
+            return false;
+        }
+
+        return this.GetString(key, value, max_size);
+    }
+
     /**
      * Retrieves the int stored at a key.
      *
@@ -368,7 +387,7 @@ methodmap JSON_Object < StringMap {
     /**
      * Retrieves the int stored at an index.
      *
-     * @param index      Index to retrieve int value for.
+     * @param index     Index to retrieve int value for.
      * @returns         Value stored at index.
      */
     public int GetIntIndexed(int index) {

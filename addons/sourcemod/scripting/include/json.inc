@@ -71,25 +71,38 @@ stock void json_encode(JSON_Object obj, char[] output, int maxlen) {
             snap.GetKey(i, key, maxlen);
         }
 
-        if (json_is_meta_key(key)) continue;  // skip meta-keys
-        if (obj.GetKeyHidden(key)) continue;  // skip hidden keys
+        // skip meta-keys
+        if (json_is_meta_key(key)) {
+            continue;
+        }
 
+        // skip keys that are marked as hidden
+        if (obj.GetKeyHidden(key)) {
+            continue;
+        }
+
+        // skip keys of unknown type
         JSON_CELL_TYPE type = obj.GetKeyType(key);
-        if (type == Type_Invalid) continue;  // skip keys of unknown type
+        if (type == Type_Invalid) {
+            continue;
+        }
 
-        str_length = 1;
+        // if we are dealing with a string, prepare the str_value variable for fetching
         if (type == Type_String) {
             str_length = obj.GetKeyLength(key);
         }
         char[] str_value = new char[str_length + 1];
 
+        // determine the length of the char[] needed to represent our cell data
         cell_length = 0;
         switch (type) {
             case Type_String: {
+                // get the string value early, as its cell_length is determined by its contents
                 obj.GetString(key, str_value, str_length + 1);
-                cell_length = json_cell_string_size(str_length) + 1;
+                cell_length = json_cell_string_size(str_length);
             }
             case Type_Int: {
+                // get the int value early, as its cell_length is determined by its contents
                 int_value = obj.GetInt(key);
                 cell_length = json_cell_int_size(int_value);
             }
@@ -107,6 +120,7 @@ stock void json_encode(JSON_Object obj, char[] output, int maxlen) {
             }
         }
 
+        // fit the contents into the cell
         char[] cell = new char[cell_length];
         switch (type) {
             case Type_String: {
@@ -133,7 +147,7 @@ stock void json_encode(JSON_Object obj, char[] output, int maxlen) {
         }
 
         // make the builder fit our key:value
-        builder_size = cell_length + 1;  // cell_length is length of value and null terminator, +1 for ,
+        builder_size = cell_length + 1;  // use previously determined cell length and +1 for comma
         if (!is_array) {
             builder_size += json_cell_string_size(strlen(key)) + 1;  // get the length of the key, +1 for :
         }

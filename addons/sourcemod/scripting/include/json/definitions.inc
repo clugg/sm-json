@@ -42,7 +42,7 @@
 // you may need to tinker with these for large objects/floating point numbers
 #define JSON_BUFFER_SIZE 8192
 #define JSON_FLOAT_BUFFER_SIZE 32
-#define JSON_INDEX_BUFFER_LENGTH 16
+#define JSON_INDEX_BUFFER_SIZE 16
 
 // meta-key defines
 #define JSON_ARRAY_INDEX_KEY "__array_index"

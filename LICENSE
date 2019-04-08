@@ -2,7 +2,7 @@
 SourceMod JSON Encoder/Decoder
 Provides a pure SourcePawn implementation of JSON encoding and decoding.
 
-sm-json (C) 2018 James D.  All rights reserved.
+sm-json (C) 2018 James Dickens.  All rights reserved.
 =============================================================================
 
 This program is free software; you can redistribute it and/or modify it under

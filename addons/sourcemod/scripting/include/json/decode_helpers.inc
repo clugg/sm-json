@@ -4,15 +4,15 @@
  * sm-json
  * Provides a pure SourcePawn implementation of JSON encoding and decoding.
  * https://github.com/clugg/sm-json
- * 
- * sm-json (C)2018 James D. (clug)
+ *
+ * sm-json (C)2018 James Dickens. (clug)
  * SourceMod (C)2004-2008 AlliedModders LLC.  All rights reserved.
  * =============================================================================
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License, version 3.0, as published by the
  * Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more

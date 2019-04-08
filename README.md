@@ -143,6 +143,7 @@ for (int i = 0; i < obj.Length; ++i) {
     JSON_CELL_TYPE type = obj.GetKeyType(key);
     // do whatever you want with type, key information
 }
+delete snap;
 ```
 
 ### Other Stuff

@@ -42,15 +42,19 @@
  * @param haystack       String to check that starts with needle.
  * @param maxlen         Maximum size of string buffer.
  * @param needle         String to check that haystack starts with.
- * @return               True if haystack begins with needle, false otherwise.
+ * @returns              True if haystack begins with needle, false otherwise.
  */
 stock bool json_string_startswith(const char[] haystack, const char[] needle) {
     int haystack_length = strlen(haystack);
     int needle_length = strlen(needle);
-    if (needle_length > haystack_length) return false;
+    if (needle_length > haystack_length) {
+        return false;
+    }
 
     for (int i = 0; i < needle_length; ++i) {
-        if (haystack[i] != needle[i]) return false;
+        if (haystack[i] != needle[i]) {
+            return false;
+        }
     }
 
     return true;
@@ -62,15 +66,19 @@ stock bool json_string_startswith(const char[] haystack, const char[] needle) {
  * @param haystack       String to check that ends with needle.
  * @param maxlen         Maximum size of string buffer.
  * @param needle         String to check that haystack ends with.
- * @return               True if haystack ends with needle, false otherwise.
+ * @returns              True if haystack ends with needle, false otherwise.
  */
 stock bool json_string_endswith(const char[] haystack, const char[] needle) {
     int haystack_length = strlen(haystack);
     int needle_length = strlen(needle);
-    if (needle_length > haystack_length) return false;
+    if (needle_length > haystack_length) {
+        return false;
+    }
 
     for (int i = 0; i < needle_length; ++i) {
-        if (haystack[haystack_length - needle_length + i] != needle[i]) return false;
+        if (haystack[haystack_length - needle_length + i] != needle[i]) {
+            return false;
+        }
     }
 
     return true;

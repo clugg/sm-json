@@ -46,11 +46,13 @@
 /**
  * Encodes a JSON_Object into its string representation.
  *
- * @param obj       Object to encode.
- * @param output    String buffer to store output.
- * @param maxlen    Maximum size of string buffer.
+ * @param obj           Object to encode.
+ * @param output        String buffer to store output.
+ * @param maxlen        Maximum size of string buffer.
+ * @param pretty_print  Should the output be pretty printed (newlines and spaces)? [optional, default: false]
+ * @param depth         The current depth of the encoder. [optional, default: 0]
  */
-stock void json_encode(JSON_Object obj, char[] output, int maxlen) {
+stock void json_encode(JSON_Object obj, char[] output, int maxlen, bool pretty_print = false, int depth = 0) {
     char[] key = new char[maxlen];
     bool is_array = obj.IsArray;
     bool is_empty = true;
@@ -142,7 +144,7 @@ stock void json_encode(JSON_Object obj, char[] output, int maxlen) {
             }
             case Type_Object: {
                 JSON_Object value = obj.GetObject(key);
-                json_encode(value, cell, cell_length);
+                json_encode(value, cell, cell_length, pretty_print, depth + 1);
             }
         }
 
@@ -152,17 +154,34 @@ stock void json_encode(JSON_Object obj, char[] output, int maxlen) {
             builder_size += json_cell_string_size(strlen(key)) + 1;  // get the length of the key, +1 for :
         }
 
+        if (pretty_print) {
+            // 1 space after colon
+            builder_size += 1;
+        }
+
         char[] builder = new char[builder_size];
         strcopy(builder, builder_size, "");
         // add the key if it's an object
         if (!is_array) {
             json_cell_string(key, builder, builder_size);
             StrCat(builder, builder_size, ":");
+            if (pretty_print) {
+                StrCat(builder, builder_size, " ");
+            }
         }
 
-        // add the value and a trailing comma, then send builder to output
+        // add the value and a trailing comma
         StrCat(builder, builder_size, cell);
         StrCat(builder, builder_size, ",");
+
+        if (pretty_print) {
+            StrCat(output, maxlen, "\n");
+            for (int j = 0; j < depth + 1; ++j) {
+                StrCat(output, maxlen, "    ");
+            }
+        }
+
+        // send builder to output
         StrCat(output, maxlen, builder);
 
         is_empty = false;
@@ -170,13 +189,23 @@ stock void json_encode(JSON_Object obj, char[] output, int maxlen) {
 
     delete snap;
 
-    if (is_empty) {
-        // append a comma so that it is replaced with closing bracket
-        StrCat(output, maxlen, ",");
+    if (!is_empty) {
+        // remove the final comma
+        output[strlen(output) - 1] = '\0';
     }
 
-    // replace final , with closing bracket
-    output[strlen(output) - 1] = (is_array) ? ']' : '}';
+    if (pretty_print) {
+        StrCat(output, maxlen, "\n");
+    }
+
+    if (pretty_print) {
+        for (int j = 0; j < depth; ++j) {
+            StrCat(output, maxlen, "    ");
+        }
+    }
+
+    // append closing bracket
+    StrCat(output, maxlen, (is_array) ? "]" : "}");
 }
 
 /**

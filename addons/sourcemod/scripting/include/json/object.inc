@@ -754,9 +754,11 @@ methodmap JSON_Object < StringMap {
      *
      * @param output    String buffer to store output.
      * @param maxlen    Maximum size of string buffer.
+     * @param pretty_print  Should the output be pretty printed (newlines and spaces)? [optional, default: false]
+     * @param depth         The current depth of the encoder. [optional, default: 0]
      */
-    public void Encode(char[] output, int maxlen) {
-        json_encode(this, output, maxlen);
+    public void Encode(char[] output, int maxlen, bool pretty_print = false, int depth = 0) {
+        json_encode(this, output, maxlen, pretty_print, depth);
     }
 
     /**

@@ -150,36 +150,71 @@ delete snap;
 ```
 
 ### Other Stuff
+#### Pretty Printing
+You can pretty print encoded JSON by passing `true` as the third paramater. Currently, pretty printing is not customisable and uses newlines and 4 spaces for indentation.
+```c
+char output[JSON_BUFFER_SIZE];
+
+JSON_Object child_arr = new JSON_Object(true);
+child_arr.PushInt(1);
+
+JSON_Object child_obj = new JSON_Object();
+child_obj.SetHandle("im_indented", null);
+child_obj.SetHandle("second_depth", child_arr);
+
+JSON_Object parent_obj = new JSON_Object();
+parent_obj.SetBool("pretty_printing", true);
+parent_obj.SetObject("first_depth", child_obj);
+
+parent_obj.Encode(output, sizeof(output), true);
+parent_obj.Cleanup();
+delete parent_obj;
+```
+
+`output` will contain the following:
+```json
+{
+    "first_depth": {
+        "im_indented": null,
+        "second_depth": null
+    },
+    "pretty_printing": true
+}
+```
+
+#### Indexed Methods
 Every relevant getter and setter has an `Indexed` version which works based on integers. This is useful for working directly with array indices.
 ```c
 obj.SetIntIndexed(0, 1337);
 int first_el = obj.GetIntIndexed(0);  // 1337
 ```
 
-You can check if a key exists on an object.
+#### Checking if a key exists
 ```c
 obj.HasKey("my_key");  // will return true if it exists
 ```
 
-You can get a key's type information.
+#### Getting a key's type
 ```c
 obj.GetKeyType("my_key");  // will return a JSON_CELL_TYPE
 obj.GetKeyTypeIndexed(0);
 ```
 
+#### Getting a string's length
 If a key contains a string, you can get it's exact length (not including NULL terminator).
 ```c
 obj.GetKeyLength("my_string");
 obj.GetKeyLengthIndexed(0);
 ```
 
-You can remove keys from the structure.
+#### Removing a key
 ```c
 obj.Remove("my_key");
 obj.RemoveIndexed(0);
 ```
 
-You can hide keys from being json_encode-d, but still use them for data storage. This is useful for 'secret' information.
+#### Hidding Keys/Visibility
+You can hide keys from being json_encoded, but still use them for data storage. This is useful for 'secret' information.
 ```c
 obj.SetKeyHidden("my_secret_key", true);
 obj.SetKeyHiddenIndexed(0, true);
@@ -191,4 +226,3 @@ A number of common tests have been written [here](addons/sourcemod/scripting/jso
 
 ## License
 [GNU General Public License v3.0](https://choosealicense.com/licenses/gpl-3.0/)
-

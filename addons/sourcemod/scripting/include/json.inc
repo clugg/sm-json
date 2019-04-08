@@ -172,7 +172,7 @@ stock void json_encode(JSON_Object obj, char[] output, int maxlen) {
  * @param result    Object to store output in. Setting this allows loading over an existing JSON_Object, 'refreshing' it as opposed to creating a new one. [optional, default: null]
  * @param pos       Current position of the decoder as a bytes offset into the buffer.
  * @param depth     Current depth of the decoder as child elements in the object.
- * @return          JSON_Object representation of buffer, or null if decoding failed (buffer didn't contain valid JSON).
+ * @returns         JSON_Object representation of buffer, or null if decoding failed (buffer didn't contain valid JSON).
  */
 stock JSON_Object json_decode(const char[] buffer, JSON_Object result = null, int &pos = 0, int depth = 0) {
     int length = strlen(buffer);

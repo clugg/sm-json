@@ -50,6 +50,11 @@
 #define JSON_META_LENGTH_KEY ":length"
 #define JSON_META_HIDDEN_KEY ":hidden"
 
+// pretty print constants
+#define JSON_PP_AFTER_COLON " "
+#define JSON_PP_INDENT "    "
+#define JSON_PP_NEWLINE "\n"
+
 /**
  * Types of cells within a JSON object
  */

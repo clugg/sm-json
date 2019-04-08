@@ -156,7 +156,7 @@ stock void json_encode(JSON_Object obj, char[] output, int maxlen, bool pretty_p
 
         if (pretty_print) {
             // 1 space after colon
-            builder_size += 1;
+            builder_size += strlen(JSON_PP_AFTER_COLON);
         }
 
         char[] builder = new char[builder_size];
@@ -166,7 +166,7 @@ stock void json_encode(JSON_Object obj, char[] output, int maxlen, bool pretty_p
             json_cell_string(key, builder, builder_size);
             StrCat(builder, builder_size, ":");
             if (pretty_print) {
-                StrCat(builder, builder_size, " ");
+                StrCat(builder, builder_size, JSON_PP_AFTER_COLON);
             }
         }
 
@@ -175,9 +175,9 @@ stock void json_encode(JSON_Object obj, char[] output, int maxlen, bool pretty_p
         StrCat(builder, builder_size, ",");
 
         if (pretty_print) {
-            StrCat(output, maxlen, "\n");
+            StrCat(output, maxlen, JSON_PP_NEWLINE);
             for (int j = 0; j < depth + 1; ++j) {
-                StrCat(output, maxlen, "    ");
+                StrCat(output, maxlen, JSON_PP_INDENT);
             }
         }
 
@@ -195,12 +195,12 @@ stock void json_encode(JSON_Object obj, char[] output, int maxlen, bool pretty_p
     }
 
     if (pretty_print) {
-        StrCat(output, maxlen, "\n");
+        StrCat(output, maxlen, JSON_PP_NEWLINE);
     }
 
     if (pretty_print) {
         for (int j = 0; j < depth; ++j) {
-            StrCat(output, maxlen, "    ");
+            StrCat(output, maxlen, JSON_PP_INDENT);
         }
     }
 

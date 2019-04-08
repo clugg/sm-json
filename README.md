@@ -1,11 +1,10 @@
 # sm-json
 
-**This project is currently unstable. I am currently refactoring the parser, so things may not work as expected. I recommend using [SMJansson](https://forums.alliedmods.net/showthread.php?t=184604) or [REST in Pawn](https://forums.alliedmods.net/showthread.php?t=298024) for the time being.**
-
 Provides a pure SourcePawn implementation of JSON encoding and decoding. Also offers a nice way of implementing objects using `StringMap` inheritance coupled with `methodmap`s.
 
 Follows the JSON specification ([RFC7159](https://tools.ietf.org/html/rfc7159)) almost perfectly. Currently, the following is not supported:
-* Scientific notation for floating point numbers
+* Lone values (e.g. `"string"`, `1`, `0.1`, `true`, `false`, `null`, etc. - anything that is **not contained within an object**)
+* Numbers with an exponent
 * Escaping/unescaping unicode values in strings (\uXXXX)
 
 ## Requirements
@@ -137,7 +136,11 @@ for (int i = 0; i < obj.Length; ++i) {
         obj.GetIndexString(key, sizeof(key), i);
     } else {
         snap.GetKey(i, key, sizeof(key));
-        if (json_is_meta_key(key)) continue;  // skip meta-keys
+
+        // skip meta-keys
+        if (json_is_meta_key(key)) {
+            continue;
+        }
     }
 
     JSON_CELL_TYPE type = obj.GetKeyType(key);
@@ -147,17 +150,45 @@ delete snap;
 ```
 
 ### Other Stuff
-A key can be hidden from the encoder, but still used for data storage. This is useful for 'secret' information.
+Every relevant getter and setter has an `Indexed` version which works based on integers. This is useful for working directly with array indices.
 ```c
-obj.SetKeyHidden("my secret key", true);
-```
-In the case of needing to set integer-based keys (without using array-only functionality), you can use SetStringIndexed (and so on), which accepts an int as the key and converts it to a string internally.
-```c
-obj.SetStringIndexed(5, "hello");
+obj.SetIntIndexed(0, 1337);
+int first_el = obj.GetIntIndexed(0);  // 1337
 ```
 
+You can check if a key exists on an object.
+```c
+obj.HasKey("my_key");  // will return true if it exists
+```
+
+You can get a key's type information.
+```c
+obj.GetKeyType("my_key");  // will return a JSON_CELL_TYPE
+obj.GetKeyTypeIndexed(0);
+```
+
+If a key contains a string, you can get it's exact length (not including NULL terminator).
+```c
+obj.GetKeyLength("my_string");
+obj.GetKeyLengthIndexed(0);
+```
+
+You can remove keys from the structure.
+```c
+obj.Remove("my_key");
+obj.RemoveIndexed(0);
+```
+
+You can hide keys from being json_encode-d, but still use them for data storage. This is useful for 'secret' information.
+```c
+obj.SetKeyHidden("my_secret_key", true);
+obj.SetKeyHiddenIndexed(0, true);
+```
+**Note:** Calling Clear() on an object will remove all hidden flags. Be careful not to expose data this way.
+
 ## Testing
-A number of common tests have been written [here](addons/sourcemod/scripting/json_test.sp).
+A number of common tests have been written [here](addons/sourcemod/scripting/json_test.sp). They also contain further examples of how the library can be used.
 
 ## License
 [GNU General Public License v3.0](https://choosealicense.com/licenses/gpl-3.0/)
+

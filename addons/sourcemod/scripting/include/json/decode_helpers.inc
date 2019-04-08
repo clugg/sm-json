@@ -265,21 +265,25 @@ stock bool json_skip_whitespace(const char[] buffer, int maxlen, int &pos) {
  * @returns                 True if pos is not at the end of the buffer, false otherwise.
  */
 stock bool json_extract_until_end(const char[] buffer, int maxlen, int &pos, char[] output, int output_maxlen, bool is_array) {
-    // extracts a string from current pos until a valid 'end point'
     strcopy(output, output_maxlen, "");
 
     int start = pos;
+    // while we haven't reached whitespace, a valid end point or the maxlen, increment position
     while (!json_is_whitespace(buffer, pos) && !json_is_at_end(buffer, pos, is_array) && pos < maxlen) {
         ++pos;
     }
-    int end = pos - 1;
+    int end = pos;
 
+    // skip any following whitespace
     json_skip_whitespace(buffer, maxlen, pos);
 
+    // if we aren't at a valid endpoint, extraction failed
     if (!json_is_at_end(buffer, pos, is_array)) {
         return false;
     }
-    strcopy(output, end - start + 2, buffer[start]);
+
+    // copy only from start with length end - start + NULL
+    strcopy(output, end - start + 1, buffer[start]);
 
     return pos < maxlen;
 }

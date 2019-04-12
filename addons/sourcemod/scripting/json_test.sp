@@ -352,6 +352,28 @@ bool it_should_pretty_print()
     return true;
 }
 
+bool it_should_trim_floats()
+{
+    JSON_Object arr = new JSON_Object(true);
+
+    arr.PushFloat(0.0);
+    arr.Encode(json_encode_output, sizeof(json_encode_output));
+    PrintToServer("%s", json_encode_output);
+    bool zero_success = StrEqual(json_encode_output, "[0.0]");
+
+    arr.SetFloatIndexed(0, 1.0);
+    arr.Encode(json_encode_output, sizeof(json_encode_output));
+    PrintToServer("%s", json_encode_output);
+    bool one_success = StrEqual(json_encode_output, "[1.0]");
+
+    arr.SetFloatIndexed(0, 10.01);
+    arr.Encode(json_encode_output, sizeof(json_encode_output));
+    PrintToServer("%s", json_encode_output);
+    bool fraction_success = StrEqual(json_encode_output, "[10.01]");
+
+    return zero_success && one_success && fraction_success;
+}
+
 
 public void OnPluginStart()
 {
@@ -432,6 +454,9 @@ public void OnPluginStart()
 
     PrintToServer("it_should_pretty_print");
     check_test(it_should_pretty_print());
+
+    PrintToServer("it_should_trim_floats");
+    check_test(it_should_trim_floats());
 
     PrintToServer("");
     PrintToServer("%d OK, %d FAILED", passed, failed);

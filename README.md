@@ -215,7 +215,7 @@ obj.Remove("my_key");
 obj.RemoveIndexed(0);
 ```
 
-#### Hidding Keys/Visibility
+#### Hiding Keys/Visibility
 You can hide keys from being json_encoded, but still use them for data storage. This is useful for 'secret' information.
 ```c
 obj.SetKeyHidden("my_secret_key", true);

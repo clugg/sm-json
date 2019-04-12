@@ -139,6 +139,11 @@ stock void json_cell_int(int input, char[] output, int maxlen) {
  */
 stock void json_cell_float(float input, char[] output, int maxlen) {
     FloatToString(input, output, maxlen);
+    // trim trailing 0s from float output
+    int last_char = strlen(output) - 1;
+    while (output[last_char] == '0' && output[last_char - 1] != '.') {
+        output[last_char--] = '\0';
+    }
 }
 
 /**

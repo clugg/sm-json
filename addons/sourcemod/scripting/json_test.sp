@@ -421,6 +421,10 @@ public void OnPluginStart()
         "[\"whitespace_after_array\"] ",
         "{\n\t\"lots_of_whitespace\" : true\n}",
         "[\"nicely\\\"escaped\\\"string\"]",
+        "[-1e2]", "[1e2]", "[1e+2]", "[1e-2]", "[-1e-2]",
+        "[-1E2]", "[1E2]", "[1E+2]", "[1E-2]", "[-1E-2]",
+        "[-0.5e2]", "[0.5e2]", "[0.5e+2]", "[0.5e-2]", "[-0.5e-2]",
+        "[-0.5E2]", "[0.5E2]", "[0.5E+2]", "[0.5E-2]", "[-0.5E-2]"
     };
     for (int i = 0; i < sizeof(should_decode); ++i) {
         PrintToServer("it_should_decode %s", should_decode[i]);
@@ -440,10 +444,13 @@ public void OnPluginStart()
         "[\"badly\"escaped\"string\"]",
         "[\"badly\\\\\"escaped\\\\\"string\"]",
         "[0,]", "[,0]", "[,0,]",
+        "[0-]",
         "[.1]", "[1.]",
         "[00]", "[-00]",
         "[01]", "[-01]",
         "[00.01]", "[-00.01]",
+        "[0e1]", "[0-e1]", "[0.e1]",
+        "[1e+-1]", "[-1e-+1]",
         "junk before array[]", "[]junk after array",
         "junk before object{}", "{}junk after object"
     };

@@ -3,8 +3,7 @@
 Provides a pure SourcePawn implementation of JSON encoding and decoding. Also offers a nice way of implementing objects using `StringMap` inheritance coupled with `methodmap`s.
 
 Follows the JSON specification ([RFC7159](https://tools.ietf.org/html/rfc7159)) almost perfectly. Currently, the following is not supported:
-* Lone values (e.g. `"string"`, `1`, `0.1`, `true`, `false`, `null`, etc. - anything that is **not contained within an object**)
-* Numbers with an exponent
+* Any singular value not contained with a structure (e.g. `"string"`, `1`, `0.1`, `true`, `false`, `null`, etc.)
 * Escaping/unescaping unicode values in strings (\uXXXX)
 
 ## Requirements

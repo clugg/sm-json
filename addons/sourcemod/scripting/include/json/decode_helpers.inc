@@ -76,7 +76,7 @@ stock bool json_is_string(const char[] buffer) {
  */
 stock bool json_is_int(const char[] buffer) {
     bool starts_with_zero = false;
-    bool has_numeric = false;
+    bool has_digit_gt_zero = false;
 
     int length = strlen(buffer);
     for (int i = 0; i < length; ++i) {
@@ -90,11 +90,11 @@ stock bool json_is_int(const char[] buffer) {
                 if (starts_with_zero) {
                     // detect repeating leading zeros
                     return false;
-                } else if (!has_numeric) {
+                } else if (!has_digit_gt_zero) {
                     starts_with_zero = true;
                 }
             } else {
-                has_numeric = true;
+                has_digit_gt_zero = true;
             }
         } else {
             return false;
@@ -103,7 +103,7 @@ stock bool json_is_int(const char[] buffer) {
 
     // buffer must start with zero and have no other numerics before decimal
     // OR not start with zero and have other numerics
-    return ((starts_with_zero && !has_numeric) || (!starts_with_zero && has_numeric));
+    return ((starts_with_zero && !has_digit_gt_zero) || (!starts_with_zero && has_digit_gt_zero));
 }
 
 /**
@@ -113,10 +113,12 @@ stock bool json_is_int(const char[] buffer) {
  * @returns         True if buffer contains a float, false otherwise.
  */
 stock bool json_is_float(const char[] buffer) {
-    bool has_numeric = false;
     bool starts_with_zero = false;
+    bool has_digit_gt_zero = false;
     bool after_decimal = false;
-    bool has_numeric_after_decimal = false;
+    bool has_digit_after_decimal = false;
+    bool after_exponent = false;
+    bool has_digit_after_exponent = false;
 
     int length = strlen(buffer);
     for (int i = 0; i < length; ++i) {
@@ -125,44 +127,84 @@ stock bool json_is_float(const char[] buffer) {
             continue;
         }
 
-        // if we haven't encountered a decimal yet
-        if (!after_decimal) {
+        // if we haven't encountered a decimal or exponent yet
+        if (!after_decimal && !after_exponent) {
             if (buffer[i] == '.') {
-                // if we encounter a decimal before any numbers
-                if (!has_numeric && !starts_with_zero) {
+                // if we encounter a decimal before any digits
+                if (!starts_with_zero && !has_digit_gt_zero) {
                     return false;
                 }
 
                 after_decimal = true;
+            } else if (buffer[i] == 'e' || buffer[i] == 'E') {
+                // if we encounter an exponent before any non-zero digits
+                if (starts_with_zero && !has_digit_gt_zero) {
+                    return false;
+                }
+
+                after_exponent = true;
             } else if (IsCharNumeric(buffer[i])) {
                 if (buffer[i] == '0') {
                     if (starts_with_zero) {
                         // detect repeating leading zeros
                         return false;
-                    } else if (!has_numeric) {
+                    } else if (!has_digit_gt_zero) {
                         starts_with_zero = true;
                     }
                 } else {
-                    has_numeric = true;
+                    has_digit_gt_zero = true;
                 }
             } else {
                 return false;
             }
-        } else {
+        } else if (after_decimal && !after_exponent) {
             // after decimal has been encountered, allow any numerics
             if (IsCharNumeric(buffer[i])) {
-                has_numeric_after_decimal = true;
+                has_digit_after_decimal = true;
+            } else if (buffer[i] == 'e' || buffer[i] == 'E') {
+                if (!has_digit_after_decimal) {
+                    // detect exponents directly after decimal
+                    return false;
+                }
+
+                after_exponent = true;
+            } else {
+                return false;
+            }
+        } else if (after_exponent) {
+            if ((buffer[i] == '+' || buffer[i] == '-') && (buffer[i - 1] == 'e' || buffer[i - 1] == 'E')) {
+                // allow + or - directly after exponent
+                continue;
+            } else if (IsCharNumeric(buffer[i])) {
+                has_digit_after_exponent = true;
             } else {
                 return false;
             }
         }
     }
 
-    // buffer must start with zero and have no other numerics before decimal
-    // OR not start with zero and have other numerics
-    // AND there must be a decimal AND there must be numerics after decimal
-    return ((starts_with_zero && !has_numeric) || (!starts_with_zero && has_numeric))
-        && after_decimal && has_numeric_after_decimal;
+    if (starts_with_zero && has_digit_gt_zero) {
+        // if buffer starts with zero, there should be no other digits before the decimal
+        return false;
+    }
+
+    // if we have a decimal, there should be digit(s) after it
+    if (after_decimal) {
+        if (!has_digit_after_decimal) {
+            return false;
+        }
+    }
+
+    // if we have an exponent, there should be digit(s) after it
+    if (after_exponent) {
+        if (!has_digit_after_exponent) {
+            return false;
+        }
+    }
+
+    // we should have reached an exponent, decimal or both
+    // otherwise, this number can be handled by the int parser
+    return after_decimal || after_exponent;
 }
 
 /**

@@ -48,7 +48,7 @@ public Plugin myinfo = {
 /**
  * @section Globals
  */
-char json_encode_output[JSON_BUFFER_SIZE];
+char json_encode_output[256];
 int passed = 0;
 int failed = 0;
 

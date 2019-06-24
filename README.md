@@ -127,14 +127,17 @@ OtherClass obj_coerced = view_as<OtherClass>(obj);
 ### Iterating Objects
 You can iterate through the keys in a JSON_Object due to the fact that it's a `StringMap` and as such you can fetch a `StringMapSnapshot` from it.
 ```c
-char key[JSON_BUFFER_LENGTH];
 bool is_array = obj.IsArray;
+int key_length = 0;
 StringMapSnapshot snap = obj.Snapshot();
 for (int i = 0; i < obj.Length; ++i) {
+    key_length = snap.KeyBufferSize(i);
+    char[] key = new char[key_length];
+
     if (is_array) {
-        obj.GetIndexString(key, sizeof(key), i);
+        obj.GetIndexString(key, key_length, i);
     } else {
-        snap.GetKey(i, key, sizeof(key));
+        snap.GetKey(i, key, key_length);
 
         // skip meta-keys
         if (json_is_meta_key(key)) {

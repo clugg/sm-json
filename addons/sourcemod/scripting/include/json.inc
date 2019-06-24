@@ -391,13 +391,16 @@ stock JSON_Object json_decode(const char[] buffer, JSON_Object result = null, in
  * @param obj JSON_Object to clean up.
  */
 void json_cleanup(JSON_Object obj) {
-    char key[JSON_BUFFER_SIZE];
     bool is_array = obj.IsArray;
 
+    int key_length = 0;
     StringMapSnapshot snap = obj.Snapshot();
     for (int i = 0; i < snap.Length; ++i) {
+        key_length = snap.KeyBufferSize(i);
+        char[] key = new char[key_length];
+
         // ignore meta keys
-        snap.GetKey(i, key, sizeof(key));
+        snap.GetKey(i, key, key_length);
         if (json_is_meta_key(key)) {
             continue;
         }

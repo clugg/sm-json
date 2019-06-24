@@ -34,7 +34,6 @@
 #include <sourcemod>
 #include <json>
 
-#pragma dynamic 16384
 #pragma semicolon 1
 #pragma newdecls required
 

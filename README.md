@@ -16,7 +16,7 @@ Follows the JSON specification ([RFC7159](https://tools.ietf.org/html/rfc7159)) 
 A JSON_Object is used to represent the values within any JSON. It can be either an array or an object, which can be checked with `object.IsArray`.
 
 ```c
-char output[JSON_BUFFER_SIZE];
+char output[256];
 
 JSON_Object empty_array = new JSON_Object(true);  // true denotes array
 
@@ -155,7 +155,7 @@ delete snap;
 #### Pretty Printing
 You can pretty print encoded JSON by passing `true` as the third paramater. Currently, pretty printing is not customisable and uses newlines and 4 spaces for indentation.
 ```c
-char output[JSON_BUFFER_SIZE];
+char output[256];
 
 JSON_Object child_arr = new JSON_Object(true);
 child_arr.PushInt(1);

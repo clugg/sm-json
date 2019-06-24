@@ -53,7 +53,6 @@
  * @param depth         The current depth of the encoder. [optional, default: 0]
  */
 stock void json_encode(JSON_Object obj, char[] output, int maxlen, bool pretty_print = false, int depth = 0) {
-    char[] key = new char[maxlen];
     bool is_array = obj.IsArray;
     bool is_empty = true;
     int builder_size;
@@ -66,11 +65,15 @@ stock void json_encode(JSON_Object obj, char[] output, int maxlen, bool pretty_p
     strcopy(output, maxlen, (is_array) ? "[" : "{");
 
     StringMapSnapshot snap = obj.Snapshot();
+    int key_length = 0;
     for (int i = 0; i < obj.Length; ++i) {
+        key_length = snap.KeyBufferSize(i);
+        char[] key = new char[key_length];
+
         if (is_array) {
-            obj.GetIndexString(key, maxlen, i);
+            obj.GetIndexString(key, key_length, i);
         } else {
-            snap.GetKey(i, key, maxlen);
+            snap.GetKey(i, key, key_length);
         }
 
         // skip meta-keys
@@ -154,7 +157,7 @@ stock void json_encode(JSON_Object obj, char[] output, int maxlen, bool pretty_p
             builder_size += json_cell_string_size(strlen(key)) + 1;  // get the length of the key, +1 for :
         }
 
-        if (pretty_print) {
+        if (pretty_print && !is_array) {
             // 1 space after colon
             builder_size += strlen(JSON_PP_AFTER_COLON);
         }

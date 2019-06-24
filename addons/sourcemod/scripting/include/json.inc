@@ -222,6 +222,7 @@ stock void json_encode(JSON_Object obj, char[] output, int maxlen, bool pretty_p
  */
 stock JSON_Object json_decode(const char[] buffer, JSON_Object result = null, int &pos = 0, int depth = 0) {
     int length = strlen(buffer);
+    int maxlen = (length < JSON_BUFFER_SIZE) ? length : JSON_BUFFER_SIZE;
     bool is_array = false;
 
     // skip preceding whitespace
@@ -244,8 +245,8 @@ stock JSON_Object json_decode(const char[] buffer, JSON_Object result = null, in
     }
 
     bool empty_checked = false;
-    char key[JSON_BUFFER_SIZE];
-    char cell[JSON_BUFFER_SIZE];
+    char[] key = new char[maxlen];
+    char[] cell = new char[maxlen];
 
     // while we haven't reached the end of our structure
     while ((!is_array && !json_is_object_end(buffer[pos]))
@@ -277,7 +278,7 @@ stock JSON_Object json_decode(const char[] buffer, JSON_Object result = null, in
             }
 
             // extract the key from the buffer
-            json_extract_string(buffer, length, pos, key, sizeof(key), is_array);
+            json_extract_string(buffer, length, pos, key, maxlen, is_array);
 
             // skip any whitespace following the key
             if (!json_skip_whitespace(buffer, length, pos)) {
@@ -318,7 +319,7 @@ stock JSON_Object json_decode(const char[] buffer, JSON_Object result = null, in
             }
         } else if (json_is_string(buffer[pos])) {
             // if we are dealing with a string, attempt to extract it
-            if (!json_extract_string(buffer, length, pos, cell, sizeof(cell), is_array)) {
+            if (!json_extract_string(buffer, length, pos, cell, maxlen, is_array)) {
                 LogError("json_decode: couldn't extract string at %d", pos);
                 return null;
             }
@@ -329,7 +330,7 @@ stock JSON_Object json_decode(const char[] buffer, JSON_Object result = null, in
                 result.SetString(key, cell);
             }
         } else {
-            if (!json_extract_until_end(buffer, length, pos, cell, sizeof(cell), is_array)) {
+            if (!json_extract_until_end(buffer, length, pos, cell, maxlen, is_array)) {
                 LogError("json_decode: couldn't extract until end at %d", pos);
                 return null;
             }

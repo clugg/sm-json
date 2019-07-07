@@ -1,6 +1,6 @@
 # sm-json
 
-Provides a pure SourcePawn implementation of JSON encoding and decoding. Also offers a nice way of implementing objects using `StringMap` inheritance coupled with `methodmap`s.
+A pure SourcePawn JSON encoder/decoder. Also offers a nice way of implementing objects using `StringMap` inheritance coupled with `methodmap`s.
 
 Follows the JSON specification ([RFC7159](https://tools.ietf.org/html/rfc7159)) almost perfectly. Currently, the following is not supported:
 * Any singular value not contained with a structure (e.g. `"string"`, `1`, `0.1`, `true`, `false`, `null`, etc.)
@@ -10,6 +10,12 @@ Follows the JSON specification ([RFC7159](https://tools.ietf.org/html/rfc7159)) 
 * SourceMod 1.7 and up
 
 ## Usage
+
+### Including the Library
+
+```c
+#include <json>
+```
 
 ### Creating an Object, Nesting Objects & Basic Encoding
 
@@ -98,6 +104,7 @@ methodmap YourClass < JSON_Object {
     }
 }
 
+char output[256];
 YourClass instance = new YourClass();
 instance.Encode(output, sizeof(output));
 // {"myfloat":73.570000,"myobject":[],"myhandle":null,"mybool":false,"name":"my class","myint":9001}

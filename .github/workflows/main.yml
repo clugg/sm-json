@@ -1,0 +1,19 @@
+name: CI
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1.0.0
+    - name: Download latest sourcemod
+      run: |
+        curl "https://sm.alliedmods.net/smdrop/1.9/$(curl https://sm.alliedmods.net/smdrop/1.9/sourcemod-latest-linux)" -o sourcemod.tar.gz
+        tar -xvzf sourcemod.tar.gz
+        rm sourcemod.tar.gz
+    - name: Compile code
+      working-directory: addons/sourcemod/scripting
+      run: |
+        chmod +x compile.sh
+        ./compile.sh json_test.sp

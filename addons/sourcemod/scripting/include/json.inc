@@ -393,7 +393,7 @@ stock JSON_Object json_decode(const char[] buffer, JSON_Object result = null, in
  *
  * @param obj JSON_Object to clean up.
  */
-void json_cleanup(JSON_Object obj) {
+stock void json_cleanup(JSON_Object obj) {
     bool is_array = obj.IsArray;
 
     int key_length = 0;

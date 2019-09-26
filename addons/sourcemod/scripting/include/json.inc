@@ -41,9 +41,9 @@
 
 #include <string>
 #include <json/definitions>
-#include <json/string_helpers>
-#include <json/encode_helpers>
-#include <json/decode_helpers>
+#include <json/helpers/decode>
+#include <json/helpers/encode>
+#include <json/helpers/string>
 #include <json/object>
 
 /**

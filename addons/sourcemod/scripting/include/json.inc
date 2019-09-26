@@ -52,10 +52,11 @@
  * @param obj           Object to encode.
  * @param output        String buffer to store output.
  * @param maxlen        Maximum size of string buffer.
- * @param pretty_print  Should the output be pretty printed (newlines and spaces)? [optional, default: false]
- * @param depth         The current depth of the encoder. [optional, default: 0]
+ * @param pretty_print  Should the output be pretty printed (newlines and spaces)? [default: false]
+ * @param depth         The current depth of the encoder. [default: 0]
  */
-stock void json_encode(JSON_Object obj, char[] output, int maxlen, bool pretty_print = false, int depth = 0) {
+stock void json_encode(JSON_Object obj, char[] output, int maxlen, bool pretty_print = false, int depth = 0)
+{
     bool is_array = obj.IsArray;
     bool is_empty = true;
     int builder_size;
@@ -89,8 +90,8 @@ stock void json_encode(JSON_Object obj, char[] output, int maxlen, bool pretty_p
             continue;
         }
 
-        // skip keys of unknown type
         JSON_CELL_TYPE type = obj.GetKeyType(key);
+        // skip keys of unknown type
         if (type == Type_Invalid) {
             continue;
         }
@@ -156,21 +157,22 @@ stock void json_encode(JSON_Object obj, char[] output, int maxlen, bool pretty_p
 
         // make the builder fit our key:value
         builder_size = cell_length + 1;  // use previously determined cell length and +1 for comma
-        if (!is_array) {
+        if (! is_array) {
             builder_size += json_cell_string_size(strlen(key)) + 1;  // get the length of the key, +1 for :
-        }
 
-        if (pretty_print && !is_array) {
-            // 1 space after colon
-            builder_size += strlen(JSON_PP_AFTER_COLON);
+            if (pretty_print) {
+                // 1 space after colon
+                builder_size += strlen(JSON_PP_AFTER_COLON);
+            }
         }
 
         char[] builder = new char[builder_size];
         strcopy(builder, builder_size, "");
         // add the key if it's an object
-        if (!is_array) {
+        if (! is_array) {
             json_cell_string(key, builder, builder_size);
             StrCat(builder, builder_size, ":");
+
             if (pretty_print) {
                 StrCat(builder, builder_size, JSON_PP_AFTER_COLON);
             }
@@ -195,16 +197,14 @@ stock void json_encode(JSON_Object obj, char[] output, int maxlen, bool pretty_p
 
     delete snap;
 
-    if (!is_empty) {
+    if (! is_empty) {
         // remove the final comma
         output[strlen(output) - 1] = '\0';
     }
 
     if (pretty_print) {
         StrCat(output, maxlen, JSON_PP_NEWLINE);
-    }
 
-    if (pretty_print) {
         for (int j = 0; j < depth; ++j) {
             StrCat(output, maxlen, JSON_PP_INDENT);
         }
@@ -218,17 +218,18 @@ stock void json_encode(JSON_Object obj, char[] output, int maxlen, bool pretty_p
  * Decodes a JSON string into its JSON_Object representation.
  *
  * @param buffer    Buffer to decode.
- * @param result    Object to store output in. Setting this allows loading over an existing JSON_Object, 'refreshing' it as opposed to creating a new one. [optional, default: null]
+ * @param result    Object to store output in. Setting this allows loading over an existing JSON_Object, 'refreshing' it as opposed to creating a new one. [default: null]
  * @param pos       Current position of the decoder as a bytes offset into the buffer.
  * @param depth     Current depth of the decoder as child elements in the object.
  * @returns         JSON_Object representation of buffer, or null if decoding failed (buffer didn't contain valid JSON).
  */
-stock JSON_Object json_decode(const char[] buffer, JSON_Object result = null, int &pos = 0, int depth = 0) {
+stock JSON_Object json_decode(const char[] buffer, JSON_Object result = null, int &pos = 0, int depth = 0)
+{
     int length = strlen(buffer);
     bool is_array = false;
 
     // skip preceding whitespace
-    if (!json_skip_whitespace(buffer, length, pos)) {
+    if (! json_skip_whitespace(buffer, length, pos)) {
         LogError("json_decode: buffer ended early at %d", pos);
         return null;
     }
@@ -251,30 +252,30 @@ stock JSON_Object json_decode(const char[] buffer, JSON_Object result = null, in
     char[] cell = new char[length];
 
     // while we haven't reached the end of our structure
-    while ((!is_array && !json_is_object_end(buffer[pos]))
-        || (is_array && !json_is_array_end(buffer[pos]))) {
+    while (! is_array && ! json_is_object_end(buffer[pos])
+        || is_array && ! json_is_array_end(buffer[pos])) {
         // pos is either an opening structure or comma, so increment past it
         ++pos;
 
         // if we are at the end of an object or array
         // and haven't checked for empty yet, we can stop here (empty structure)
-        if (((!is_array && json_is_object_end(buffer[pos]))
-            || (is_array && json_is_array_end(buffer[pos])))
-            && !empty_checked) {
+        if ((! is_array && json_is_object_end(buffer[pos])
+            || is_array && json_is_array_end(buffer[pos]))
+            && ! empty_checked) {
             break;
         }
 
         empty_checked = true;
 
         // skip any whitespace preceding the element
-        if (!json_skip_whitespace(buffer, length, pos)) {
+        if (! json_skip_whitespace(buffer, length, pos)) {
             LogError("json_decode: buffer ended early at %d", pos);
             return null;
         }
 
         // if dealing with an object, look for the key
-        if (!is_array) {
-            if (!json_is_string(buffer[pos])) {
+        if (! is_array) {
+            if (! json_is_string(buffer[pos])) {
                 LogError("json_decode: expected key string at %d", pos);
                 return null;
             }
@@ -283,7 +284,7 @@ stock JSON_Object json_decode(const char[] buffer, JSON_Object result = null, in
             json_extract_string(buffer, length, pos, key, length, is_array);
 
             // skip any whitespace following the key
-            if (!json_skip_whitespace(buffer, length, pos)) {
+            if (! json_skip_whitespace(buffer, length, pos)) {
                 LogError("json_decode: buffer ended early at %d", pos);
                 return null;
             }
@@ -295,7 +296,7 @@ stock JSON_Object json_decode(const char[] buffer, JSON_Object result = null, in
             }
 
             // skip any whitespace following the colon
-            if (!json_skip_whitespace(buffer, length, pos)) {
+            if (! json_skip_whitespace(buffer, length, pos)) {
                 LogError("json_decode: buffer ended early at %d", pos);
                 return null;
             }
@@ -304,7 +305,7 @@ stock JSON_Object json_decode(const char[] buffer, JSON_Object result = null, in
         if (json_is_object(buffer[pos]) || json_is_array(buffer[pos])) {
             // if we are dealing with an object or array
             // fetch the existing object if one exists at the key
-            JSON_Object current = (!is_array) ? result.GetObject(key) : null;
+            JSON_Object current = (! is_array) ? result.GetObject(key) : null;
 
             // decode recursively
             JSON_Object value = json_decode(buffer, current, pos, depth + 1);
@@ -321,7 +322,7 @@ stock JSON_Object json_decode(const char[] buffer, JSON_Object result = null, in
             }
         } else if (json_is_string(buffer[pos])) {
             // if we are dealing with a string, attempt to extract it
-            if (!json_extract_string(buffer, length, pos, cell, length, is_array)) {
+            if (! json_extract_string(buffer, length, pos, cell, length, is_array)) {
                 LogError("json_decode: couldn't extract string at %d", pos);
                 return null;
             }
@@ -332,7 +333,7 @@ stock JSON_Object json_decode(const char[] buffer, JSON_Object result = null, in
                 result.SetString(key, cell);
             }
         } else {
-            if (!json_extract_until_end(buffer, length, pos, cell, length, is_array)) {
+            if (! json_extract_until_end(buffer, length, pos, cell, length, is_array)) {
                 LogError("json_decode: couldn't extract until end at %d", pos);
                 return null;
             }
@@ -375,7 +376,7 @@ stock JSON_Object json_decode(const char[] buffer, JSON_Object result = null, in
             }
         }
 
-        if (!json_skip_whitespace(buffer, length, pos)) {
+        if (! json_skip_whitespace(buffer, length, pos)) {
             LogError("json_decode: buffer ended early at %d", pos);
             return null;
         }
@@ -396,7 +397,8 @@ stock JSON_Object json_decode(const char[] buffer, JSON_Object result = null, in
  *
  * @param obj JSON_Object to clean up.
  */
-stock void json_cleanup(JSON_Object obj) {
+stock void json_cleanup(JSON_Object obj)
+{
     bool is_array = obj.IsArray;
 
     int key_length = 0;

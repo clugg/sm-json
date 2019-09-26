@@ -48,6 +48,7 @@ public Plugin myinfo = {
 /**
  * @section Globals
  */
+
 char json_encode_output[256];
 int passed = 0;
 int failed = 0;
@@ -57,37 +58,62 @@ int failed = 0;
  */
 
 methodmap Weapon < JSON_Object {
-    public Weapon() {
+    public Weapon()
+    {
         return view_as<Weapon>(new JSON_Object());
     }
 
     property int id {
-        public get() { return this.GetInt("id"); }
-        public set(int value) { this.SetInt("id", value); }
+        public get()
+        {
+            return this.GetInt("id");
+        }
+
+        public set(int value)
+        {
+            this.SetInt("id", value);
+        }
     }
 
-    public bool GetString(char[] buffer, int maxlen) {
+    public bool GetString(char[] buffer, int maxlen)
+    {
         return this.GetString("name", buffer, maxlen);
     }
 
-    public void SetName(const char[] value) {
+    public void SetName(const char[] value)
+    {
         this.SetString("name", value);
     }
 }
 
 methodmap Player < JSON_Object {
-    public Player() {
+    public Player()
+    {
         return view_as<Player>(new JSON_Object());
     }
 
     property int id {
-        public get() { return this.GetInt("id"); }
-        public set(int value) { this.SetInt("id", value); }
+        public get()
+        {
+            return this.GetInt("id");
+        }
+
+        public set(int value)
+        {
+            this.SetInt("id", value);
+        }
     }
 
     property Weapon weapon {
-        public get() { return view_as<Weapon>(this.GetObject("weapon")); }
-        public set(Weapon value) { this.SetObject("weapon", view_as<JSON_Object>(value)); }
+        public get()
+        {
+            return view_as<Weapon>(this.GetObject("weapon"));
+        }
+
+        public set(Weapon value)
+        {
+            this.SetObject("weapon", view_as<JSON_Object>(value));
+        }
     }
 }
 
@@ -196,6 +222,7 @@ bool it_should_reload_an_object()
 
     obj.SetBool("loaded", true);
     obj.Decode("{\"reloaded\": true}");
+
     obj.Encode(json_encode_output, sizeof(json_encode_output));
     PrintToServer("%s", json_encode_output);
     bool success = obj.HasKey("loaded")
@@ -216,6 +243,7 @@ bool it_should_support_objects_nested_in_objects()
 
     obj.Encode(json_encode_output, sizeof(json_encode_output));
     PrintToServer("%s", json_encode_output);
+
     bool success = obj.GetObject("object").GetBool("nested");
     obj.Cleanup();
     delete obj;
@@ -233,6 +261,7 @@ bool it_should_support_objects_nested_in_arrays()
 
     arr.Encode(json_encode_output, sizeof(json_encode_output));
     PrintToServer("%s", json_encode_output);
+
     bool success = arr.GetObjectIndexed(0).GetBool("nested");
     arr.Cleanup();
     delete arr;
@@ -250,6 +279,7 @@ bool it_should_support_arrays_nested_in_objects()
 
     obj.Encode(json_encode_output, sizeof(json_encode_output));
     PrintToServer("%s", json_encode_output);
+
     bool success = obj.GetObject("array").GetBoolIndexed(0);
     obj.Cleanup();
     delete obj;
@@ -267,6 +297,7 @@ bool it_should_support_arrays_nested_in_arrays()
 
     arr.Encode(json_encode_output, sizeof(json_encode_output));
     PrintToServer("%s", json_encode_output);
+
     bool success = arr.GetObjectIndexed(0).GetBoolIndexed(0);
     arr.Cleanup();
     delete arr;
@@ -281,6 +312,7 @@ bool it_should_support_basic_methodmaps()
 
     player.Encode(json_encode_output, sizeof(json_encode_output));
     PrintToServer("%s", json_encode_output);
+
     delete player;
 
     return true;
@@ -298,6 +330,7 @@ bool it_should_support_nested_methodmaps()
 
     player.Encode(json_encode_output, sizeof(json_encode_output));
     PrintToServer("%s", json_encode_output);
+
     bool success = player.weapon.id == 2;
     player.Cleanup();
     delete player;
@@ -345,6 +378,7 @@ bool it_should_pretty_print()
 
     parent_obj.Encode(json_encode_output, sizeof(json_encode_output), true);
     PrintToServer("%s", json_encode_output);
+
     parent_obj.Cleanup();
     delete parent_obj;
 

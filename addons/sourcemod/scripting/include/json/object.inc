@@ -154,6 +154,34 @@ methodmap JSON_Object < StringMap {
     }
 
     /**
+     * Removes an item from the object by key.
+     *
+     * @param key       Key of object to remove.
+     * @returns         True on success, false if the value was never set.
+     */
+    public bool Remove(const char[] key) {
+        static char meta_keys[][] = {JSON_META_TYPE_KEY, JSON_META_LENGTH_KEY, JSON_META_HIDDEN_KEY};
+
+        // create a new char[] which will fit the longest meta-key
+        int meta_key_size = strlen(key) + 8;
+        char[] meta_key = new char[meta_key_size];
+
+        // view ourselves as a StringMap so we can call underlying Remove() method
+        StringMap self = view_as<StringMap>(this);
+
+        bool success = true;
+        for (int i = 0; i < sizeof(meta_keys); ++i) {
+            Format(meta_key, meta_key_size, "%s%s", key, meta_keys[i]);
+
+            if (this.HasKey(meta_key)) {
+                success = success && self.Remove(meta_key);
+            }
+        }
+
+        return success && self.Remove(key);
+    }
+
+    /**
      * Removes an item from the object by index.
      *
      * @param index     Index of object to remove.

@@ -46,7 +46,7 @@
 #define JSON_FLOAT_BUFFER_SIZE 32
 #define JSON_INDEX_BUFFER_SIZE 16
 
-// meta-key defines
+// meta-key constants
 #define JSON_ARRAY_INDEX_KEY "__array_index"
 #define JSON_META_TYPE_KEY   ":type"
 #define JSON_META_LENGTH_KEY ":length"
@@ -82,7 +82,8 @@ char JSON_STRING_ESCAPED[][] = {"\\\\", "\\\"", "\\/", "\\b", "\\f", "\\n", "\\r
  * @param buffer        String buffer.
  * @param maxlength     Maximum buffer length.
  */
-stock void json_escape_string(char[] buffer, int maxlen) {
+stock void json_escape_string(char[] buffer, int maxlen)
+{
     for (int i = 0; i < sizeof(JSON_STRING_NORMAL); ++i) {
         ReplaceString(buffer, maxlen, JSON_STRING_NORMAL[i], JSON_STRING_ESCAPED[i]);
     }
@@ -94,7 +95,8 @@ stock void json_escape_string(char[] buffer, int maxlen) {
  * @param buffer        String buffer.
  * @param maxlength     Maximum buffer length.
  */
-stock void json_unescape_string(char[] buffer, int maxlen) {
+stock void json_unescape_string(char[] buffer, int maxlen)
+{
     for (int i = 0; i < sizeof(JSON_STRING_NORMAL); ++i) {
         ReplaceString(buffer, maxlen, JSON_STRING_ESCAPED[i], JSON_STRING_NORMAL[i]);
     }
@@ -107,7 +109,8 @@ stock void json_unescape_string(char[] buffer, int maxlen) {
  * @param key   Key to check.
  * @returns     True when it is a meta-key, false otherwise.
  */
-stock bool json_is_meta_key(char[] key) {
+stock bool json_is_meta_key(char[] key)
+{
     return json_string_endswith(key, JSON_META_TYPE_KEY)
         || json_string_endswith(key, JSON_META_LENGTH_KEY)
         || json_string_endswith(key, JSON_META_HIDDEN_KEY)

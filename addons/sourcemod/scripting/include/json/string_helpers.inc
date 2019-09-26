@@ -36,6 +36,9 @@
 #endif
 #define _json_string_helpers_included
 
+#pragma semicolon 1
+#pragma newdecls required
+
 /**
  * Checks if a string starts with another string.
  *

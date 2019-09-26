@@ -36,6 +36,9 @@
 #endif
 #define _json_object_included
 
+#pragma semicolon 1
+#pragma newdecls required
+
 #include <string>
 #include <json/definitions>
 #include <json/encode_helpers>

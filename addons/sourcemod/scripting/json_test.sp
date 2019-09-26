@@ -579,6 +579,76 @@ bool it_should_trim_floats()
     return StrEqual(json_encode_output, "[0.0,1.0,10.01,-0.0,-1.0,-10.01]");
 }
 
+bool it_should_remove_meta_keys_from_arrays()
+{
+    bool success = true;
+
+    JSON_Object arr = new JSON_Object(true);
+    arr.PushString("hello");
+    arr.PushInt(0);
+
+    if (! arr.HasKey("0:type") || arr.GetKeyTypeIndexed(0) != Type_String
+        || ! arr.HasKey("0:length") || arr.GetKeyLengthIndexed(0) != 5
+        || ! arr.HasKey("1:type") || arr.GetKeyTypeIndexed(1) != Type_Int) {
+        LogError("json_test: array did not properly set meta-keys");
+
+        success = false;
+    }
+
+    arr.RemoveIndexed(0);
+
+    if (arr.HasKey("0:type") || arr.HasKey("0:length")) {
+        LogError("json_test: array did not properly remove meta-keys");
+
+        success = false;
+    }
+
+    if (! arr.HasKey("1:type")) {
+        LogError("json_test: array removed incorrect meta-key");
+
+        success = false;
+    }
+
+    delete arr;
+
+    return success;
+}
+
+bool it_should_remove_meta_keys_from_objects()
+{
+    bool success = true;
+
+    JSON_Object obj = new JSON_Object();
+    obj.SetString("hello", "world");
+    obj.SetInt("zero", 0);
+
+    if (! obj.HasKey("hello:type") || obj.GetKeyType("hello") != Type_String
+        || ! obj.HasKey("hello:length") || obj.GetKeyLength("hello") != 5
+        || ! obj.HasKey("zero:type") || obj.GetKeyType("zero") != Type_Int) {
+        LogError("json_test: object did not properly set meta-keys");
+
+        success = false;
+    }
+
+    obj.Remove("hello");
+
+    if (obj.HasKey("hello:type") || obj.HasKey("hello:length")) {
+        LogError("json_test: object did not properly remove meta-keys");
+
+        success = false;
+    }
+
+    if (! obj.HasKey("zero:type")) {
+        LogError("json_test: object removed incorrect meta-key");
+
+        success = false;
+    }
+
+    delete obj;
+
+    return success;
+}
+
 
 public void OnPluginStart()
 {
@@ -669,6 +739,12 @@ public void OnPluginStart()
 
     PrintToServer("it_should_trim_floats");
     check_test(it_should_trim_floats());
+
+    PrintToServer("it_should_remove_meta_keys_from_arrays");
+    check_test(it_should_remove_meta_keys_from_arrays());
+
+    PrintToServer("it_should_remove_meta_keys_from_objects");
+    check_test(it_should_remove_meta_keys_from_objects());
 
     PrintToServer("");
     PrintToServer("%d OK, %d FAILED", passed, failed);

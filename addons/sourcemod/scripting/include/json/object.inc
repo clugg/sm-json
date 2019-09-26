@@ -41,7 +41,7 @@
 
 #include <string>
 #include <json/definitions>
-#include <json/encode_helpers>
+#include <json/helpers/encode>
 #include <json>
 
 methodmap JSON_Object < StringMap {

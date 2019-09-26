@@ -40,7 +40,7 @@
 #pragma newdecls required
 
 #include <string>
-#include <json/string_helpers>
+#include <json/helpers/string>
 
 // you may need to tinker with these for large objects/floating point numbers
 #define JSON_FLOAT_BUFFER_SIZE 32

@@ -121,6 +121,22 @@ methodmap Player < JSON_Object {
  * @section Helpers
  */
 
+/**
+ * Checks if floats are "equal enough", to account for floating point errors.
+ * @see https://en.wikipedia.org/wiki/Floating_point_error_mitigation
+ *
+ * @param float x           First value to compare.
+ * @param float y           Second value to compare.
+ * @param float tolerance   Maximum allowed tolerance for floats to be considered equal.
+ * @returns True if the floats are equal within the distance, false otherwise.
+ */
+bool equal_enough(float x, float y, float tolerance = 0.0005)
+{
+    float difference = x / y;
+    return difference > (1 - tolerance)
+        && difference < (1 + tolerance);
+}
+
 void check_test(bool result)
 {
     if (result) {
@@ -163,26 +179,106 @@ bool it_should_encode_empty_arrays()
 bool it_should_support_objects()
 {
     JSON_Object obj = new JSON_Object();
-    obj.SetString("str", "leet");
-    obj.SetString("escaped_str", "\"leet\"");
-    obj.SetInt("int", 9001);
-    obj.SetInt("negative_int", -9001);
-    obj.SetInt("zero", 0);
-    obj.SetInt("negative_zero", -0);
-    obj.SetFloat("float", 13.37);
-    obj.SetFloat("negative_float", -13.37);
-    obj.SetFloat("float_zero", 0.0);
-    obj.SetFloat("negative_float_zero", -0.0);
-    obj.SetBool("true", true);
-    obj.SetBool("false", false);
-    obj.SetHandle("handle", null);
+    bool success = obj.SetString("str", "leet")
+        && obj.SetString("escaped_str", "\"leet\"")
+        && obj.SetInt("int", 9001)
+        && obj.SetInt("negative_int", -9001)
+        && obj.SetInt("int_zero", 0)
+        && obj.SetInt("negative_int_zero", -0)
+        && obj.SetFloat("float", 13.37)
+        && obj.SetFloat("negative_float", -13.37)
+        && obj.SetFloat("float_zero", 0.0)
+        && obj.SetFloat("negative_float_zero", -0.0)
+        && obj.SetBool("true", true)
+        && obj.SetBool("false", false)
+        && obj.SetHandle("handle", null);
 
     obj.Encode(json_encode_output, sizeof(json_encode_output));
     PrintToServer("%s", json_encode_output);
+    delete obj;
+
+    if (! success) {
+        LogError("json_test: failed while setting object values");
+
+        return false;
+    }
 
     JSON_Object decoded_obj = json_decode(json_encode_output);
-    bool success = decoded_obj != null;
-    delete obj;
+    if (decoded_obj == null) {
+        LogError("json_test: unable to decode object");
+
+        return false;
+    }
+
+    char string[32];
+    any value;
+    Handle hndl;
+
+    if (! decoded_obj.GetString("str", string, sizeof(string)) || ! StrEqual(string, "leet")) {
+        LogError("json_test: unexpected value for key str: %s", string);
+        success = false;
+    }
+
+    if (! decoded_obj.GetString("escaped_str", string, sizeof(string)) || ! StrEqual(string, "\"leet\"")) {
+        LogError("json_test: unexpected value for key escaped_str: %s", string);
+        success = false;
+    }
+
+    if ((value = decoded_obj.GetInt("int")) != 9001) {
+        LogError("json_test: unexpected value for key int: %d", value);
+        success = false;
+    }
+
+    if ((value = decoded_obj.GetInt("negative_int")) != -9001) {
+        LogError("json_test: unexpected value for key negative_int: %d", value);
+        success = false;
+    }
+
+    if ((value = decoded_obj.GetInt("int_zero")) != 0) {
+        LogError("json_test: unexpected value for key int_zero: %d", value);
+        success = false;
+    }
+
+    if ((value = decoded_obj.GetInt("negative_int_zero")) != -0) {
+        LogError("json_test: unexpected value for key negative_int_zero: %d", value);
+        success = false;
+    }
+
+    if (! equal_enough((value = decoded_obj.GetFloat("float")), 13.37)) {
+        LogError("json_test: unexpected value for key float: %f", value);
+        success = false;
+    }
+
+    if (! equal_enough((value = decoded_obj.GetFloat("negative_float")), -13.37)) {
+        LogError("json_test: unexpected value for key negative_float: %f", value);
+        success = false;
+    }
+
+    if ((value = decoded_obj.GetFloat("float_zero")) != 0.0) {
+        LogError("json_test: unexpected value for key float_zero: %f", value);
+        success = false;
+    }
+
+    if ((value = decoded_obj.GetFloat("negative_float_zero")) != -0.0) {
+        LogError("json_test: unexpected value for key negative_float_zero: %f", value);
+        success = false;
+    }
+
+    if ((value = decoded_obj.GetBool("true")) != true) {
+        LogError("json_test: unexpected value for key true: %d", value);
+        success = false;
+    }
+
+    if ((value = decoded_obj.GetBool("false")) != false) {
+        LogError("json_test: unexpected value for key false: %d", value);
+        success = false;
+    }
+
+    if ((hndl = decoded_obj.GetHandle("handle")) != null) {
+        LogError("json_test: unexpected value for key handle: %d", view_as<int>(hndl));
+        success = false;
+    }
+
     delete decoded_obj;
 
     return success;
@@ -191,26 +287,107 @@ bool it_should_support_objects()
 bool it_should_support_arrays()
 {
     JSON_Object arr = new JSON_Object(true);
-    arr.PushString("leet");
-    arr.PushString("\"leet\"");
-    arr.PushInt(9001);
-    arr.PushInt(-9001);
-    arr.PushInt(0);
-    arr.PushInt(-0);
-    arr.PushFloat(13.37);
-    arr.PushFloat(-13.37);
-    arr.PushFloat(0.0);
-    arr.PushFloat(-0.0);
-    arr.PushBool(true);
-    arr.PushBool(false);
-    arr.PushHandle(null);
+    bool success = arr.PushString("leet")
+        && arr.PushString("\"leet\"")
+        && arr.PushInt(9001)
+        && arr.PushInt(-9001)
+        && arr.PushInt(0)
+        && arr.PushInt(-0)
+        && arr.PushFloat(13.37)
+        && arr.PushFloat(-13.37)
+        && arr.PushFloat(0.0)
+        && arr.PushFloat(-0.0)
+        && arr.PushBool(true)
+        && arr.PushBool(false)
+        && arr.PushHandle(null);
 
     arr.Encode(json_encode_output, sizeof(json_encode_output));
     PrintToServer("%s", json_encode_output);
+    delete arr;
+
+    if (! success) {
+        LogError("json_test: failed while pushing array values");
+
+        return false;
+    }
 
     JSON_Object decoded_arr = json_decode(json_encode_output);
-    bool success = decoded_arr != null;
-    delete arr;
+    if (decoded_arr == null) {
+        LogError("json_test: unable to decode array");
+
+        return false;
+    }
+
+    int index = 0;
+    char string[32];
+    any value;
+    Handle hndl;
+
+    if (! decoded_arr.GetStringIndexed(index++, string, sizeof(string)) || ! StrEqual(string, "leet")) {
+        LogError("json_test: unexpected value for index %d: %s", index, string);
+        success = false;
+    }
+
+    if (! decoded_arr.GetStringIndexed(index++, string, sizeof(string)) || ! StrEqual(string, "\"leet\"")) {
+        LogError("json_test: unexpected value for index %d: %s", index, string);
+        success = false;
+    }
+
+    if ((value = decoded_arr.GetIntIndexed(index++)) != 9001) {
+        LogError("json_test: unexpected value for index %d: %d", index, value);
+        success = false;
+    }
+
+    if ((value = decoded_arr.GetIntIndexed(index++)) != -9001) {
+        LogError("json_test: unexpected value for index %d: %d", index, value);
+        success = false;
+    }
+
+    if ((value = decoded_arr.GetIntIndexed(index++)) != 0) {
+        LogError("json_test: unexpected value for index %d: %d", index, value);
+        success = false;
+    }
+
+    if ((value = decoded_arr.GetIntIndexed(index++)) != -0) {
+        LogError("json_test: unexpected value for index %d: %d", index, value);
+        success = false;
+    }
+
+    if (! equal_enough((value = decoded_arr.GetFloatIndexed(index++)), 13.37)) {
+        LogError("json_test: unexpected value for index %d: %f", index, value);
+        success = false;
+    }
+
+    if (! equal_enough((value = decoded_arr.GetFloatIndexed(index++)), -13.37)) {
+        LogError("json_test: unexpected value for index %d: %f", index, value);
+        success = false;
+    }
+
+    if ((value = decoded_arr.GetFloatIndexed(index++)) != 0.0) {
+        LogError("json_test: unexpected value for index %d: %f", index, value);
+        success = false;
+    }
+
+    if ((value = decoded_arr.GetFloatIndexed(index++)) != -0.0) {
+        LogError("json_test: unexpected value for index %d: %f", index, value);
+        success = false;
+    }
+
+    if ((value = decoded_arr.GetBoolIndexed(index++)) != true) {
+        LogError("json_test: unexpected value for index %d: %d", index, value);
+        success = false;
+    }
+
+    if ((value = decoded_arr.GetBoolIndexed(index++)) != false) {
+        LogError("json_test: unexpected value for index %d: %d", index, value);
+        success = false;
+    }
+
+    if ((hndl = decoded_arr.GetHandleIndexed(index++)) != null) {
+        LogError("json_test: unexpected value for index %d: %d", index, view_as<int>(hndl));
+        success = false;
+    }
+
     delete decoded_arr;
 
     return success;
@@ -219,14 +396,15 @@ bool it_should_support_arrays()
 bool it_should_reload_an_object()
 {
     JSON_Object obj = new JSON_Object();
-
-    obj.SetBool("loaded", true);
+    obj.SetBool("loaded", false);
     obj.Decode("{\"reloaded\": true}");
 
     obj.Encode(json_encode_output, sizeof(json_encode_output));
     PrintToServer("%s", json_encode_output);
-    bool success = obj.HasKey("loaded")
-        && obj.HasKey("reloaded");
+
+    bool success = obj.HasKey("loaded") && obj.GetBool("loaded") == false
+        && obj.HasKey("reloaded") && obj.GetBool("reloaded") == true;
+
     delete obj;
 
     return success;
@@ -356,7 +534,7 @@ bool it_should_not_decode(char[] data)
     JSON_Object obj = json_decode(data);
     if (obj != null) {
         obj.Encode(json_encode_output, sizeof(json_encode_output));
-        PrintToServer("WARNING: malformed JSON was parsed as valid: %s", json_encode_output);
+        LogError("json_test: malformed JSON was parsed as valid: %s", json_encode_output);
         return false;
     }
 
@@ -382,29 +560,23 @@ bool it_should_pretty_print()
     parent_obj.Cleanup();
     delete parent_obj;
 
-    return true;
+    return StrEqual(json_encode_output, "{\n    \"first_depth\": {\n        \"im_indented\": null,\n        \"second_depth\": [\n            1\n        ]\n    },\n    \"pretty_printing\": true\n}");
 }
 
 bool it_should_trim_floats()
 {
     JSON_Object arr = new JSON_Object(true);
-
     arr.PushFloat(0.0);
+    arr.PushFloat(1.0);
+    arr.PushFloat(10.01);
+    arr.PushFloat(-0.0);
+    arr.PushFloat(-1.0);
+    arr.PushFloat(-10.01);
+
     arr.Encode(json_encode_output, sizeof(json_encode_output));
     PrintToServer("%s", json_encode_output);
-    bool zero_success = StrEqual(json_encode_output, "[0.0]");
 
-    arr.SetFloatIndexed(0, 1.0);
-    arr.Encode(json_encode_output, sizeof(json_encode_output));
-    PrintToServer("%s", json_encode_output);
-    bool one_success = StrEqual(json_encode_output, "[1.0]");
-
-    arr.SetFloatIndexed(0, 10.01);
-    arr.Encode(json_encode_output, sizeof(json_encode_output));
-    PrintToServer("%s", json_encode_output);
-    bool fraction_success = StrEqual(json_encode_output, "[10.01]");
-
-    return zero_success && one_success && fraction_success;
+    return StrEqual(json_encode_output, "[0.0,1.0,10.01,-0.0,-1.0,-10.01]");
 }
 
 

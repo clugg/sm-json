@@ -36,9 +36,6 @@
 #endif
 #define _json_helpers_decode_included
 
-#pragma semicolon 1
-#pragma newdecls required
-
 #include <string>
 
 /**

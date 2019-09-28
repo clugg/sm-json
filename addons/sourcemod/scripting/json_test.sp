@@ -32,10 +32,12 @@
  */
 
 #include <sourcemod>
-#include <json>
 
 #pragma semicolon 1
 #pragma newdecls required
+
+// Include our own include after setting compiler settings, to ensure we conform.
+#include <json>
 
 public Plugin myinfo = {
     name = "JSON Tester",

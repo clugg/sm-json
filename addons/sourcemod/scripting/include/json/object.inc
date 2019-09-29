@@ -168,50 +168,6 @@ methodmap JSON_Object < StringMap {
     }
 
     /**
-     * Removes an item from the object by key.
-     *
-     * @param key       Key of object to remove.
-     * @returns         True on success, false if the value was never set.
-     */
-    public bool Remove(const char[] key) {
-        static char meta_keys[][] = {JSON_META_TYPE_KEY, JSON_META_LENGTH_KEY, JSON_META_HIDDEN_KEY};
-
-        // create a new char[] which will fit the longest meta-key
-        int meta_key_size = strlen(key) + 8;
-        char[] meta_key = new char[meta_key_size];
-
-        // view ourselves as a StringMap so we can call underlying Remove() method
-        StringMap self = view_as<StringMap>(this);
-
-        bool success = true;
-        for (int i = 0; i < sizeof(meta_keys); ++i) {
-            Format(meta_key, meta_key_size, "%s%s", key, meta_keys[i]);
-
-            if (this.HasKey(meta_key)) {
-                success = success && self.Remove(meta_key);
-            }
-        }
-
-        return success && self.Remove(key);
-    }
-
-    /**
-     * Removes an item from the object by index.
-     *
-     * @param index     Index of object to remove.
-     * @returns         True on success, false if the current object is not an array or the index does not exist.
-     */
-    public bool RemoveIndexed(int index)
-    {
-        char key[JSON_INDEX_BUFFER_SIZE];
-        if (! this.GetIndexString(key, sizeof(key), index)) {
-            return false;
-        }
-
-        return this.Remove(key);
-    }
-
-    /**
      * @section Internal getters.
      */
 
@@ -924,6 +880,102 @@ methodmap JSON_Object < StringMap {
     {
         return this.IndexOfString(value) != -1;
     }
+
+     /**
+     * Removes an item from the object by key.
+     *
+     * @param key       Key of object to remove.
+     * @returns         True on success, false if the value was never set.
+     */
+    public bool Remove(const char[] key) {
+        static char meta_keys[][] = {JSON_META_TYPE_KEY, JSON_META_LENGTH_KEY, JSON_META_HIDDEN_KEY};
+
+        // create a new char[] which will fit the longest meta-key
+        int meta_key_size = strlen(key) + 8;
+        char[] meta_key = new char[meta_key_size];
+
+        // view ourselves as a StringMap so we can call underlying Remove() method
+        StringMap self = view_as<StringMap>(this);
+
+        bool success = true;
+        for (int i = 0; i < sizeof(meta_keys); ++i) {
+            Format(meta_key, meta_key_size, "%s%s", key, meta_keys[i]);
+
+            if (this.HasKey(meta_key)) {
+                success = success && self.Remove(meta_key);
+            }
+        }
+
+        return success && self.Remove(key);
+    }
+
+    /**
+     * Removes a key and its related meta-keys from the object.
+     *
+     * @param key   Key to remove.
+     * @returns     True on success, false if the value was never set.
+     */
+    public bool RemoveIndexed(int index)
+    {
+        if (! this.HasIndex(index)) {
+            return false;
+        }
+
+        char key[JSON_INDEX_BUFFER_SIZE];
+        if (! this.GetIndexString(key, sizeof(key), index)) {
+            return false;
+        }
+
+        if (! this.Remove(key)) {
+            return false;
+        }
+
+        for (int i = index + 1; i < this.CurrentIndex; ++i) {
+            if (! this.GetIndexString(key, sizeof(key), i)) {
+                return false;
+            }
+
+            int target = i - 1;
+
+            JSON_CELL_TYPE type = this.GetKeyTypeIndexed(i);
+
+            switch (type) {
+                case Type_String: {
+                    int str_length = this.GetKeyLengthIndexed(i);
+                    char[] str_value = new char[str_length];
+
+                    this.GetStringIndexed(i, str_value, str_length + 1);
+                    this.SetStringIndexed(target, str_value);
+                }
+                case Type_Int: {
+                    this.SetIntIndexed(target, this.GetIntIndexed(i));
+                }
+                case Type_Float: {
+                    this.SetFloatIndexed(target, this.GetFloatIndexed(i));
+                }
+                case Type_Bool: {
+                    this.SetBoolIndexed(target, this.GetBoolIndexed(i));
+                }
+                case Type_Null: {
+                    this.SetHandleIndexed(target, this.GetHandleIndexed(i));
+                }
+                case Type_Object: {
+                    this.SetObjectIndexed(target, this.GetObjectIndexed(i));
+                }
+            }
+
+            if (this.GetKeyHiddenIndexed(i)) {
+                this.SetKeyHiddenIndexed(target, true);
+            }
+
+            this.Remove(key);
+        }
+
+        this.CurrentIndex -= 1;
+
+        return true;
+    }
+
     /**
      * Encodes the object into its string representation.
      *

@@ -31,12 +31,10 @@
  * or <http://www.sourcemod.net/license.php>.
  */
 
-#include <sourcemod>
-
 #pragma semicolon 1
 #pragma newdecls required
 
-// Include our own include after setting compiler settings, to ensure we conform.
+#include <sourcemod>
 #include <json>
 
 public Plugin myinfo = {
@@ -65,7 +63,8 @@ methodmap Weapon < JSON_Object {
         return view_as<Weapon>(new JSON_Object());
     }
 
-    property int id {
+    property int id
+    {
         public get()
         {
             return this.GetInt("id");
@@ -94,7 +93,8 @@ methodmap Player < JSON_Object {
         return view_as<Player>(new JSON_Object());
     }
 
-    property int id {
+    property int id
+    {
         public get()
         {
             return this.GetInt("id");
@@ -106,7 +106,8 @@ methodmap Player < JSON_Object {
         }
     }
 
-    property Weapon weapon {
+    property Weapon weapon
+    {
         public get()
         {
             return view_as<Weapon>(this.GetObject("weapon"));
@@ -139,6 +140,12 @@ bool equal_enough(float x, float y, float tolerance = 0.0005)
         && difference < (1 + tolerance);
 }
 
+void print_json(JSON_Object obj, bool pretty = false)
+{
+    obj.Encode(json_encode_output, sizeof(json_encode_output), pretty);
+    PrintToServer("%s", json_encode_output);
+}
+
 void check_test(bool result)
 {
     if (result) {
@@ -160,8 +167,7 @@ bool it_should_encode_empty_objects()
 {
     JSON_Object obj = new JSON_Object();
 
-    obj.Encode(json_encode_output, sizeof(json_encode_output));
-    PrintToServer("%s", json_encode_output);
+    print_json(obj);
     delete obj;
 
     return StrEqual(json_encode_output, "{}");
@@ -171,8 +177,7 @@ bool it_should_encode_empty_arrays()
 {
     JSON_Object arr = new JSON_Object(true);
 
-    arr.Encode(json_encode_output, sizeof(json_encode_output));
-    PrintToServer("%s", json_encode_output);
+    print_json(arr);
     delete arr;
 
     return StrEqual(json_encode_output, "[]");
@@ -195,8 +200,7 @@ bool it_should_support_objects()
         && obj.SetBool("false", false)
         && obj.SetHandle("handle", null);
 
-    obj.Encode(json_encode_output, sizeof(json_encode_output));
-    PrintToServer("%s", json_encode_output);
+    print_json(obj);
     delete obj;
 
     if (! success) {
@@ -303,8 +307,7 @@ bool it_should_support_arrays()
         && arr.PushBool(false)
         && arr.PushHandle(null);
 
-    arr.Encode(json_encode_output, sizeof(json_encode_output));
-    PrintToServer("%s", json_encode_output);
+    print_json(arr);
     delete arr;
 
     if (! success) {
@@ -401,8 +404,7 @@ bool it_should_reload_an_object()
     obj.SetBool("loaded", false);
     obj.Decode("{\"reloaded\": true}");
 
-    obj.Encode(json_encode_output, sizeof(json_encode_output));
-    PrintToServer("%s", json_encode_output);
+    print_json(obj);
 
     bool success = obj.HasKey("loaded") && obj.GetBool("loaded") == false
         && obj.HasKey("reloaded") && obj.GetBool("reloaded") == true;
@@ -421,8 +423,7 @@ bool it_should_support_objects_nested_in_objects()
     obj.SetBool("nested", false);
     obj.SetObject("object", nested_obj);
 
-    obj.Encode(json_encode_output, sizeof(json_encode_output));
-    PrintToServer("%s", json_encode_output);
+    print_json(obj);
 
     bool success = obj.GetObject("object").GetBool("nested");
     obj.Cleanup();
@@ -439,8 +440,7 @@ bool it_should_support_objects_nested_in_arrays()
     JSON_Object arr = new JSON_Object(true);
     arr.PushObject(nested_obj);
 
-    arr.Encode(json_encode_output, sizeof(json_encode_output));
-    PrintToServer("%s", json_encode_output);
+    print_json(arr);
 
     bool success = arr.GetObjectIndexed(0).GetBool("nested");
     arr.Cleanup();
@@ -457,8 +457,7 @@ bool it_should_support_arrays_nested_in_objects()
     JSON_Object obj = new JSON_Object();
     obj.SetObject("array", nested_arr);
 
-    obj.Encode(json_encode_output, sizeof(json_encode_output));
-    PrintToServer("%s", json_encode_output);
+    print_json(obj);
 
     bool success = obj.GetObject("array").GetBoolIndexed(0);
     obj.Cleanup();
@@ -475,8 +474,7 @@ bool it_should_support_arrays_nested_in_arrays()
     JSON_Object arr = new JSON_Object(true);
     arr.PushObject(nested_arr);
 
-    arr.Encode(json_encode_output, sizeof(json_encode_output));
-    PrintToServer("%s", json_encode_output);
+    print_json(arr);
 
     bool success = arr.GetObjectIndexed(0).GetBoolIndexed(0);
     arr.Cleanup();
@@ -525,8 +523,7 @@ bool it_should_decode(char[] data)
         return false;
     }
 
-    obj.Encode(json_encode_output, sizeof(json_encode_output));
-    PrintToServer("%s", json_encode_output);
+    print_json(obj);
 
     return true;
 }
@@ -547,6 +544,7 @@ bool it_should_pretty_print()
 {
     JSON_Object child_arr = new JSON_Object(true);
     child_arr.PushInt(1);
+    child_arr.PushObject(new JSON_Object(true));
 
     JSON_Object child_obj = new JSON_Object();
     child_obj.SetHandle("im_indented", null);
@@ -556,9 +554,7 @@ bool it_should_pretty_print()
     parent_obj.SetBool("pretty_printing", true);
     parent_obj.SetObject("first_depth", child_obj);
 
-    parent_obj.Encode(json_encode_output, sizeof(json_encode_output), true);
-    PrintToServer("%s", json_encode_output);
-
+    print_json(parent_obj, true);
     parent_obj.Cleanup();
     delete parent_obj;
 
@@ -575,8 +571,7 @@ bool it_should_trim_floats()
     arr.PushFloat(-1.0);
     arr.PushFloat(-10.01);
 
-    arr.Encode(json_encode_output, sizeof(json_encode_output));
-    PrintToServer("%s", json_encode_output);
+    print_json(arr);
 
     return StrEqual(json_encode_output, "[0.0,1.0,10.01,-0.0,-1.0,-10.01]");
 }

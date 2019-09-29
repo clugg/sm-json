@@ -63,12 +63,22 @@ stock void json_encode(JSON_Object obj, char[] output, int maxlen, bool pretty_p
     int int_value;
     int cell_length = 0;
 
-    strcopy(output, maxlen, (is_array) ? "[" : "{");
+    StringMapSnapshot snap = null;
+    int json_size = 0;
+    if (is_array) {
+        json_size = obj.CurrentIndex;
 
-    StringMapSnapshot snap = obj.Snapshot();
+        strcopy(output, maxlen, "[");
+    } else {
+        snap = obj.Snapshot();
+        json_size = snap.Length;
+
+        strcopy(output, maxlen, "{");
+    }
+
     int key_length = 0;
-    for (int i = 0; i < obj.Length; ++i) {
-        key_length = snap.KeyBufferSize(i);
+    for (int i = 0; i < json_size; ++i) {
+        key_length = (is_array) ? JSON_INDEX_BUFFER_SIZE : snap.KeyBufferSize(i);
         char[] key = new char[key_length];
 
         if (is_array) {
@@ -192,7 +202,9 @@ stock void json_encode(JSON_Object obj, char[] output, int maxlen, bool pretty_p
         is_empty = false;
     }
 
-    delete snap;
+    if (snap != null) {
+        delete snap;
+    }
 
     if (! is_empty) {
         // remove the final comma

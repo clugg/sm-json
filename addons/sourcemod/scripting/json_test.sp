@@ -146,6 +146,45 @@ void print_json(JSON_Object obj, bool pretty = false)
     PrintToServer("%s", json_encode_output);
 }
 
+bool check_array_remove(JSON_Object arr, int index)
+{
+    PrintToServer("Removing element at index %d", index);
+
+    // get current value at index
+    JSON_CELL_TYPE type = arr.GetKeyTypeIndexed(index);
+    int str_size = 0;
+    if (type == Type_String) {
+        str_size = arr.GetKeyLengthIndexed(index) + 1;
+    }
+
+    any value;
+    char[] str = new char[str_size];
+
+    if (type == Type_String) {
+        arr.GetStringIndexed(index, str, str_size);
+    } else {
+        arr.GetValueIndexed(index, value);
+    }
+
+    // remove the index from the array
+    arr.RemoveIndexed(index);
+    print_json(arr);
+
+    // confirm that it is gone
+    int found = -1;
+    if (type == Type_String) {
+        found = arr.IndexOfString(str);
+    } else {
+        found = arr.IndexOf(value);
+    }
+
+    if (found != -1) {
+        LogError("json_test: found value at position %d after removing it from array", found);
+    }
+
+    return found == -1;
+}
+
 void check_test(bool result)
 {
     if (result) {
@@ -608,14 +647,8 @@ bool it_should_remove_meta_keys_from_arrays()
 
     arr.RemoveIndexed(0);
 
-    if (arr.HasKey("0:type") || arr.HasKey("0:length")) {
-        LogError("json_test: array did not properly remove meta-keys");
-
-        success = false;
-    }
-
-    if (! arr.HasKey("1:type")) {
-        LogError("json_test: array removed incorrect meta-key");
+    if (arr.HasKey("1:type") || arr.HasKey("0:length") || arr.GetKeyTypeIndexed(0) != Type_Int) {
+        LogError("json_test: array did not properly remove meta-keys: %d, %d, %d", arr.GetKeyTypeIndexed(1), arr.GetKeyLengthIndexed(0), arr.GetKeyTypeIndexed(0));
 
         success = false;
     }
@@ -656,6 +689,40 @@ bool it_should_remove_meta_keys_from_objects()
     }
 
     delete obj;
+
+    return success;
+}
+
+bool it_should_shift_array_down_after_removed_index()
+{
+    JSON_Object arr = new JSON_Object(true);
+    bool success = arr.PushString("leet")
+        && arr.PushString("\"leet\"")
+        && arr.PushInt(9001)
+        && arr.PushFloat(-13.37)
+        && arr.PushBool(true)
+        && arr.PushBool(false);
+
+    print_json(arr);
+
+    if (! success) {
+        LogError("json_test: failed while pushing array values");
+
+        success = false;
+    }
+
+    success = success && check_array_remove(arr, 0);
+    success = success && check_array_remove(arr, arr.CurrentIndex - 1);
+    int max = arr.CurrentIndex - 1;
+    success = success && check_array_remove(arr, GetRandomInt(0, max));
+
+    if (arr.Length != max) {
+        LogError("json_test: array did not properly shift down indexes");
+
+        success = false;
+    }
+
+    delete arr;
 
     return success;
 }
@@ -756,6 +823,9 @@ public void OnPluginStart()
 
     PrintToServer("it_should_remove_meta_keys_from_objects");
     check_test(it_should_remove_meta_keys_from_objects());
+
+    PrintToServer("it_should_shift_array_down_after_removed_index");
+    check_test(it_should_shift_array_down_after_removed_index());
 
     PrintToServer("");
     PrintToServer("%d OK, %d FAILED", passed, failed);

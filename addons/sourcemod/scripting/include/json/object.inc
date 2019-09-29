@@ -139,6 +139,17 @@ methodmap JSON_Object < StringMap {
     }
 
     /**
+     * Checks whether the object has an index.
+     *
+     * @param index     Index to check existence of.
+     * @returns         True if the index exists, false otherwise.
+     */
+    public bool HasIndex(int index)
+    {
+        return index >= 0 && index < this.Length;
+    }
+
+    /**
      * Gets the string representation of an array index.
      *
      * @param output    String buffer to store output.

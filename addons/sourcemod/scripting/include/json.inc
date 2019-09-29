@@ -209,13 +209,13 @@ stock void json_encode(JSON_Object obj, char[] output, int maxlen, bool pretty_p
     if (! is_empty) {
         // remove the final comma
         output[strlen(output) - 1] = '\0';
-    }
 
-    if (pretty_print) {
-        StrCat(output, maxlen, JSON_PP_NEWLINE);
+        if (pretty_print) {
+            StrCat(output, maxlen, JSON_PP_NEWLINE);
 
-        for (int j = 0; j < depth; ++j) {
-            StrCat(output, maxlen, JSON_PP_INDENT);
+            for (int j = 0; j < depth; ++j) {
+                StrCat(output, maxlen, JSON_PP_INDENT);
+            }
         }
     }
 

@@ -558,7 +558,21 @@ bool it_should_pretty_print()
     parent_obj.Cleanup();
     delete parent_obj;
 
-    return StrEqual(json_encode_output, "{\n    \"first_depth\": {\n        \"im_indented\": null,\n        \"second_depth\": [\n            1\n        ]\n    },\n    \"pretty_printing\": true\n}");
+    bool success = StrEqual(json_encode_output, "{\n    \"first_depth\": {\n        \"im_indented\": null,\n        \"second_depth\": [\n            1,\n            []\n        ]\n    },\n    \"pretty_printing\": true\n}");
+
+    JSON_Object empty_arr = new JSON_Object(true);
+    print_json(empty_arr, true);
+    delete empty_arr;
+
+    success = success && StrEqual(json_encode_output, "[]");
+
+    JSON_Object empty_object = new JSON_Object();
+    print_json(empty_object, true);
+    delete empty_object;
+
+    success = success && StrEqual(json_encode_output, "{}");
+
+    return success;
 }
 
 bool it_should_trim_floats()

@@ -862,6 +862,69 @@ methodmap JSON_Object < StringMap {
      */
 
     /**
+     * Finds the index of a value in the array.
+     *
+     * @param value     Value to search for.
+     * @returns         The index of the value if it is found, -1 otherwise.
+     */
+    public int IndexOf(any value)
+    {
+        any current;
+        for (int i = 0; i < this.CurrentIndex; ++i) {
+            if (this.GetValueIndexed(i, current) && value == current) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    /**
+     * Finds the index of a string in the array.
+     *
+     * @param value     String to search for.
+     * @returns         The index of the string if it is found, -1 otherwise.
+     */
+    public int IndexOfString(const char[] value)
+    {
+        for (int i = 0; i < this.CurrentIndex; ++i) {
+            if (this.GetKeyTypeIndexed(i) != Type_String) {
+                continue;
+            }
+
+            int current_size = this.GetKeyLengthIndexed(i) + 1;
+            char[] current = new char[current_size];
+            this.GetStringIndexed(i, current, current_size);
+            if (StrEqual(value, current)) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    /**
+     * Determines whether the array contains a value.
+     *
+     * @param value     Value to search for.
+     * @returns         True if the value is found, false otherwise.
+     */
+    public bool Contains(any value)
+    {
+        return this.IndexOf(value) != -1;
+    }
+
+    /**
+     * Determines whether the array contains a string.
+     *
+     * @param value     String to search for.
+     * @returns         True if the string is found, false otherwise.
+     */
+    public bool ContainsString(const char[] value)
+    {
+        return this.IndexOfString(value) != -1;
+    }
+    /**
      * Encodes the object into its string representation.
      *
      * @param output        String buffer to store output.

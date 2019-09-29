@@ -401,6 +401,25 @@ methodmap JSON_Object < StringMap {
      * @section Object getters.
      */
 
+    // GetValue is implemented natively by StringMap
+
+    /**
+     * Retrieves the value stored at an index.
+     *
+     * @param index     Index to retrieve value for.
+     * @param value     Variable to store value.
+     * @returns         Value stored at index.
+     */
+    public bool GetValueIndexed(int index, any &value)
+    {
+        char key[JSON_INDEX_BUFFER_SIZE];
+        if (! this.GetIndexString(key, sizeof(key), index)) {
+            return false;
+        }
+
+        return this.GetValue(key, value);
+    }
+
     // GetString is implemented natively by StringMap
 
     /**

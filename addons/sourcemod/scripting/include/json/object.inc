@@ -100,6 +100,11 @@ methodmap JSON_Object < StringMap {
             int result;
             return (this.GetValue(JSON_ARRAY_INDEX_KEY, result)) ? result : -1;
         }
+
+        public set(int value)
+        {
+            this.SetValue(JSON_ARRAY_INDEX_KEY, value);
+        }
     }
 
     /**
@@ -124,12 +129,13 @@ methodmap JSON_Object < StringMap {
      */
     public bool IncrementIndex()
     {
-        int current = this.CurrentIndex;
-        if (current == -1) {
+        if (! this.HasKey(JSON_ARRAY_INDEX_KEY)) {
             return false;
         }
 
-        return this.SetValue(JSON_ARRAY_INDEX_KEY, current + 1);
+        this.CurrentIndex += 1;
+
+        return true;
     }
 
     /**

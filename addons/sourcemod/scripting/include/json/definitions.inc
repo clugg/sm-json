@@ -68,38 +68,6 @@ enum JSON_CELL_TYPE {
 };
 
 /**
- * Multi-dimensional char array mapping characters to their escaped form
- */
-char JSON_STRING_NORMAL[][]  = {"\\",   "\"",   "/",   "\b",  "\f",  "\n",  "\r",  "\t" };
-char JSON_STRING_ESCAPED[][] = {"\\\\", "\\\"", "\\/", "\\b", "\\f", "\\n", "\\r", "\\t"};
-
-/**
- * Escapes a string based on the rules defined in json/definitions.inc
- *
- * @param buffer        String buffer.
- * @param maxlength     Maximum buffer length.
- */
-stock void json_escape_string(char[] buffer, int maxlen)
-{
-    for (int i = 0; i < sizeof(JSON_STRING_NORMAL); ++i) {
-        ReplaceString(buffer, maxlen, JSON_STRING_NORMAL[i], JSON_STRING_ESCAPED[i]);
-    }
-}
-
-/**
- * Unescapes a string based on the rules defined in json/definitions.inc
- *
- * @param buffer        String buffer.
- * @param maxlength     Maximum buffer length.
- */
-stock void json_unescape_string(char[] buffer, int maxlen)
-{
-    for (int i = 0; i < sizeof(JSON_STRING_NORMAL); ++i) {
-        ReplaceString(buffer, maxlen, JSON_STRING_ESCAPED[i], JSON_STRING_NORMAL[i]);
-    }
-}
-
-/**
  * Checks whether the key provided is an meta-key that
  * should only be used internally.
  *

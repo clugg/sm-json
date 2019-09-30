@@ -39,42 +39,56 @@
 /**
  * Mapping characters to their escaped form.
  */
-char JSON_STRING_NORMAL[][]  = {"\\",   "\"",   "/",   "\b",  "\f",  "\n",  "\r",  "\t" };
-char JSON_STRING_ESCAPED[][] = {"\\\\", "\\\"", "\\/", "\\b", "\\f", "\\n", "\\r", "\\t"};
+char JSON_STRING_NORMAL[][]  = {
+    "\\",   "\"",   "/",   "\b",  "\f",  "\n",  "\r",  "\t"
+};
+char JSON_STRING_ESCAPED[][] = {
+    "\\\\", "\\\"", "\\/", "\\b", "\\f", "\\n", "\\r", "\\t"
+};
 
 /**
- * Escapes a string.
+ * Escapes a string in-place in a buffer.
  *
  * @param buffer        String buffer.
- * @param maxlength     Maximum buffer length.
+ * @param max_size Maximum size of string buffer.
  */
-stock void json_escape_string(char[] buffer, int maxlen)
+stock void json_escape_string(char[] buffer, int max_size)
 {
     for (int i = 0; i < sizeof(JSON_STRING_NORMAL); ++i) {
-        ReplaceString(buffer, maxlen, JSON_STRING_NORMAL[i], JSON_STRING_ESCAPED[i]);
+        ReplaceString(
+            buffer,
+            max_size,
+            JSON_STRING_NORMAL[i],
+            JSON_STRING_ESCAPED[i]
+        );
     }
 }
 
 /**
- * Unescapes a string.
+ * Unescapes a string in-place in a buffer.
  *
  * @param buffer        String buffer.
- * @param maxlength     Maximum buffer length.
+ * @param max_size Maximum size of string buffer.
  */
-stock void json_unescape_string(char[] buffer, int maxlen)
+stock void json_unescape_string(char[] buffer, int max_size)
 {
     for (int i = 0; i < sizeof(JSON_STRING_NORMAL); ++i) {
-        ReplaceString(buffer, maxlen, JSON_STRING_ESCAPED[i], JSON_STRING_NORMAL[i]);
+        ReplaceString(
+            buffer,
+            max_size,
+            JSON_STRING_ESCAPED[i],
+            JSON_STRING_NORMAL[i]
+        );
     }
 }
 
 /**
  * Checks if a string starts with another string.
  *
- * @param haystack       String to check that starts with needle.
- * @param maxlen         Maximum size of string buffer.
- * @param needle         String to check that haystack starts with.
- * @returns              True if haystack begins with needle, false otherwise.
+ * @param haystack      String to check that starts with needle.
+ * @param max_size Maximum size of string buffer.
+ * @param needle        String to check that haystack starts with.
+ * @returns             True if haystack begins with needle, false otherwise.
  */
 stock bool json_string_startswith(const char[] haystack, const char[] needle)
 {
@@ -96,10 +110,10 @@ stock bool json_string_startswith(const char[] haystack, const char[] needle)
 /**
  * Checks if a string ends with another string.
  *
- * @param haystack       String to check that ends with needle.
- * @param maxlen         Maximum size of string buffer.
- * @param needle         String to check that haystack ends with.
- * @returns              True if haystack ends with needle, false otherwise.
+ * @param haystack      String to check that ends with needle.
+ * @param max_size Maximum size of string buffer.
+ * @param needle        String to check that haystack ends with.
+ * @returns             True if haystack ends with needle, false otherwise.
  */
 stock bool json_string_endswith(const char[] haystack, const char[] needle)
 {

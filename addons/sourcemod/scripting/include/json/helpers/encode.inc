@@ -39,72 +39,88 @@
 #include <string>
 
 /**
- * @section Calculating buffer sizes for JSON cells.
+ * @section Calculate number of characters needed to store a value in a buffer.
  */
 
 /**
  * Calculates the maximum buffer length required to
  * store the JSON cell representation of a string.
  *
- * @param maxlen    The string's current length or buffer size.
+ * @param length    The length of the string.
  * @returns         Maximum buffer length.
  */
-stock int json_cell_string_size(int maxlen)
+stock int json_cell_string_size(int length)
 {
-    return (maxlen * 2) + 3;  // * 2 for potential escaping, + 3 for surrounding quotes + NULL
+    // double for potential escaping, + 2 for outside quotes + NULL terminator
+    return (length * 2) + 3;
 }
 
 /**
  * Calculates the maximum buffer length required to
  * store the JSON cell representation of an int.
  *
- * @param input     The int.
+ * @param input     Value to calculate maximum buffer length for.
  * @returns         Maximum buffer length.
  */
 stock int json_cell_int_size(int input)
 {
     if (input == 0) {
-        return 2;  // "0" + NULL
+        // "0" + NULL terminator
+        return 2;
     }
 
-    return ((input < 0) ? 1 : 0) + RoundToFloor(Logarithm(FloatAbs(float(input)), 10.0)) + 2;  // neg sign + number of digits + NULL
+    int result = 0;
+    if (input < 0) {
+        // negative sign
+        result += 1;
+    }
+
+    // calculate number of digits in number
+    result += RoundToFloor(Logarithm(FloatAbs(float(input)), 10.0)) + 1;
+
+    // NULL terminator
+    result += 1;
+
+    return result;
 }
 
 /**
  * Calculates the maximum buffer length required to
  * store the JSON cell representation of a float.
  *
- * @returns         Maximum buffer length.
+ * @returns     Maximum buffer length.
  */
 stock int json_cell_float_size()
 {
-    return JSON_FLOAT_BUFFER_SIZE;  // fixed-length
+    return JSON_FLOAT_BUFFER_SIZE;
 }
 
 /**
  * Calculates the maximum buffer length required to
  * store the JSON cell representation of a bool.
  *
- * @returns         Maximum buffer length.
+ * @returns     Maximum buffer length.
  */
 stock int json_cell_bool_size()
 {
-    return 6;  // "true|false" + NULL
+    // "true"|"false" + NULL terminator
+    return 6;
 }
 
 /**
  * Calculates the maximum buffer length required to
  * store the JSON cell representation of null.
  *
- * @returns         Maximum buffer length.
+ * @returns     Maximum buffer length.
  */
 stock int json_cell_null_size()
 {
-    return 5;  // "null" + NULL
+    // "null" + NULL terminator
+    return 5;
 }
 
 /**
- * @section Generating JSON cells.
+ * @section Convert values to JSON-compatible values in a buffer.
  */
 
 /**
@@ -112,17 +128,22 @@ stock int json_cell_null_size()
  *
  * @param input     Value to generate output for.
  * @param output    String buffer to store output.
- * @param maxlen    Maximum size of string buffer.
+ * @param max_size  Maximum size of string buffer.
  */
-stock void json_cell_string(const char[] input, char[] output, int maxlen)
+stock void json_cell_string(const char[] input, char[] output, int max_size)
 {
-    strcopy(output, maxlen, "?");  // add dummy char at start so we can replace it with a quote later
-    StrCat(output, maxlen, input);  // add input string to output
-    json_escape_string(output, maxlen);  // run basic escapes on the string
+    // add dummy char that won't be escaped to replace with a quote later
+    strcopy(output, max_size, "?");
+
+    // add input string to output
+    StrCat(output, max_size, input);
+
+    // escape the output string
+    json_escape_string(output, max_size);
 
     // surround string with quotations
     output[0] = '"';
-    StrCat(output, maxlen, "\"");
+    StrCat(output, max_size, "\"");
 }
 
 /**
@@ -130,11 +151,11 @@ stock void json_cell_string(const char[] input, char[] output, int maxlen)
  *
  * @param input     Value to generate output for.
  * @param output    String buffer to store output.
- * @param maxlen    Maximum size of string buffer.
+ * @param max_size  Maximum size of string buffer.
  */
-stock void json_cell_int(int input, char[] output, int maxlen)
+stock void json_cell_int(int input, char[] output, int max_size)
 {
-    IntToString(input, output, maxlen);
+    IntToString(input, output, max_size);
 }
 
 /**
@@ -142,11 +163,11 @@ stock void json_cell_int(int input, char[] output, int maxlen)
  *
  * @param input     Value to generate output for.
  * @param output    String buffer to store output.
- * @param maxlen    Maximum size of string buffer.
+ * @param max_size  Maximum size of string buffer.
  */
-stock void json_cell_float(float input, char[] output, int maxlen)
+stock void json_cell_float(float input, char[] output, int max_size)
 {
-    FloatToString(input, output, maxlen);
+    FloatToString(input, output, max_size);
 
     // trim trailing 0s from float output up until decimal point
     int last_char = strlen(output) - 1;
@@ -160,20 +181,20 @@ stock void json_cell_float(float input, char[] output, int maxlen)
  *
  * @param input     Value to generate output for.
  * @param output    String buffer to store output.
- * @param maxlen    Maximum size of string buffer.
+ * @param max_size  Maximum size of string buffer.
  */
-stock void json_cell_bool(bool input, char[] output, int maxlen)
+stock void json_cell_bool(bool input, char[] output, int max_size)
 {
-    strcopy(output, maxlen, (input) ? "true" : "false");
+    strcopy(output, max_size, (input) ? "true" : "false");
 }
 
 /**
  * Generates the JSON cell representation of null.
  *
  * @param output    String buffer to store output.
- * @param maxlen    Maximum size of string buffer.
+ * @param max_size  Maximum size of string buffer.
  */
-stock void json_cell_null(char[] output, int maxlen)
+stock void json_cell_null(char[] output, int max_size)
 {
-    strcopy(output, maxlen, "null");
+    strcopy(output, max_size, "null");
 }

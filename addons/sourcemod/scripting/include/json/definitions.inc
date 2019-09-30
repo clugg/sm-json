@@ -39,20 +39,41 @@
 #include <string>
 #include <json/helpers/string>
 
-// you may need to tinker with these for large objects/floating point numbers
+/**
+ * @section Pretty Print Constants
+ *
+ * Used to determine how pretty printed JSON should be formatted when encoded.
+ * You can modify these if you prefer your JSON formatted differently.
+ */
+
+#define JSON_PP_AFTER_COLON " "
+#define JSON_PP_INDENT "    "
+#define JSON_PP_NEWLINE "\n"
+
+/**
+ * @section Buffer Size Constants
+ *
+ * You may need to change these if you are working with very large arrays or floating point numbers.
+ */
+
 #define JSON_FLOAT_BUFFER_SIZE 32
 #define JSON_INDEX_BUFFER_SIZE 16
 
-// meta-key constants
+/**
+ * @section Meta-key Constants
+ *
+ * Used to store metadata for each key in an object.
+ * You shouldn't need to change these unless working with keys that may clash with them.
+ */
+
 #define JSON_ARRAY_INDEX_KEY "__array_index"
 #define JSON_META_TYPE_KEY   ":type"
 #define JSON_META_LENGTH_KEY ":length"
 #define JSON_META_HIDDEN_KEY ":hidden"
 
-// pretty print constants
-#define JSON_PP_AFTER_COLON " "
-#define JSON_PP_INDENT "    "
-#define JSON_PP_NEWLINE "\n"
+/**
+ * @section General
+ */
 
 /**
  * Types of cells within a JSON object
@@ -68,8 +89,7 @@ enum JSON_CELL_TYPE {
 };
 
 /**
- * Checks whether the key provided is an meta-key that
- * should only be used internally.
+ * Checks whether the key provided is a meta-key that should only be used internally.
  *
  * @param key   Key to check.
  * @returns     True when it is a meta-key, false otherwise.

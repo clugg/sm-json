@@ -37,6 +37,38 @@
 #define _json_helpers_string_included
 
 /**
+ * Mapping characters to their escaped form.
+ */
+char JSON_STRING_NORMAL[][]  = {"\\",   "\"",   "/",   "\b",  "\f",  "\n",  "\r",  "\t" };
+char JSON_STRING_ESCAPED[][] = {"\\\\", "\\\"", "\\/", "\\b", "\\f", "\\n", "\\r", "\\t"};
+
+/**
+ * Escapes a string.
+ *
+ * @param buffer        String buffer.
+ * @param maxlength     Maximum buffer length.
+ */
+stock void json_escape_string(char[] buffer, int maxlen)
+{
+    for (int i = 0; i < sizeof(JSON_STRING_NORMAL); ++i) {
+        ReplaceString(buffer, maxlen, JSON_STRING_NORMAL[i], JSON_STRING_ESCAPED[i]);
+    }
+}
+
+/**
+ * Unescapes a string.
+ *
+ * @param buffer        String buffer.
+ * @param maxlength     Maximum buffer length.
+ */
+stock void json_unescape_string(char[] buffer, int maxlen)
+{
+    for (int i = 0; i < sizeof(JSON_STRING_NORMAL); ++i) {
+        ReplaceString(buffer, maxlen, JSON_STRING_ESCAPED[i], JSON_STRING_NORMAL[i]);
+    }
+}
+
+/**
  * Checks if a string starts with another string.
  *
  * @param haystack       String to check that starts with needle.

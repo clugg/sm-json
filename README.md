@@ -142,7 +142,7 @@ for (int i = 0; i < obj.Length; ++i) {
     char[] key = new char[key_length];
 
     if (is_array) {
-        obj.GetIndexString(key, key_length, i);
+        IntToString(i, key, key_length);
     } else {
         snap.GetKey(i, key, key_length);
 

@@ -82,7 +82,7 @@ stock void json_encode(JSON_Object obj, char[] output, int max_size, bool pretty
         char[] key = new char[key_length];
 
         if (is_array) {
-            obj.GetIndexString(key, key_length, i);
+            IntToString(i, key, key_length);
         } else {
             snap.GetKey(i, key, key_length);
         }

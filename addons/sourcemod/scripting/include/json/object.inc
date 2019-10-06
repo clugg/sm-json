@@ -153,18 +153,18 @@ methodmap JSON_Object < StringMap {
      * Gets the string representation of an array index.
      *
      * @param output    String buffer to store output.
-     * @param maxlen    Maximum size of string buffer.
+     * @param max_size  Maximum size of string buffer.
      * @param key       Key to get string for. [default: current index]
      * @returns         True on success, false otherwise.
      */
-    public int GetIndexString(char[] output, int maxlen, int key = -1)
+    public int GetIndexString(char[] output, int max_size, int key = -1)
     {
         key = (key == -1) ? this.CurrentIndex : key;
         if (key == -1) {
             return false;
         }
 
-        return IntToString(key, output, maxlen);
+        return IntToString(key, output, max_size);
     }
 
     /**
@@ -179,9 +179,9 @@ methodmap JSON_Object < StringMap {
      */
     public JSON_CELL_TYPE GetKeyType(const char[] key)
     {
-        int maxlen = strlen(key) + strlen(JSON_META_TYPE_KEY) + 1;
-        char[] type_key = new char[maxlen];
-        Format(type_key, maxlen, "%s%s", key, JSON_META_TYPE_KEY);
+        int max_size = strlen(key) + strlen(JSON_META_TYPE_KEY) + 1;
+        char[] type_key = new char[max_size];
+        Format(type_key, max_size, "%s%s", key, JSON_META_TYPE_KEY);
 
         JSON_CELL_TYPE type;
         return (this.GetValue(type_key, type)) ? type : Type_Invalid;
@@ -211,9 +211,9 @@ methodmap JSON_Object < StringMap {
      */
     public int GetKeyLength(const char[] key)
     {
-        int maxlen = strlen(key) + strlen(JSON_META_LENGTH_KEY) + 1;
-        char[] length_key = new char[maxlen];
-        Format(length_key, maxlen, "%s%s", key, JSON_META_LENGTH_KEY);
+        int max_size = strlen(key) + strlen(JSON_META_LENGTH_KEY) + 1;
+        char[] length_key = new char[max_size];
+        Format(length_key, max_size, "%s%s", key, JSON_META_LENGTH_KEY);
 
         int length;
         return (this.GetValue(length_key, length)) ? length : -1;
@@ -243,9 +243,9 @@ methodmap JSON_Object < StringMap {
      */
     public bool GetKeyHidden(const char[] key)
     {
-        int maxlen = strlen(key) + strlen(JSON_META_HIDDEN_KEY) + 1;
-        char[] length_key = new char[maxlen];
-        Format(length_key, maxlen, "%s%s", key, JSON_META_HIDDEN_KEY);
+        int max_size = strlen(key) + strlen(JSON_META_HIDDEN_KEY) + 1;
+        char[] length_key = new char[max_size];
+        Format(length_key, max_size, "%s%s", key, JSON_META_HIDDEN_KEY);
 
         bool hidden;
         return (this.GetValue(length_key, hidden)) ? hidden : false;
@@ -280,9 +280,9 @@ methodmap JSON_Object < StringMap {
      */
     public bool SetKeyType(const char[] key, JSON_CELL_TYPE type)
     {
-        int maxlen = strlen(key) + strlen(JSON_META_TYPE_KEY) + 1;
-        char[] type_key = new char[maxlen];
-        Format(type_key, maxlen, "%s%s", key, JSON_META_TYPE_KEY);
+        int max_size = strlen(key) + strlen(JSON_META_TYPE_KEY) + 1;
+        char[] type_key = new char[max_size];
+        Format(type_key, max_size, "%s%s", key, JSON_META_TYPE_KEY);
 
         return this.SetValue(type_key, type);
     }
@@ -313,9 +313,9 @@ methodmap JSON_Object < StringMap {
      */
     public bool SetKeyLength(const char[] key, int length)
     {
-        int maxlen = strlen(key) + strlen(JSON_META_LENGTH_KEY) + 1;
-        char[] length_key = new char[maxlen];
-        Format(length_key, maxlen, "%s%s", key, JSON_META_LENGTH_KEY);
+        int max_size = strlen(key) + strlen(JSON_META_LENGTH_KEY) + 1;
+        char[] length_key = new char[max_size];
+        Format(length_key, max_size, "%s%s", key, JSON_META_LENGTH_KEY);
 
         return this.SetValue(length_key, length);
     }
@@ -346,9 +346,9 @@ methodmap JSON_Object < StringMap {
      */
     public bool SetKeyHidden(const char[] key, bool hidden)
     {
-        int maxlen = strlen(key) + strlen(JSON_META_HIDDEN_KEY) + 1;
-        char[] hidden_key = new char[maxlen];
-        Format(hidden_key, maxlen, "%s%s", key, JSON_META_HIDDEN_KEY);
+        int max_size = strlen(key) + strlen(JSON_META_HIDDEN_KEY) + 1;
+        char[] hidden_key = new char[max_size];
+        Format(hidden_key, max_size, "%s%s", key, JSON_META_HIDDEN_KEY);
 
         return this.SetValue(hidden_key, hidden);
     }
@@ -400,7 +400,7 @@ methodmap JSON_Object < StringMap {
      *
      * @param index     Index to retrieve string value for.
      * @param value     String buffer to store output.
-     * @param maxlen    Maximum size of string buffer.
+     * @param max_size  Maximum size of string buffer.
      * @returns         True on success. False if the key is not set, or the key is set as a value or array (not a string).
      */
     public bool GetStringIndexed(int index, char[] value, int max_size)
@@ -980,13 +980,13 @@ methodmap JSON_Object < StringMap {
      * Encodes the object into its string representation.
      *
      * @param output        String buffer to store output.
-     * @param maxlen        Maximum size of string buffer.
+     * @param max_size      Maximum size of string buffer.
      * @param pretty_print  Should the output be pretty printed (newlines and spaces)? [default: false]
      * @param depth         The current depth of the encoder. [default: 0]
      */
-    public void Encode(char[] output, int maxlen, bool pretty_print = false, int depth = 0)
+    public void Encode(char[] output, int max_size, bool pretty_print = false, int depth = 0)
     {
-        json_encode(this, output, maxlen, pretty_print, depth);
+        json_encode(this, output, max_size, pretty_print, depth);
     }
 
     /**

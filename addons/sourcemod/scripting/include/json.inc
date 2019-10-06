@@ -48,11 +48,11 @@
  *
  * @param obj           Object to encode.
  * @param output        String buffer to store output.
- * @param maxlen        Maximum size of string buffer.
+ * @param max_size      Maximum size of string buffer.
  * @param pretty_print  Should the output be pretty printed (newlines and spaces)? [default: false]
  * @param depth         The current depth of the encoder. [default: 0]
  */
-stock void json_encode(JSON_Object obj, char[] output, int maxlen, bool pretty_print = false, int depth = 0)
+stock void json_encode(JSON_Object obj, char[] output, int max_size, bool pretty_print = false, int depth = 0)
 {
     bool is_array = obj.IsArray;
     bool is_empty = true;
@@ -68,12 +68,12 @@ stock void json_encode(JSON_Object obj, char[] output, int maxlen, bool pretty_p
     if (is_array) {
         json_size = obj.CurrentIndex;
 
-        strcopy(output, maxlen, "[");
+        strcopy(output, max_size, "[");
     } else {
         snap = obj.Snapshot();
         json_size = snap.Length;
 
-        strcopy(output, maxlen, "{");
+        strcopy(output, max_size, "{");
     }
 
     int key_length = 0;
@@ -132,7 +132,7 @@ stock void json_encode(JSON_Object obj, char[] output, int maxlen, bool pretty_p
                 cell_length = json_cell_null_size();
             }
             case Type_Object: {
-                cell_length = maxlen;
+                cell_length = max_size;
             }
         }
 
@@ -190,14 +190,14 @@ stock void json_encode(JSON_Object obj, char[] output, int maxlen, bool pretty_p
         StrCat(builder, builder_size, ",");
 
         if (pretty_print) {
-            StrCat(output, maxlen, JSON_PP_NEWLINE);
+            StrCat(output, max_size, JSON_PP_NEWLINE);
             for (int j = 0; j < depth + 1; ++j) {
-                StrCat(output, maxlen, JSON_PP_INDENT);
+                StrCat(output, max_size, JSON_PP_INDENT);
             }
         }
 
         // send builder to output
-        StrCat(output, maxlen, builder);
+        StrCat(output, max_size, builder);
 
         is_empty = false;
     }
@@ -211,16 +211,16 @@ stock void json_encode(JSON_Object obj, char[] output, int maxlen, bool pretty_p
         output[strlen(output) - 1] = '\0';
 
         if (pretty_print) {
-            StrCat(output, maxlen, JSON_PP_NEWLINE);
+            StrCat(output, max_size, JSON_PP_NEWLINE);
 
             for (int j = 0; j < depth; ++j) {
-                StrCat(output, maxlen, JSON_PP_INDENT);
+                StrCat(output, max_size, JSON_PP_INDENT);
             }
         }
     }
 
     // append closing bracket
-    StrCat(output, maxlen, (is_array) ? "]" : "}");
+    StrCat(output, max_size, (is_array) ? "]" : "}");
 }
 
 /**

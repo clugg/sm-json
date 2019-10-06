@@ -49,8 +49,8 @@ char JSON_STRING_ESCAPED[][] = {
 /**
  * Escapes a string in-place in a buffer.
  *
- * @param buffer        String buffer.
- * @param max_size Maximum size of string buffer.
+ * @param buffer    String buffer.
+ * @param max_size  Maximum size of string buffer.
  */
 stock void json_escape_string(char[] buffer, int max_size)
 {
@@ -67,8 +67,8 @@ stock void json_escape_string(char[] buffer, int max_size)
 /**
  * Unescapes a string in-place in a buffer.
  *
- * @param buffer        String buffer.
- * @param max_size Maximum size of string buffer.
+ * @param buffer    String buffer.
+ * @param max_size  Maximum size of string buffer.
  */
 stock void json_unescape_string(char[] buffer, int max_size)
 {
@@ -85,10 +85,10 @@ stock void json_unescape_string(char[] buffer, int max_size)
 /**
  * Checks if a string starts with another string.
  *
- * @param haystack      String to check that starts with needle.
- * @param max_size Maximum size of string buffer.
- * @param needle        String to check that haystack starts with.
- * @returns             True if haystack begins with needle, false otherwise.
+ * @param haystack  String to check that starts with needle.
+ * @param max_size  Maximum size of string buffer.
+ * @param needle    String to check that haystack starts with.
+ * @returns         True if haystack begins with needle, false otherwise.
  */
 stock bool json_string_startswith(const char[] haystack, const char[] needle)
 {
@@ -110,10 +110,10 @@ stock bool json_string_startswith(const char[] haystack, const char[] needle)
 /**
  * Checks if a string ends with another string.
  *
- * @param haystack      String to check that ends with needle.
- * @param max_size Maximum size of string buffer.
- * @param needle        String to check that haystack ends with.
- * @returns             True if haystack ends with needle, false otherwise.
+ * @param haystack  String to check that ends with needle.
+ * @param max_size  Maximum size of string buffer.
+ * @param needle    String to check that haystack ends with.
+ * @returns         True if haystack ends with needle, false otherwise.
  */
 stock bool json_string_endswith(const char[] haystack, const char[] needle)
 {

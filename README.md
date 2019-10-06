@@ -84,8 +84,8 @@ methodmap YourClass < JSON_Object {
         return this.SetString("name", value);
     }
 
-    public bool GetName(char[] buffer, int maxlen) {
-        return this.GetString("name", buffer, maxlen);
+    public bool GetName(char[] buffer, int max_size) {
+        return this.GetString("name", buffer, max_size);
     }
 
     public YourClass() {

@@ -150,24 +150,6 @@ methodmap JSON_Object < StringMap {
     }
 
     /**
-     * Gets the string representation of an array index.
-     *
-     * @param output    String buffer to store output.
-     * @param max_size  Maximum size of string buffer.
-     * @param key       Key to get string for. [default: current index]
-     * @returns         True on success, false otherwise.
-     */
-    public int GetIndexString(char[] output, int max_size, int key = -1)
-    {
-        key = (key == -1) ? this.CurrentIndex : key;
-        if (key == -1) {
-            return false;
-        }
-
-        return IntToString(key, output, max_size);
-    }
-
-    /**
      * @section Internal getters.
      */
 
@@ -196,7 +178,7 @@ methodmap JSON_Object < StringMap {
     public JSON_CELL_TYPE GetKeyTypeIndexed(int index)
     {
         char key[JSON_INDEX_BUFFER_SIZE];
-        if (! this.GetIndexString(key, sizeof(key), index)) {
+        if (! IntToString(index, key, sizeof(key))) {
             return Type_Invalid;
         }
 
@@ -228,7 +210,7 @@ methodmap JSON_Object < StringMap {
     public int GetKeyLengthIndexed(int index)
     {
         char key[JSON_INDEX_BUFFER_SIZE];
-        if (! this.GetIndexString(key, sizeof(key), index)) {
+        if (! IntToString(index, key, sizeof(key))) {
             return -1;
         }
 
@@ -260,7 +242,7 @@ methodmap JSON_Object < StringMap {
     public bool GetKeyHiddenIndexed(int index)
     {
         char key[JSON_INDEX_BUFFER_SIZE];
-        if (! this.GetIndexString(key, sizeof(key), index)) {
+        if (! IntToString(index, key, sizeof(key))) {
             return false;
         }
 
@@ -297,7 +279,7 @@ methodmap JSON_Object < StringMap {
     public bool SetKeyTypeIndexed(int index, JSON_CELL_TYPE value)
     {
         char key[JSON_INDEX_BUFFER_SIZE];
-        if (! this.GetIndexString(key, sizeof(key), index)) {
+        if (! IntToString(index, key, sizeof(key))) {
             return false;
         }
 
@@ -330,7 +312,7 @@ methodmap JSON_Object < StringMap {
     public bool SetKeyLengthIndexed(int index, int length)
     {
         char key[JSON_INDEX_BUFFER_SIZE];
-        if (! this.GetIndexString(key, sizeof(key), index)) {
+        if (! IntToString(index, key, sizeof(key))) {
             return false;
         }
 
@@ -363,7 +345,7 @@ methodmap JSON_Object < StringMap {
     public bool SetKeyHiddenIndexed(int index, bool hidden)
     {
         char key[JSON_INDEX_BUFFER_SIZE];
-        if (! this.GetIndexString(key, sizeof(key), index)) {
+        if (! IntToString(index, key, sizeof(key))) {
             return false;
         }
 
@@ -386,7 +368,7 @@ methodmap JSON_Object < StringMap {
     public bool GetValueIndexed(int index, any &value)
     {
         char key[JSON_INDEX_BUFFER_SIZE];
-        if (! this.GetIndexString(key, sizeof(key), index)) {
+        if (! IntToString(index, key, sizeof(key))) {
             return false;
         }
 
@@ -406,7 +388,7 @@ methodmap JSON_Object < StringMap {
     public bool GetStringIndexed(int index, char[] value, int max_size)
     {
         char key[JSON_INDEX_BUFFER_SIZE];
-        if (! this.GetIndexString(key, sizeof(key), index)) {
+        if (! IntToString(index, key, sizeof(key))) {
             return false;
         }
 
@@ -434,7 +416,7 @@ methodmap JSON_Object < StringMap {
     public int GetIntIndexed(int index)
     {
         char key[JSON_INDEX_BUFFER_SIZE];
-        if (! this.GetIndexString(key, sizeof(key), index)) {
+        if (! IntToString(index, key, sizeof(key))) {
             return -1;
         }
 
@@ -462,7 +444,7 @@ methodmap JSON_Object < StringMap {
     public float GetFloatIndexed(int index)
     {
         char key[JSON_INDEX_BUFFER_SIZE];
-        if (! this.GetIndexString(key, sizeof(key), index)) {
+        if (! IntToString(index, key, sizeof(key))) {
             return -1.0;
         }
 
@@ -490,7 +472,7 @@ methodmap JSON_Object < StringMap {
     public bool GetBoolIndexed(int index)
     {
         char key[JSON_INDEX_BUFFER_SIZE];
-        if (! this.GetIndexString(key, sizeof(key), index)) {
+        if (! IntToString(index, key, sizeof(key))) {
             return false;
         }
 
@@ -518,7 +500,7 @@ methodmap JSON_Object < StringMap {
     public Handle GetHandleIndexed(int index)
     {
         char key[JSON_INDEX_BUFFER_SIZE];
-        if (! this.GetIndexString(key, sizeof(key), index)) {
+        if (! IntToString(index, key, sizeof(key))) {
             return null;
         }
 
@@ -545,7 +527,7 @@ methodmap JSON_Object < StringMap {
     public JSON_Object GetObjectIndexed(int index)
     {
         char key[JSON_INDEX_BUFFER_SIZE];
-        if (! this.GetIndexString(key, sizeof(key), index)) {
+        if (! IntToString(index, key, sizeof(key))) {
             return null;
         }
 
@@ -580,7 +562,7 @@ methodmap JSON_Object < StringMap {
     public bool SetStringIndexed(int index, const char[] value, bool replace = true)
     {
         char key[JSON_INDEX_BUFFER_SIZE];
-        if (! this.GetIndexString(key, sizeof(key), index)) {
+        if (! IntToString(index, key, sizeof(key))) {
             return false;
         }
 
@@ -610,7 +592,7 @@ methodmap JSON_Object < StringMap {
     public bool SetIntIndexed(int index, int value, bool replace = true)
     {
         char key[JSON_INDEX_BUFFER_SIZE];
-        if (! this.GetIndexString(key, sizeof(key), index)) {
+        if (! IntToString(index, key, sizeof(key))) {
             return false;
         }
 
@@ -640,7 +622,7 @@ methodmap JSON_Object < StringMap {
     public bool SetFloatIndexed(int index, float value, bool replace = true)
     {
         char key[JSON_INDEX_BUFFER_SIZE];
-        if (! this.GetIndexString(key, sizeof(key), index)) {
+        if (! IntToString(index, key, sizeof(key))) {
             return false;
         }
 
@@ -670,7 +652,7 @@ methodmap JSON_Object < StringMap {
     public bool SetBoolIndexed(int index, bool value, bool replace = true)
     {
         char key[JSON_INDEX_BUFFER_SIZE];
-        if (! this.GetIndexString(key, sizeof(key), index)) {
+        if (! IntToString(index, key, sizeof(key))) {
             return false;
         }
 
@@ -700,7 +682,7 @@ methodmap JSON_Object < StringMap {
     public bool SetHandleIndexed(int index, Handle value = null, bool replace = true)
     {
         char key[JSON_INDEX_BUFFER_SIZE];
-        if (! this.GetIndexString(key, sizeof(key), index)) {
+        if (! IntToString(index, key, sizeof(key))) {
             return false;
         }
 
@@ -730,7 +712,7 @@ methodmap JSON_Object < StringMap {
     public bool SetObjectIndexed(int index, JSON_Object value, bool replace = true)
     {
         char key[JSON_INDEX_BUFFER_SIZE];
-        if (! this.GetIndexString(key, sizeof(key), index)) {
+        if (! IntToString(index, key, sizeof(key))) {
             return false;
         }
 
@@ -922,7 +904,7 @@ methodmap JSON_Object < StringMap {
         }
 
         char key[JSON_INDEX_BUFFER_SIZE];
-        if (! this.GetIndexString(key, sizeof(key), index)) {
+        if (! IntToString(index, key, sizeof(key))) {
             return false;
         }
 
@@ -931,7 +913,7 @@ methodmap JSON_Object < StringMap {
         }
 
         for (int i = index + 1; i < this.CurrentIndex; ++i) {
-            if (! this.GetIndexString(key, sizeof(key), i)) {
+            if (! IntToString(i, key, sizeof(key))) {
                 return false;
             }
 

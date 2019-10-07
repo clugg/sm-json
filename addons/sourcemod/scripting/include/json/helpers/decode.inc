@@ -39,7 +39,7 @@
 #include <string>
 
 /**
- * @section Determining what type of value a buffer contains.
+ * @section Determine Buffer Contents
  */
 
 /**
@@ -212,7 +212,7 @@ stock bool json_is_float(const char[] buffer)
         }
     }
 
-    /* we should have reached an exponent, decimal or both
+    /* we should have reached an exponent, decimal, or both.
        otherwise, this number can be handled by the int parser */
     return after_decimal || after_exponent;
 }
@@ -225,8 +225,7 @@ stock bool json_is_float(const char[] buffer)
  */
 stock bool json_is_bool(const char[] buffer)
 {
-    return StrEqual(buffer, "true")
-        || StrEqual(buffer, "false");
+    return StrEqual(buffer, "true") || StrEqual(buffer, "false");
 }
 
 /**
@@ -281,11 +280,11 @@ stock bool json_is_array(const char[] buffer)
 
 /**
  * Checks whether the character at the beginning
- * of the buffer is the start of an array.
+ * of the buffer is the end of an array.
  *
  * @param buffer    String buffer of data.
  * @returns         True if the first character in the buffer is
- *                  the start of an array, false otherwise.
+ *                  the end of an array, false otherwise.
  */
 stock bool json_is_array_end(const char[] buffer)
 {
@@ -311,7 +310,7 @@ stock bool json_is_at_end(const char[] buffer, bool is_array)
 }
 
 /**
- * @section Extracting values from a buffer.
+ * @section Extract Contents from Buffer
  */
 
 /**
@@ -356,7 +355,10 @@ stock bool json_extract_until_end(
 ) {
     strcopy(output, output_max_size, "");
 
+    // set start to position of first character in cell
     int start = pos;
+
+    // while we haven't hit whitespace, an end point or the end of the buffer
     while (
         ! json_is_whitespace(buffer[pos])
         && ! json_is_at_end(buffer[pos], is_array)
@@ -364,6 +366,8 @@ stock bool json_extract_until_end(
     ) {
         ++pos;
     }
+
+    // set end to the current position
     int end = pos;
 
     // skip any following whitespace
@@ -374,7 +378,7 @@ stock bool json_extract_until_end(
         return false;
     }
 
-    // copy only from start with length end - start + NULL
+    // copy only from start with length end - start + NULL terminator
     strcopy(output, end - start + 1, buffer[start]);
 
     return pos < max_size;
@@ -401,7 +405,6 @@ stock bool json_extract_string(
     int output_max_size,
     bool is_array
 ) {
-    // extracts a string which needs to be quote-escaped
     strcopy(output, output_max_size, "");
 
     // increment past opening quote
@@ -423,32 +426,28 @@ stock bool json_extract_string(
             return false;
         }
 
-        // pass over any non-quote character
-        if (buffer[pos] != '"') {
-            ++pos;
-            continue;
+        if (buffer[pos] == '"') {
+            // count preceding backslashes to check if quote is escaped
+            int search_pos = pos;
+            int preceding_backslashes = 0;
+            while (search_pos > 0 && buffer[--search_pos] == '\\') {
+                ++preceding_backslashes;
+            }
+
+            // if we have an even number of backslashes, the quote is not escaped
+            if (preceding_backslashes % 2 == 0) {
+                break;
+            }
         }
 
-        // count preceding backslashes to check if quote is escaped
-        int search_pos = pos;
-        int preceding_backslashes = 0;
-        while (search_pos > 0 && buffer[--search_pos] == '\\') {
-            ++preceding_backslashes;
-        }
-
-        // if we have an even number of backslashes, the quote is not escaped
-        if (preceding_backslashes % 2 == 0) {
-            break;
-        }
-
-        // otherwise, pass over the quote as it must be escaped
+        // pass over the character as it is part of the string
         ++pos;
     }
 
     // set end to the current position
     int end = pos;
 
-    // jump 1 ahead since we ended on " instead of an ending char
+    // increment past closing quote
     ++pos;
 
     // skip trailing whitespace
@@ -456,13 +455,13 @@ stock bool json_extract_string(
         return false;
     }
 
-    // if we haven't reached an ending character at the end of the cell
+    // if we haven't reached an ending character at the end of the cell,
     // there is likely junk data not encapsulated by a string
     if (! json_is_at_end(buffer[pos], is_array)) {
         return false;
     }
 
-    // copy only from start with length end - start + NULL
+    // copy only from start with length end - start + NULL terminator
     strcopy(output, end - start + 1, buffer[start]);
     json_unescape_string(output, max_size);
 

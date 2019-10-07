@@ -39,7 +39,7 @@
 #include <string>
 
 /**
- * @section Calculate number of characters needed to store a value in a buffer.
+ * @section Calculate Buffer Size for Value
  */
 
 /**
@@ -120,7 +120,7 @@ stock int json_cell_null_size()
 }
 
 /**
- * @section Convert values to JSON-compatible values in a buffer.
+ * @section Convert Values to JSON Cells
  */
 
 /**

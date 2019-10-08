@@ -41,7 +41,7 @@ public Plugin myinfo = {
     name = "JSON Tester",
     author = "clug",
     description = "Tests dumping and loading JSON objects.",
-    version = "1.0.4",
+    version = "1.1.1",
     url = "https://github.com/clugg/sm-json"
 };
 

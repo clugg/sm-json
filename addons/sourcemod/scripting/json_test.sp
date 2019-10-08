@@ -49,7 +49,7 @@ public Plugin myinfo = {
  * @section Globals
  */
 
-char json_encode_output[256];
+char json_encode_output[1024];
 int passed = 0;
 int failed = 0;
 

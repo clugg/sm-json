@@ -648,7 +648,7 @@ bool it_should_remove_meta_keys_from_arrays()
     arr.RemoveIndexed(0);
 
     if (arr.HasKey("1:type") || arr.HasKey("0:length") || arr.GetKeyTypeIndexed(0) != Type_Int) {
-        LogError("json_test: array did not properly remove meta-keys: %d, %d, %d", arr.GetKeyTypeIndexed(1), arr.GetKeyLengthIndexed(0), arr.GetKeyTypeIndexed(0));
+        LogError("json_test: array did not properly remove meta-keys");
 
         success = false;
     }

@@ -757,7 +757,7 @@ public void OnPluginStart()
     PrintToServer("it_should_support_arrays_nested_in_objects");
     check_test(it_should_support_arrays_nested_in_objects());
 
-    PrintToServer("it_should_support_objects_nested_in_objects");
+    PrintToServer("it_should_support_arrays_nested_in_arrays");
     check_test(it_should_support_arrays_nested_in_arrays());
 
     PrintToServer("it_should_support_basic_methodmaps");

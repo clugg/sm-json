@@ -266,6 +266,13 @@ stock JSON_Object json_decode(const char[] buffer, JSON_Object result = null, in
         // pos is either an opening structure or comma, so increment past it
         ++pos;
 
+        // skip any whitespace preceding the element
+        if (! json_skip_whitespace(buffer, length, pos)) {
+            LogError("json_decode: buffer ended early at position %d", pos);
+
+            return null;
+        }
+
         // if we are at the end of an object or array
         // and haven't checked for empty yet, we can stop here (empty structure)
         if ((! is_array && json_is_object_end(buffer[pos])
@@ -275,12 +282,6 @@ stock JSON_Object json_decode(const char[] buffer, JSON_Object result = null, in
         }
 
         empty_checked = true;
-
-        // skip any whitespace preceding the element
-        if (! json_skip_whitespace(buffer, length, pos)) {
-            LogError("json_decode: buffer ended early at %d", pos);
-            return null;
-        }
 
         // if dealing with an object, look for the key
         if (! is_array) {

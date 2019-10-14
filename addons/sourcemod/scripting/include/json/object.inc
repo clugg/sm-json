@@ -41,7 +41,8 @@
 #include <json/helpers/encode>
 #include <json>
 
-methodmap JSON_Object < StringMap {
+methodmap JSON_Object < StringMap
+{
     /**
      * Creates a new JSON_Object.
      *
@@ -150,14 +151,15 @@ methodmap JSON_Object < StringMap {
     }
 
     /**
-     * @section Internal getters.
+     * @section Internal Getters
      */
 
     /**
      * Gets the cell type stored at a key.
      *
      * @param key   Key to get value type for.
-     * @returns     Value type for key provided, or Type_Invalid if it does not exist.
+     * @returns     Value type for key provided,
+     *              or Type_Invalid if it does not exist.
      */
     public JSON_CELL_TYPE GetKeyType(const char[] key)
     {
@@ -189,7 +191,8 @@ methodmap JSON_Object < StringMap {
      * Gets the length of the string stored at a key.
      *
      * @param key   Key to get string length for.
-     * @returns     Length of string at key provided, or -1 if it is not a string/does not exist.
+     * @returns     Length of string at key provided,
+     *              or -1 if it is not a string/does not exist.
      */
     public int GetKeyLength(const char[] key)
     {
@@ -250,7 +253,7 @@ methodmap JSON_Object < StringMap {
     }
 
     /**
-     * @section Internal setters.
+     * @section Internal Setters
      */
 
     /**
@@ -353,7 +356,7 @@ methodmap JSON_Object < StringMap {
     }
 
     /**
-     * @section Object getters.
+     * @section Getters
      */
 
     // GetValue is implemented natively by StringMap
@@ -508,7 +511,7 @@ methodmap JSON_Object < StringMap {
     }
 
     /**
-     * Retrieves the object stored at a key.
+     * Retrieves the JSON object stored at a key.
      *
      * @param key   Key to retrieve object value for.
      * @returns     Value stored at key.
@@ -535,7 +538,7 @@ methodmap JSON_Object < StringMap {
     }
 
     /**
-     * @section Object setters.
+     * @section Setters
      */
 
     /**
@@ -870,7 +873,9 @@ methodmap JSON_Object < StringMap {
      * @returns         True on success, false if the value was never set.
      */
     public bool Remove(const char[] key) {
-        static char meta_keys[][] = {JSON_META_TYPE_KEY, JSON_META_LENGTH_KEY, JSON_META_HIDDEN_KEY};
+        static char meta_keys[][] = {
+            JSON_META_TYPE_KEY, JSON_META_LENGTH_KEY, JSON_META_HIDDEN_KEY
+        };
 
         // create a new char[] which will fit the longest meta-key
         int meta_key_size = strlen(key) + 8;
@@ -959,7 +964,7 @@ methodmap JSON_Object < StringMap {
     }
 
     /**
-     * Encodes the object into its string representation.
+     * Encodes the instance into its string representation.
      *
      * @param output        String buffer to store output.
      * @param max_size      Maximum size of string buffer.

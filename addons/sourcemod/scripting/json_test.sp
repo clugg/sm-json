@@ -57,7 +57,8 @@ int failed = 0;
  * @section Methodmaps
  */
 
-methodmap Weapon < JSON_Object {
+methodmap Weapon < JSON_Object
+{
     public Weapon()
     {
         return view_as<Weapon>(new JSON_Object());
@@ -87,7 +88,8 @@ methodmap Weapon < JSON_Object {
     }
 }
 
-methodmap Player < JSON_Object {
+methodmap Player < JSON_Object
+{
     public Player()
     {
         return view_as<Player>(new JSON_Object());

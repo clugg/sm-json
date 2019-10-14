@@ -1,13 +1,14 @@
 # sm-json
+![Build Status](https://github.com/clugg/sm-json/workflows/CI/badge.svg) ![Latest Release](https://img.shields.io/github/v/release/clugg/sm-json) ![Downloads](https://img.shields.io/github/downloads/clugg/sm-json/total)
 
 A pure SourcePawn JSON encoder/decoder. Also offers a nice way of implementing objects using `StringMap` inheritance coupled with `methodmap`s.
 
-Follows the JSON specification ([RFC7159](https://tools.ietf.org/html/rfc7159)) almost perfectly. Currently, the following is not supported:
+Follows the JSON specification ([RFC7159](https://tools.ietf.org/html/rfc7159)) almost perfectly. The following are not supported and likely never will be:
 * Any singular value not contained with a structure (e.g. `"string"`, `1`, `0.1`, `true`, `false`, `null`, etc.)
 * Escaping/unescaping unicode values in strings (\uXXXX)
 
 ## Requirements
-* SourceMod 1.7 and up
+* SourceMod 1.7 or later
 
 ## Usage
 
@@ -233,7 +234,14 @@ obj.SetKeyHiddenIndexed(0, true);
 **Note:** Calling Clear() on an object will remove all hidden flags. Be careful not to expose data this way.
 
 ## Testing
-A number of common tests have been written [here](addons/sourcemod/scripting/json_test.sp). They also contain further examples of how the library can be used.
+A number of common tests have been written [here](addons/sourcemod/scripting/json_test.sp). These tests include library-specific tests (which can be considered examples of how the library can be used) as well as almost every test from the [json.org test suite](https://www.json.org/JSON_checker/). Tests regarding unsupported features such as Unicode handling have been excluded.
+
+## Contributing
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+Please ensure that all tests pass before making a pull request.
+
+If you are fixing a bug, please add a regression test to ensure that the bug does not sneak back in. If you are adding a feature, please add tests to ensure that it works as expected.
 
 ## License
 [GNU General Public License v3.0](https://choosealicense.com/licenses/gpl-3.0/)

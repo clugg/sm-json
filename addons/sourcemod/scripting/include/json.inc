@@ -42,6 +42,7 @@
 #include <json/helpers/encode>
 #include <json/helpers/string>
 #include <json/object>
+#include <json/array>
 
 /**
  * Encodes a JSON instance into its string representation.
@@ -60,8 +61,14 @@ stock void json_encode(
     int depth = 0
 )
 {
-    bool is_array = obj.IsArray;
+    JSON_Array arr = null;
+
     bool is_empty = true;
+    bool is_array = obj.IsArray;
+    if (is_array) {
+        arr = view_as<JSON_Array>(obj);
+    }
+
     int builder_size;
 
     // used in key iterator
@@ -72,7 +79,7 @@ stock void json_encode(
     StringMapSnapshot snap = null;
     int json_size = 0;
     if (is_array) {
-        json_size = obj.CurrentIndex;
+        json_size = arr.Length;
 
         strcopy(output, max_size, "[");
     } else {
@@ -91,11 +98,11 @@ stock void json_encode(
             IntToString(i, key, key_length);
         } else {
             snap.GetKey(i, key, key_length);
-        }
 
-        // skip meta-keys
-        if (json_is_meta_key(key)) {
-            continue;
+            // skip meta-keys
+            if (json_is_meta_key(key)) {
+                continue;
+            }
         }
 
         // skip keys that are marked as hidden
@@ -236,16 +243,22 @@ stock void json_encode(
  * Decodes a JSON string into a JSON instance.
  *
  * @param buffer    Buffer to decode.
- * @param result    Object to store output in. Setting this allows loading over
+ * @param existing  Object to store output in. Setting this allows loading over
  *                  an existing JSON instance, 'refreshing' it as opposed to
  *                  creating a new one. [default: null]
  * @param pos       Current position of the decoder as a bytes offset into the buffer.
  * @param depth     Current depth of the decoder as child elements in the object.
  * @returns         JSON instance or null if decoding failed (buffer didn't contain valid JSON).
+ * @error           If the buffer does not contain valid JSON, an error will be thrown.
+ *                  If the buffer does not contain the same structure type as
+ *                  the existing paramater if one is provided, an error will be thrown.
+ *                  For example, an object cannot be reliably decoded over an existing
+ *                  array and vice versa. Only array over array and object over object
+ *                  decoding is supported.
  */
 stock JSON_Object json_decode(
     const char[] buffer,
-    JSON_Object result = null,
+    JSON_Object existing = null,
     int &pos = 0,
     int depth = 0
 )
@@ -260,18 +273,41 @@ stock JSON_Object json_decode(
         return null;
     }
 
+    JSON_Array arr = null;
+    JSON_Object obj = null;
+
     if (json_is_object(buffer[pos])) {
         is_array = false;
+
+        if (existing == null) {
+            obj = new JSON_Object();
+        } else {
+            if (existing.IsArray) {
+                LogError("json_decode: attempting to decode an array over an existing object");
+
+                return null;
+            }
+
+            obj = view_as<JSON_Object>(existing);
+        }
     } else if (json_is_array(buffer[pos])) {
         is_array = true;
+
+        if (existing == null) {
+            arr = new JSON_Array();
+        } else {
+            if (! existing.IsArray) {
+                LogError("json_decode: attempting to decode an object over an existing array");
+
+                return null;
+            }
+
+            arr = view_as<JSON_Array>(existing);
+        }
     } else {
         LogError("json_decode: character not identified as object or array at position %d", pos);
 
         return null;
-    }
-
-    if (result == null) {
-        result = new JSON_Object(is_array);
     }
 
     bool empty_checked = false;
@@ -337,7 +373,7 @@ stock JSON_Object json_decode(
         if (json_is_object(buffer[pos]) || json_is_array(buffer[pos])) {
             // if we are dealing with an object or array
             // fetch the existing object if one exists at the key
-            JSON_Object current = (! is_array) ? result.GetObject(key) : null;
+            JSON_Object current = (! is_array) ? obj.GetObject(key) : null;
 
             // decode recursively
             JSON_Object value = json_decode(buffer, current, pos, depth + 1);
@@ -348,9 +384,9 @@ stock JSON_Object json_decode(
             }
 
             if (is_array) {
-                result.PushObject(value);
+                arr.PushObject(value);
             } else {
-                result.SetObject(key, value);
+                obj.SetObject(key, value);
             }
         } else if (json_is_string(buffer[pos])) {
             // if we are dealing with a string, attempt to extract it
@@ -361,9 +397,9 @@ stock JSON_Object json_decode(
             }
 
             if (is_array) {
-                result.PushString(cell);
+                arr.PushString(cell);
             } else {
-                result.SetString(key, cell);
+                obj.SetString(key, cell);
             }
         } else {
             if (! json_extract_until_end(buffer, length, pos, cell, length, is_array)) {
@@ -381,29 +417,29 @@ stock JSON_Object json_decode(
             if (json_is_int(cell)) {
                 int value = json_extract_int(cell);
                 if (is_array) {
-                    result.PushInt(value);
+                    arr.PushInt(value);
                 } else {
-                    result.SetInt(key, value);
+                    obj.SetInt(key, value);
                 }
             } else if (json_is_float(cell)) {
                 float value = json_extract_float(cell);
                 if (is_array) {
-                    result.PushFloat(value);
+                    arr.PushFloat(value);
                 } else {
-                    result.SetFloat(key, value);
+                    obj.SetFloat(key, value);
                 }
             } else if (json_is_bool(cell)) {
                 bool value = json_extract_bool(cell);
                 if (is_array) {
-                    result.PushBool(value);
+                    arr.PushBool(value);
                 } else {
-                    result.SetBool(key, value);
+                    obj.SetBool(key, value);
                 }
             } else if (json_is_null(cell)) {
                 if (is_array) {
-                    result.PushHandle(null);
+                    arr.PushNull();
                 } else {
-                    result.SetHandle(key, null);
+                    obj.SetNull(key);
                 }
             } else {
                 LogError("json_decode: unknown type encountered at position %d: %s", pos, cell);
@@ -427,6 +463,13 @@ stock JSON_Object json_decode(
         return null;
     }
 
+    JSON_Object result;
+    if (is_array) {
+        result = view_as<JSON_Object>(arr);
+    } else {
+        result = view_as<JSON_Object>(obj);
+    }
+
     return result;
 }
 
@@ -437,8 +480,6 @@ stock JSON_Object json_decode(
  */
 stock void json_cleanup(JSON_Object obj)
 {
-    bool is_array = obj.IsArray;
-
     int key_length = 0;
     StringMapSnapshot snap = obj.Snapshot();
     for (int i = 0; i < snap.Length; ++i) {
@@ -457,17 +498,17 @@ stock void json_cleanup(JSON_Object obj)
             continue;
         }
 
-        JSON_Object nested_obj = obj.GetObject(key);
-        if (nested_obj != null) {
-            nested_obj.Cleanup();
-            delete nested_obj;
+        JSON_Object value = obj.GetObject(key);
+        if (value != null) {
+            json_cleanup(value);
+            delete value;
         }
     }
-
-    obj.Clear();
     delete snap;
 
-    if (is_array) {
-        obj.SetValue(JSON_ARRAY_INDEX_KEY, 0);
+    if (obj.IsArray) {
+        view_as<JSON_Array>(obj).Clear();
+    } else {
+        obj.Clear();
     }
 }

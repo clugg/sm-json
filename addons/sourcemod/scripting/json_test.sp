@@ -41,7 +41,7 @@ public Plugin myinfo = {
     name = "JSON Tester",
     author = "clug",
     description = "Tests dumping and loading JSON objects.",
-    version = "1.1.1",
+    version = "2.0.0",
     url = "https://github.com/clugg/sm-json"
 };
 
@@ -148,28 +148,28 @@ void print_json(JSON_Object obj, bool pretty = false)
     PrintToServer("%s", json_encode_output);
 }
 
-bool check_array_remove(JSON_Object arr, int index)
+bool check_array_remove(JSON_Array arr, int index)
 {
     PrintToServer("Removing element at index %d", index);
 
     // get current value at index
-    JSON_CELL_TYPE type = arr.GetKeyTypeIndexed(index);
+    JSON_CELL_TYPE type = arr.GetKeyType(index);
     int str_size = 0;
     if (type == Type_String) {
-        str_size = arr.GetKeyLengthIndexed(index) + 1;
+        str_size = arr.GetKeyLength(index) + 1;
     }
 
     any value;
     char[] str = new char[str_size];
 
     if (type == Type_String) {
-        arr.GetStringIndexed(index, str, str_size);
+        arr.GetString(index, str, str_size);
     } else {
-        arr.GetValueIndexed(index, value);
+        arr.GetValue(index, value);
     }
 
     // remove the index from the array
-    arr.RemoveIndexed(index);
+    arr.Remove(index);
     print_json(arr);
 
     // confirm that it is gone
@@ -216,7 +216,7 @@ bool it_should_encode_empty_objects()
 
 bool it_should_encode_empty_arrays()
 {
-    JSON_Object arr = new JSON_Object(true);
+    JSON_Array arr = new JSON_Array();
 
     print_json(arr);
     delete arr;
@@ -239,7 +239,7 @@ bool it_should_support_objects()
         && obj.SetFloat("negative_float_zero", -0.0)
         && obj.SetBool("true", true)
         && obj.SetBool("false", false)
-        && obj.SetHandle("handle", null);
+        && obj.SetNull("handle");
 
     print_json(obj);
     delete obj;
@@ -321,7 +321,7 @@ bool it_should_support_objects()
         success = false;
     }
 
-    if ((hndl = decoded_obj.GetHandle("handle")) != null) {
+    if ((hndl = decoded_obj.GetNull("handle")) != null) {
         LogError("json_test: unexpected value for key handle: %d", view_as<int>(hndl));
         success = false;
     }
@@ -333,7 +333,7 @@ bool it_should_support_objects()
 
 bool it_should_support_arrays()
 {
-    JSON_Object arr = new JSON_Object(true);
+    JSON_Array arr = new JSON_Array();
     bool success = arr.PushString("leet")
         && arr.PushString("\"leet\"")
         && arr.PushInt(9001)
@@ -346,7 +346,7 @@ bool it_should_support_arrays()
         && arr.PushFloat(-0.0)
         && arr.PushBool(true)
         && arr.PushBool(false)
-        && arr.PushHandle(null);
+        && arr.PushNull();
 
     print_json(arr);
     delete arr;
@@ -357,7 +357,7 @@ bool it_should_support_arrays()
         return false;
     }
 
-    JSON_Object decoded_arr = json_decode(json_encode_output);
+    JSON_Array decoded_arr = view_as<JSON_Array>(json_decode(json_encode_output));
     if (decoded_arr == null) {
         LogError("json_test: unable to decode array");
 
@@ -369,67 +369,67 @@ bool it_should_support_arrays()
     any value;
     Handle hndl;
 
-    if (! decoded_arr.GetStringIndexed(index++, string, sizeof(string)) || ! StrEqual(string, "leet")) {
+    if (! decoded_arr.GetString(index++, string, sizeof(string)) || ! StrEqual(string, "leet")) {
         LogError("json_test: unexpected value for index %d: %s", index, string);
         success = false;
     }
 
-    if (! decoded_arr.GetStringIndexed(index++, string, sizeof(string)) || ! StrEqual(string, "\"leet\"")) {
+    if (! decoded_arr.GetString(index++, string, sizeof(string)) || ! StrEqual(string, "\"leet\"")) {
         LogError("json_test: unexpected value for index %d: %s", index, string);
         success = false;
     }
 
-    if ((value = decoded_arr.GetIntIndexed(index++)) != 9001) {
+    if ((value = decoded_arr.GetInt(index++)) != 9001) {
         LogError("json_test: unexpected value for index %d: %d", index, value);
         success = false;
     }
 
-    if ((value = decoded_arr.GetIntIndexed(index++)) != -9001) {
+    if ((value = decoded_arr.GetInt(index++)) != -9001) {
         LogError("json_test: unexpected value for index %d: %d", index, value);
         success = false;
     }
 
-    if ((value = decoded_arr.GetIntIndexed(index++)) != 0) {
+    if ((value = decoded_arr.GetInt(index++)) != 0) {
         LogError("json_test: unexpected value for index %d: %d", index, value);
         success = false;
     }
 
-    if ((value = decoded_arr.GetIntIndexed(index++)) != -0) {
+    if ((value = decoded_arr.GetInt(index++)) != -0) {
         LogError("json_test: unexpected value for index %d: %d", index, value);
         success = false;
     }
 
-    if (! equal_enough((value = decoded_arr.GetFloatIndexed(index++)), 13.37)) {
+    if (! equal_enough((value = decoded_arr.GetFloat(index++)), 13.37)) {
         LogError("json_test: unexpected value for index %d: %f", index, value);
         success = false;
     }
 
-    if (! equal_enough((value = decoded_arr.GetFloatIndexed(index++)), -13.37)) {
+    if (! equal_enough((value = decoded_arr.GetFloat(index++)), -13.37)) {
         LogError("json_test: unexpected value for index %d: %f", index, value);
         success = false;
     }
 
-    if ((value = decoded_arr.GetFloatIndexed(index++)) != 0.0) {
+    if ((value = decoded_arr.GetFloat(index++)) != 0.0) {
         LogError("json_test: unexpected value for index %d: %f", index, value);
         success = false;
     }
 
-    if ((value = decoded_arr.GetFloatIndexed(index++)) != -0.0) {
+    if ((value = decoded_arr.GetFloat(index++)) != -0.0) {
         LogError("json_test: unexpected value for index %d: %f", index, value);
         success = false;
     }
 
-    if ((value = decoded_arr.GetBoolIndexed(index++)) != true) {
+    if ((value = decoded_arr.GetBool(index++)) != true) {
         LogError("json_test: unexpected value for index %d: %d", index, value);
         success = false;
     }
 
-    if ((value = decoded_arr.GetBoolIndexed(index++)) != false) {
+    if ((value = decoded_arr.GetBool(index++)) != false) {
         LogError("json_test: unexpected value for index %d: %d", index, value);
         success = false;
     }
 
-    if ((hndl = decoded_arr.GetHandleIndexed(index++)) != null) {
+    if ((hndl = decoded_arr.GetNull(index++)) != null) {
         LogError("json_test: unexpected value for index %d: %d", index, view_as<int>(hndl));
         success = false;
     }
@@ -478,12 +478,12 @@ bool it_should_support_objects_nested_in_arrays()
     JSON_Object nested_obj = new JSON_Object();
     nested_obj.SetBool("nested", true);
 
-    JSON_Object arr = new JSON_Object(true);
+    JSON_Array arr = new JSON_Array();
     arr.PushObject(nested_obj);
 
     print_json(arr);
 
-    bool success = arr.GetObjectIndexed(0).GetBool("nested");
+    bool success = arr.GetObject(0).GetBool("nested");
     arr.Cleanup();
     delete arr;
 
@@ -492,7 +492,7 @@ bool it_should_support_objects_nested_in_arrays()
 
 bool it_should_support_arrays_nested_in_objects()
 {
-    JSON_Object nested_arr = new JSON_Object(true);
+    JSON_Array nested_arr = new JSON_Array();
     nested_arr.PushBool(true);
 
     JSON_Object obj = new JSON_Object();
@@ -500,7 +500,7 @@ bool it_should_support_arrays_nested_in_objects()
 
     print_json(obj);
 
-    bool success = obj.GetObject("array").GetBoolIndexed(0);
+    bool success = view_as<JSON_Array>(obj.GetObject("array")).GetBool(0);
     obj.Cleanup();
     delete obj;
 
@@ -509,15 +509,15 @@ bool it_should_support_arrays_nested_in_objects()
 
 bool it_should_support_arrays_nested_in_arrays()
 {
-    JSON_Object nested_arr = new JSON_Object(true);
+    JSON_Array nested_arr = new JSON_Array();
     nested_arr.PushBool(true);
 
-    JSON_Object arr = new JSON_Object(true);
+    JSON_Array arr = new JSON_Array();
     arr.PushObject(nested_arr);
 
     print_json(arr);
 
-    bool success = arr.GetObjectIndexed(0).GetBoolIndexed(0);
+    bool success = view_as<JSON_Array>(arr.GetObject(0)).GetBool(0);
     arr.Cleanup();
     delete arr;
 
@@ -583,12 +583,12 @@ bool it_should_not_decode(char[] data)
 
 bool it_should_pretty_print()
 {
-    JSON_Object child_arr = new JSON_Object(true);
+    JSON_Array child_arr = new JSON_Array();
     child_arr.PushInt(1);
-    child_arr.PushObject(new JSON_Object(true));
+    child_arr.PushObject(new JSON_Array());
 
     JSON_Object child_obj = new JSON_Object();
-    child_obj.SetHandle("im_indented", null);
+    child_obj.SetNull("im_indented");
     child_obj.SetObject("second_depth", child_arr);
 
     JSON_Object parent_obj = new JSON_Object();
@@ -601,7 +601,7 @@ bool it_should_pretty_print()
 
     bool success = StrEqual(json_encode_output, "{\n    \"first_depth\": {\n        \"im_indented\": null,\n        \"second_depth\": [\n            1,\n            []\n        ]\n    },\n    \"pretty_printing\": true\n}");
 
-    JSON_Object empty_arr = new JSON_Object(true);
+    JSON_Array empty_arr = new JSON_Array();
     print_json(empty_arr, true);
     delete empty_arr;
 
@@ -618,7 +618,7 @@ bool it_should_pretty_print()
 
 bool it_should_trim_floats()
 {
-    JSON_Object arr = new JSON_Object(true);
+    JSON_Array arr = new JSON_Array();
     arr.PushFloat(0.0);
     arr.PushFloat(1.0);
     arr.PushFloat(10.01);
@@ -635,21 +635,21 @@ bool it_should_remove_meta_keys_from_arrays()
 {
     bool success = true;
 
-    JSON_Object arr = new JSON_Object(true);
+    JSON_Array arr = new JSON_Array();
     arr.PushString("hello");
     arr.PushInt(0);
 
-    if (! arr.HasKey("0:type") || arr.GetKeyTypeIndexed(0) != Type_String
-        || ! arr.HasKey("0:length") || arr.GetKeyLengthIndexed(0) != 5
-        || ! arr.HasKey("1:type") || arr.GetKeyTypeIndexed(1) != Type_Int) {
+    if (! arr.parent.HasKey("0:type") || arr.GetKeyType(0) != Type_String
+        || ! arr.parent.HasKey("0:length") || arr.GetKeyLength(0) != 5
+        || ! arr.parent.HasKey("1:type") || arr.GetKeyType(1) != Type_Int) {
         LogError("json_test: array did not properly set meta-keys");
 
         success = false;
     }
 
-    arr.RemoveIndexed(0);
+    arr.Remove(0);
 
-    if (arr.HasKey("1:type") || arr.HasKey("0:length") || arr.GetKeyTypeIndexed(0) != Type_Int) {
+    if (arr.parent.HasKey("1:type") || arr.parent.HasKey("0:length") || arr.GetKeyType(0) != Type_Int) {
         LogError("json_test: array did not properly remove meta-keys");
 
         success = false;
@@ -697,7 +697,7 @@ bool it_should_remove_meta_keys_from_objects()
 
 bool it_should_shift_array_down_after_removed_index()
 {
-    JSON_Object arr = new JSON_Object(true);
+    JSON_Array arr = new JSON_Array();
     bool success = arr.PushString("leet")
         && arr.PushString("\"leet\"")
         && arr.PushInt(9001)
@@ -714,8 +714,8 @@ bool it_should_shift_array_down_after_removed_index()
     }
 
     success = success && check_array_remove(arr, 0);
-    success = success && check_array_remove(arr, arr.CurrentIndex - 1);
-    int max = arr.CurrentIndex - 1;
+    success = success && check_array_remove(arr, arr.Length - 1);
+    int max = arr.Length - 1;
     success = success && check_array_remove(arr, GetRandomInt(0, max));
 
     if (arr.Length != max) {

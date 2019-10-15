@@ -7,6 +7,35 @@ Follows the JSON specification ([RFC7159](https://tools.ietf.org/html/rfc7159)) 
 * Any singular value not contained with a structure (e.g. `"string"`, `1`, `0.1`, `true`, `false`, `null`, etc.)
 * Escaping/unescaping unicode values in strings (\uXXXX)
 
+Table of Contents
+=================
+
+* [Requirements](#requirements)
+* [Installation](#installation)
+* [Usage](#usage)
+  * [Creating and Encoding Arrays & Objects](#creating-and-encoding-arrays--objects)
+  * [Decoding Arrays & Objects](#decoding-arrays--objects)
+  * [Creating a 'Class'](#creating-a-class)
+  * [Decoding 'Classes'](#decoding-classes)
+  * [Iteration](#iteration)
+  * [Pretty Printing](#pretty-printing)
+  * [Cleaning Up](#cleaning-up)
+* [API](#api)
+  * [Getters and Setters](#getters-and-setters)
+  * [Accessing parent methods](#accessing-parent-methods)
+  * [Checking if a key exists](#checking-if-a-key-exists)
+  * [Getting a key's type](#getting-a-keys-type)
+  * [Getting a string's length](#getting-a-strings-length)
+  * [Removing a key](#removing-a-key)
+  * [Hiding Keys](#hiding-keys)
+  * [Searching Arrays](#searching-arrays)
+  * [Encoding Over Existing Instances](#encoding-over-existing-instances)
+  * [Working with Unknowns](#working-with-unknowns)
+  * [Global Helper Functions](#global-helper-functions)
+* [Testing](#testing)
+* [Contributing](#contributing)
+* [License](#license)
+
 ## Requirements
 * SourceMod 1.7 or later
 

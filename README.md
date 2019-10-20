@@ -165,7 +165,7 @@ for (int i = 0; i < obj.Length; ++i) {
     char[] key = new char[key_length];
 
     if (is_array) {
-        IntToString(i, key, key_length);
+        obj.GetIndexString(key, key_length, i);
     } else {
         snap.GetKey(i, key, key_length);
 

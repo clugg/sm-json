@@ -1,5 +1,5 @@
 # sm-json
- ![Build Status](https://github.com/clugg/sm-json/workflows/CI/badge.svg) [![Latest Release](https://img.shields.io/github/v/release/clugg/sm-json)](https://github.com/clugg/sm-json/releases/v1.2.0)
+ ![Build Status](https://github.com/clugg/sm-json/workflows/CI/badge.svg) [![Latest Release](https://img.shields.io/badge/release-v1.2.0-blue)](https://github.com/clugg/sm-json/releases/v1.2.0)
 
 A pure SourcePawn JSON encoder/decoder. Also offers a nice way of implementing objects using `StringMap` inheritance coupled with `methodmap`s.
 

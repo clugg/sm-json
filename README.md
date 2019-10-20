@@ -1,11 +1,33 @@
 # sm-json
- ![Build Status](https://github.com/clugg/sm-json/workflows/CI/badge.svg) [![Latest Release](https://img.shields.io/github/v/release/clugg/sm-json)](https://github.com/clugg/sm-json/releases/latest)
+ ![Build Status](https://github.com/clugg/sm-json/workflows/CI/badge.svg) [![Latest Release](https://img.shields.io/github/v/release/clugg/sm-json)](https://github.com/clugg/sm-json/releases/v1.2.0)
 
 A pure SourcePawn JSON encoder/decoder. Also offers a nice way of implementing objects using `StringMap` inheritance coupled with `methodmap`s.
 
 Follows the JSON specification ([RFC7159](https://tools.ietf.org/html/rfc7159)) almost perfectly. The following are not supported and likely never will be:
 * Any singular value not contained with a structure (e.g. `"string"`, `1`, `0.1`, `true`, `false`, `null`, etc.)
 * Escaping/unescaping unicode values in strings (\uXXXX)
+
+Table of Contents
+=================
+
+* [Requirements](#requirements)
+* [Usage](#usage)
+  * [Including the Library](#including-the-library)
+  * [Creating an Object, Nesting Objects & Basic Encoding](#creating-an-object-nesting-objects--basic-encoding)
+  * [Creating a 'Class'](#creating-a-class)
+  * [Decoding](#decoding)
+  * [Iterating Objects](#iterating-objects)
+  * [Other Stuff](#other-stuff)
+    * [Pretty Printing](#pretty-printing)
+    * [Indexed Methods](#indexed-methods)
+    * [Checking if a key exists](#checking-if-a-key-exists)
+    * [Getting a key's type](#getting-a-keys-type)
+    * [Getting a string's length](#getting-a-strings-length)
+    * [Removing a key](#removing-a-key)
+    * [Hiding Keys/Visibility](#hiding-keysvisibility)
+* [Testing](#testing)
+* [Contributing](#contributing)
+* [License](#license)
 
 ## Requirements
 * SourceMod 1.7 or later

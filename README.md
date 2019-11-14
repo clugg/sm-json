@@ -550,9 +550,9 @@ JSON_Object obj = json_decode(SOME_UNKNOWN_JSON);
 JSON_Array arr = view_as<JSON_Array>(obj);
 
 if (obj.IsArray) {
-    obj.SetString("result", "ok");
-} else {
     arr.PushString("ok");
+} else {
+    obj.SetString("result", "ok");
 }
 ```
 

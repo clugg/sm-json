@@ -251,7 +251,7 @@ stock void json_encode(
  * @returns         JSON instance or null if decoding failed (buffer didn't contain valid JSON).
  * @error           If the buffer does not contain valid JSON, an error will be thrown.
  *                  If the buffer does not contain the same structure type as
- *                  the existing paramater if one is provided, an error will be thrown.
+ *                  the existing parameter if one is provided, an error will be thrown.
  *                  For example, an object cannot be reliably decoded over an existing
  *                  array and vice versa. Only array over array and object over object
  *                  decoding is supported.

@@ -399,12 +399,9 @@ methodmap JSON_Object < StringMap
     }
 
     /**
-     * Encodes the instance into its string representation.
+     * Calls the json_encode method, replacing the 'obj' parameter with this instance.
      *
-     * @param output        String buffer to store output.
-     * @param max_size      Maximum size of string buffer.
-     * @param pretty_print  Should the output be pretty printed (newlines and spaces)? [default: false]
-     * @param depth         The current depth of the encoder. [default: 0]
+     * @see json_encode
      */
     public void Encode(char[] output, int max_size, bool pretty_print = false, int depth = 0)
     {
@@ -412,9 +409,9 @@ methodmap JSON_Object < StringMap
     }
 
     /**
-     * Decodes a JSON string into this object.
+     * Calls the json_decode method, replacing the 'existing' parameter with this instance.
      *
-     * @param buffer    Buffer to decode.
+     * @see json_decode
      */
     public void Decode(const char[] buffer)
     {
@@ -422,7 +419,9 @@ methodmap JSON_Object < StringMap
     }
 
     /**
-     * Recursively cleans up the object and any objects referenced within.
+     * Calls the json_cleanup method, replacing the 'obj' parameter with this instance.
+     *
+     * @see json_cleanup
      */
     public void Cleanup()
     {

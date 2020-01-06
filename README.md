@@ -29,7 +29,7 @@ Table of Contents
   * [Removing a key](#removing-a-key)
   * [Hiding Keys](#hiding-keys)
   * [Searching Arrays](#searching-arrays)
-  * [Encoding Over Existing Instances](#encoding-over-existing-instances)
+  * [Decoding Over Existing Instances](#decoding-over-existing-instances)
   * [Working with Unknowns](#working-with-unknowns)
   * [Global Helper Functions](#global-helper-functions)
 * [Testing](#testing)
@@ -523,7 +523,7 @@ There are a few functions which make working with `JSON_Array`s a bit nicer.
 
 Please note that due to how the `any` type works in SourcePawn, `Contains` may return false positives for values that are stored the same in memory. For example, `0`, `null` and `false` are all stored as `0` in memory and `1` and `true` are both stored as `1` in memory. Because of this, `view_as<JSON_Array>(json_decode("[0]")).Contains(null)` will return true, and so on. You may use `Contains` in conjunction with `GetKeyType` to typecheck the returned index and ensure it matches what you expected.
 
-### Encoding Over Existing Instances
+### Decoding Over Existing Instances
 It is possible that you already have a `JSON_Array` or `JSON_Object` instance which you wish to encode over the top of. This is supported, but only for array over array and object over object. Other combinations will log an error and fail.
 
 ```c

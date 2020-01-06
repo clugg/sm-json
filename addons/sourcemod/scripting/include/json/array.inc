@@ -597,10 +597,7 @@ methodmap JSON_Array < JSON_Object
                 }
             }
 
-            if (this.GetKeyHidden(i)) {
-                this.parent.SetKeyHidden(target, true);
-            }
-
+            this.parent.SetKeyHidden(target, this.GetKeyHidden(i));
             this.parent.Remove(key);
         }
 

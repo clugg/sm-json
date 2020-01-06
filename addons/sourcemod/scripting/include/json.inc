@@ -474,6 +474,145 @@ stock JSON_Object json_decode(
 }
 
 /**
+ * Merges the entries from the second object to the first,
+ * optionally replacing existing entries with the same key.
+ *
+ * @param to        Object to merge on to.
+ * @param from      Object to merge entries from.
+ * @param replace   Should existing keys be replaced if they exist in both objects?
+ * @returns         True on success, false otherwise.
+ * @error           If the objects are not the same structure type
+ *                  as one another, an error will be thrown.
+ *                  For example, an object cannot be reliably merged over an array
+ *                  and vice versa. Only array over array and object over object
+ *                  merging is supported.
+ */
+stock bool json_merge(JSON_Object to, JSON_Object from, bool replace = true)
+{
+    if (to.IsArray && ! from.IsArray) {
+        LogError("json_merge: attempting to merge an object onto an array");
+
+        return false;
+    } else if (! to.IsArray && from.IsArray) {
+        LogError("json_merge: attempting to merge an array onto an object");
+
+        return false;
+    }
+
+    JSON_Array to_arr = null;
+
+    bool is_array = to.IsArray;
+    if (is_array) {
+        to_arr = view_as<JSON_Array>(to);
+    }
+
+    StringMapSnapshot snap = null;
+    int json_size = 0;
+    if (is_array) {
+        json_size = view_as<JSON_Array>(from).Length;
+    } else {
+        snap = from.Snapshot();
+        json_size = snap.Length;
+    }
+
+    int key_length = 0;
+    for (int i = 0; i < json_size; ++i) {
+        key_length = (is_array) ? JSON_INDEX_BUFFER_SIZE : snap.KeyBufferSize(i);
+        char[] key = new char[key_length];
+
+        if (is_array) {
+            IntToString(i, key, key_length);
+        } else {
+            snap.GetKey(i, key, key_length);
+
+            // skip meta-keys
+            if (json_is_meta_key(key)) {
+                continue;
+            }
+
+            // skip already existing keys if we aren't in replace mode
+            if (! replace && to.HasKey(key)) {
+                continue;
+            }
+        }
+
+        JSON_CELL_TYPE type = from.GetKeyType(key);
+        // skip keys of unknown type
+        if (type == Type_Invalid) {
+            continue;
+        }
+
+        // merge value onto structure
+        switch (type) {
+            case Type_String: {
+                int length = from.GetKeyLength(key);
+                char[] value = new char[length + 1];
+                from.GetString(key, value, length + 1);
+
+                if (is_array) {
+                    to_arr.PushString(value);
+                } else {
+                    to.SetString(key, value);
+                }
+            }
+            case Type_Int: {
+                int value = from.GetInt(key);
+
+                if (is_array) {
+                    to_arr.PushInt(value);
+                } else {
+                    to.SetInt(key, value);
+                }
+            }
+            case Type_Float: {
+                float value = from.GetFloat(key);
+
+                if (is_array) {
+                    to_arr.PushFloat(value);
+                } else {
+                    to.SetFloat(key, value);
+                }
+            }
+            case Type_Bool: {
+                bool value = from.GetBool(key);
+
+                if (is_array) {
+                    to_arr.PushBool(value);
+                } else {
+                    to.SetBool(key, value);
+                }
+            }
+            case Type_Null: {
+                if (is_array) {
+                    to_arr.PushNull();
+                } else {
+                    to.SetNull(key);
+                }
+            }
+            case Type_Object: {
+                JSON_Object value = from.GetObject(key);
+
+                if (is_array) {
+                    to_arr.PushObject(value);
+                } else {
+                    to.SetObject(key, value);
+                }
+            }
+        }
+
+        // set hidden attribute
+        bool hidden = from.GetKeyHidden(key);
+        if (is_array) {
+            to_arr.SetKeyHidden(to_arr.Length - 1, hidden);
+        } else {
+            to.SetKeyHidden(key, hidden);
+        }
+    }
+
+    return true;
+}
+
+/**
  * Recursively cleans up a JSON instance and any JSON instances stored within.
  *
  * @param obj   JSON instance to clean up.

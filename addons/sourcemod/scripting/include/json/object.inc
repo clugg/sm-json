@@ -146,8 +146,7 @@ methodmap JSON_Object < StringMap
         char[] length_key = new char[max_size];
         Format(length_key, max_size, "%s%s", key, JSON_META_HIDDEN_KEY);
 
-        bool hidden;
-        return (this.GetValue(length_key, hidden)) ? hidden : false;
+        return this.HasKey(length_key);
     }
 
     /**
@@ -199,7 +198,13 @@ methodmap JSON_Object < StringMap
         char[] hidden_key = new char[max_size];
         Format(hidden_key, max_size, "%s%s", key, JSON_META_HIDDEN_KEY);
 
-        return this.SetValue(hidden_key, hidden);
+        if (hidden) {
+            return this.SetValue(hidden_key, hidden);
+        } else {
+            this.parent.Remove(hidden_key);
+
+            return true;
+        }
     }
 
     /**

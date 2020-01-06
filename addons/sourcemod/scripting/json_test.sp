@@ -529,8 +529,7 @@ bool it_should_support_basic_methodmaps()
     Player player = new Player();
     player.id = 1;
 
-    player.Encode(json_encode_output, sizeof(json_encode_output));
-    PrintToServer("%s", json_encode_output);
+    print_json(player);
 
     delete player;
 
@@ -547,8 +546,7 @@ bool it_should_support_nested_methodmaps()
     player.weapon = weapon;
     player.weapon.id = 2;  // demonstrating nested property setters
 
-    player.Encode(json_encode_output, sizeof(json_encode_output));
-    PrintToServer("%s", json_encode_output);
+    print_json(player);
 
     bool success = player.weapon.id == 2;
     player.Cleanup();

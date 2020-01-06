@@ -424,6 +424,16 @@ methodmap JSON_Object < StringMap
     }
 
     /**
+     * Calls the json_merge method, replacing the 'to' parameter with this instance.
+     *
+     * @see json_merge
+     */
+    public bool Merge(JSON_Object from, bool replace = true)
+    {
+        return json_merge(this, from, replace);
+    }
+
+    /**
      * Calls the json_cleanup method, replacing the 'obj' parameter with this instance.
      *
      * @see json_cleanup

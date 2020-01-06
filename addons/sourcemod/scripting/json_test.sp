@@ -41,7 +41,7 @@ public Plugin myinfo = {
     name = "JSON Tester",
     author = "clug",
     description = "Tests dumping and loading JSON objects.",
-    version = "2.0.0",
+    version = "2.1.0",
     url = "https://github.com/clugg/sm-json"
 };
 
@@ -727,6 +727,130 @@ bool it_should_shift_array_down_after_removed_index()
     return success;
 }
 
+bool it_should_not_merge_array_onto_object()
+{
+    JSON_Object obj = new JSON_Object();
+    JSON_Array arr = new JSON_Array();
+
+    bool success = obj.Merge(arr) == false;
+
+    delete obj;
+    delete arr;
+
+    return success;
+}
+
+bool it_should_not_merge_object_onto_array()
+{
+    JSON_Array arr = new JSON_Array();
+    JSON_Object obj = new JSON_Object();
+
+    bool success = arr.Merge(obj) == false;
+
+    delete arr;
+    delete obj;
+
+    return success;
+}
+
+bool it_should_merge_arrays()
+{
+    JSON_Array arr1 = new JSON_Array();
+    arr1.PushInt(1);
+    arr1.PushBool(true);
+    arr1.SetKeyHidden(1, true);
+
+    JSON_Array arr2 = new JSON_Array();
+    arr2.PushInt(2);
+    arr2.PushBool(false);
+    arr2.SetKeyHidden(1, true);
+
+    if (! arr1.Merge(arr2)) {
+        LogError("json_test: failed while merging arrays");
+
+        return false;
+    }
+
+    print_json(arr1);
+
+    bool success = arr1.Length == 4
+        && arr1.GetKeyType(2) == Type_Int
+        && arr1.GetInt(2) == 2
+        && arr1.GetKeyType(3) == Type_Bool
+        && arr1.GetBool(3) == false
+        && arr1.GetKeyHidden(1) == true
+        && arr1.GetKeyHidden(3) == true
+        && StrEqual(json_encode_output, "[1,2]");
+
+    delete arr1;
+    delete arr2;
+
+    return success;
+}
+
+bool it_should_merge_objects_with_replacement()
+{
+    JSON_Object obj1 = new JSON_Object();
+    obj1.SetInt("key1", 1);
+    obj1.SetBool("replaced", false);
+    obj1.SetKeyHidden("replaced", false);
+
+    JSON_Object obj2 = new JSON_Object();
+    obj2.SetInt("key2", 2);
+    obj2.SetBool("replaced", true);
+    obj2.SetKeyHidden("replaced", true);
+
+    if (! obj1.Merge(obj2)) {
+        LogError("json_test: failed while merging objects");
+
+        return false;
+    }
+
+    print_json(obj1);
+
+    bool success = obj1.HasKey("key2")
+        && obj1.GetKeyType("key2") == Type_Int
+        && obj1.GetInt("key2") == 2
+        && obj1.GetBool("replaced") == true
+        && obj1.GetKeyHidden("replaced") == true;
+
+    delete obj1;
+    delete obj2;
+
+    return success;
+}
+
+bool it_should_merge_objects_without_replacement()
+{
+    JSON_Object obj1 = new JSON_Object();
+    obj1.SetInt("key1", 1);
+    obj1.SetBool("replaced", false);
+    obj1.SetKeyHidden("replaced", false);
+
+    JSON_Object obj2 = new JSON_Object();
+    obj2.SetInt("key2", 2);
+    obj2.SetBool("replaced", true);
+    obj2.SetKeyHidden("replaced", true);
+
+    if (! obj1.Merge(obj2, false)) {
+        LogError("json_test: failed while merging objects");
+
+        return false;
+    }
+
+    print_json(obj1);
+
+    bool success = obj1.HasKey("key2")
+        && obj1.GetKeyType("key2") == Type_Int
+        && obj1.GetInt("key2") == 2
+        && obj1.GetBool("replaced") == false
+        && obj1.GetKeyHidden("replaced") == false;
+
+    delete obj1;
+    delete obj2;
+
+    return success;
+}
 
 public void OnPluginStart()
 {
@@ -840,6 +964,21 @@ public void OnPluginStart()
 
     PrintToServer("it_should_shift_array_down_after_removed_index");
     check_test(it_should_shift_array_down_after_removed_index());
+
+    PrintToServer("it_should_not_merge_array_onto_object");
+    check_test(it_should_not_merge_array_onto_object());
+
+    PrintToServer("it_should_not_merge_object_onto_array");
+    check_test(it_should_not_merge_object_onto_array());
+
+    PrintToServer("it_should_merge_arrays");
+    check_test(it_should_merge_arrays());
+
+    PrintToServer("it_should_merge_objects_with_replacement");
+    check_test(it_should_merge_objects_with_replacement());
+
+    PrintToServer("it_should_merge_objects_without_replacement");
+    check_test(it_should_merge_objects_without_replacement());
 
     PrintToServer("");
     PrintToServer("%d OK, %d FAILED", passed, failed);

@@ -29,6 +29,7 @@ Table of Contents
   * [Removing a key](#removing-a-key)
   * [Hiding Keys](#hiding-keys)
   * [Searching Arrays](#searching-arrays)
+  * [Merging Instances](#merging-instances)
   * [Decoding Over Existing Instances](#decoding-over-existing-instances)
   * [Working with Unknowns](#working-with-unknowns)
   * [Global Helper Functions](#global-helper-functions)
@@ -523,8 +524,44 @@ There are a few functions which make working with `JSON_Array`s a bit nicer.
 
 Please note that due to how the `any` type works in SourcePawn, `Contains` may return false positives for values that are stored the same in memory. For example, `0`, `null` and `false` are all stored as `0` in memory and `1` and `true` are both stored as `1` in memory. Because of this, `view_as<JSON_Array>(json_decode("[0]")).Contains(null)` will return true, and so on. You may use `Contains` in conjunction with `GetKeyType` to typecheck the returned index and ensure it matches what you expected.
 
+### Merging Instances
+
+`JSON_Array`s can be merged with one another, and `JSON_Object`s can too. For obvious reasons, an array cannot be merged with an object (and vice versa). Other combinations will log an error and fail.
+
+Merging is shallow, which means that if the second object has child objects, the reference will be maintained to the existing object when merged, as opposed to copying the children. You can also disable key replacement by passing `false` as a parameter. For example, if you have two objects both containing key `x`, with replacement on (default behaviour), `x` will be taken from the second object, and with replacement off, from the first object.
+
+Merged keys will respect their previous hidden state when merged on to the first object.
+
+```c
+JSON_Array arr1 = new JSON_Array();
+arr1.PushInt(1);
+arr1.PushInt(2);
+arr1.PushInt(3);
+
+JSON_Array arr2 = new JSON_Array();
+arr2.PushInt(4);
+arr2.PushInt(5);
+arr2.PushInt(6);
+
+arr1.Merge(arr2); // arr1 is now equivocally [1,2,3,4,5,6], arr2 remains unchanged
+```
+
+```c
+JSON_Object obj1 = new JSON_Object();
+obj1.SetInt("x", 1);
+obj2.SetInt("y", 2);
+
+JSON_Object obj2 = new JSON_Object();
+obj2.SetInt("y", 3);
+obj2.SetInt("z", 4)
+
+obj1.Merge(obj2); // obj1 is now equivocally {"x":1,"y":3,"z":4}, obj2 remains unchanged
+// alternatively, without replacement
+obj1.Merge(obj2, false); // obj1 is now equivocally {"x":1,"y":2,"z":4}, obj2 remains unchanged
+```
+
 ### Decoding Over Existing Instances
-It is possible that you already have a `JSON_Array` or `JSON_Object` instance which you wish to encode over the top of. This is supported, but only for array over array and object over object. Other combinations will log an error and fail.
+It is possible that you already have a `JSON_Array` or `JSON_Object` instance which you wish to decode over the top of. As with [Merging Instances](#merging-instances), only array/array and object/object decoding is possible.
 
 ```c
 arr.PushInt(1);
@@ -557,7 +594,7 @@ if (obj.IsArray) {
 ```
 
 ### Global Helper Functions
-All of the examples that you have seen in this documentation use object-oriented syntax for encoding, decoding and cleaning up. In reality, these are wrappers which call functions: `json_encode`, `json_decode` and `json_cleanup`. For example:
+All of the examples that you have seen in this documentation use object-oriented syntax for encoding, decoding, merging and cleaning up. In reality, these are wrappers which call functions: `json_encode`, `json_decode`, `json_merge` and `json_cleanup`. For example:
 
 ```c
 arr.Encode(output, sizeof(output));
@@ -567,6 +604,10 @@ json_encode(arr, output, sizeof(output));
 arr.Decode("[1,2,3]");
 // is equivalent to
 json_decode("[1,2,3]", arr);
+
+arr.Merge(other_arr);
+// is equivalent to
+json_merge(arr, other_arr);
 
 arr.Cleanup();
 // is equivalent to

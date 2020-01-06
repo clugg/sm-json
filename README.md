@@ -122,7 +122,7 @@ delete obj;
 ```
 
 ### Creating a 'Class'
-JSON_Objects and JSON_Arrays can be inherited once you understand a little bit about methodmaps. This can be abused to create pseudo-classes with properties. Since these use StringMaps under the hood, they will not be as efficient as arrays or enum structs, but in most cases they should be more than fine.
+`JSON_Object`s and `JSON_Array`s can be inherited once you understand a little bit about methodmaps. This can be abused to create pseudo-classes with properties. Since these use StringMaps under the hood, they will probably not be as efficient as arrays or enum structs, but in most cases they should be more than fine.
 
 ```c
 methodmap YourClass < JSON_Object
@@ -409,7 +409,7 @@ delete shared;
 ```
 
 ## API
-All of the following examples assume access to an existing JSON_Array and JSON_Object instance.
+All of the following examples assume access to an existing `JSON_Array` and `JSON_Object` instance.
 
 ```c
 JSON_Array arr = new JSON_Array();

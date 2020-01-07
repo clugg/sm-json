@@ -647,7 +647,7 @@ stock void json_cleanup(JSON_Object obj)
 
     if (obj.IsArray) {
         JSON_Array obj_arr = view_as<JSON_Array>(obj);
-	obj_arr.Clear();
+        obj_arr.Clear();
     } else {
         obj.Clear();
     }

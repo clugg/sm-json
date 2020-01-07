@@ -646,7 +646,8 @@ stock void json_cleanup(JSON_Object obj)
     delete snap;
 
     if (obj.IsArray) {
-        view_as<JSON_Array>(obj).Clear();
+        JSON_Array obj_arr = view_as<JSON_Array>(obj);
+	obj_arr.Clear();
     } else {
         obj.Clear();
     }

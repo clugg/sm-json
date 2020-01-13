@@ -75,6 +75,8 @@
  * @section General
  */
 
+bool JSON_ALLOW_SINGLE_QUOTES = false;
+
 /**
  * Types of cells within a JSON object
  */

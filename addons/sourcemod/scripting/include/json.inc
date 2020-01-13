@@ -509,7 +509,8 @@ stock bool json_merge(JSON_Object to, JSON_Object from, bool replace = true)
     StringMapSnapshot snap = null;
     int json_size = 0;
     if (is_array) {
-        json_size = view_as<JSON_Array>(from).Length;
+        JSON_Array from_arr = view_as<JSON_Array>(from);
+        json_size = from_arr.Length;
     } else {
         snap = from.Snapshot();
         json_size = snap.Length;

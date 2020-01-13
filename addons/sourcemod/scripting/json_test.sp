@@ -500,7 +500,8 @@ bool it_should_support_arrays_nested_in_objects()
 
     print_json(obj);
 
-    bool success = view_as<JSON_Array>(obj.GetObject("array")).GetBool(0);
+    JSON_Array obj_array = view_as<JSON_Array>(obj.GetObject("array"));
+    bool success = obj_array.GetBool(0);
     obj.Cleanup();
     delete obj;
 
@@ -517,7 +518,8 @@ bool it_should_support_arrays_nested_in_arrays()
 
     print_json(arr);
 
-    bool success = view_as<JSON_Array>(arr.GetObject(0)).GetBool(0);
+    JSON_Array arr_array = view_as<JSON_Array>(arr.GetObject(0));
+    bool success = arr_array.GetBool(0);
     arr.Cleanup();
     delete arr;
 

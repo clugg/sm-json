@@ -68,7 +68,7 @@ stock bool json_is_whitespace(const char[] buffer)
  */
 stock bool json_is_string(const char[] buffer)
 {
-    return buffer[0] == '"';
+    return buffer[0] == '"' || (JSON_ALLOW_SINGLE_QUOTES && buffer[0] == '\'');
 }
 
 /**
@@ -407,6 +407,9 @@ stock bool json_extract_string(
 ) {
     strcopy(output, output_max_size, "");
 
+    // store initial quote
+    char quote = buffer[pos];
+
     // increment past opening quote
     ++pos;
 
@@ -426,7 +429,7 @@ stock bool json_extract_string(
             return false;
         }
 
-        if (buffer[pos] == '"') {
+        if (buffer[pos] == quote) {
             // count preceding backslashes to check if quote is escaped
             int search_pos = pos;
             int preceding_backslashes = 0;
@@ -464,6 +467,10 @@ stock bool json_extract_string(
     // copy only from start with length end - start + NULL terminator
     strcopy(output, end - start + 1, buffer[start]);
     json_unescape_string(output, max_size);
+
+    if (quote == '\'') {
+        ReplaceString(output, max_size, "\\'", "'");
+    }
 
     return pos < max_size;
 }

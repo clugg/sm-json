@@ -607,7 +607,7 @@ methodmap JSON_Array < JSON_Object
     }
 
     /**
-     * @section Constructor
+     * @section Constructor and json.inc Aliases
      */
 
     /**
@@ -621,5 +621,27 @@ methodmap JSON_Array < JSON_Object
         self.Clear();
 
         return self;
+    }
+
+    /**
+     * Calls the json_copy_shallow method, replacing the 'obj' parameter with this instance
+     * and casting the return value to an array.
+     *
+     * @see json_copy_shallow
+     */
+    public JSON_Array ShallowCopy()
+    {
+        return view_as<JSON_Array>(this.parent.ShallowCopy());
+    }
+
+    /**
+     * Calls the json_copy_deep method, replacing the 'obj' parameter with this instance
+     * and casting the return value to an array.
+     *
+     * @see json_copy_deep
+     */
+    public JSON_Array DeepCopy()
+    {
+        return view_as<JSON_Array>(this.parent.DeepCopy());
     }
 };

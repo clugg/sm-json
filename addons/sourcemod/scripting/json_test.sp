@@ -41,7 +41,7 @@ public Plugin myinfo = {
     name = "JSON Tester",
     author = "clug",
     description = "Tests dumping and loading JSON objects.",
-    version = "2.1.0",
+    version = "2.2.0",
     url = "https://github.com/clugg/sm-json"
 };
 
@@ -852,6 +852,120 @@ bool it_should_merge_objects_without_replacement()
     return success;
 }
 
+bool it_should_copy_flat_arrays()
+{
+    JSON_Array arr = new JSON_Array();
+    arr.PushInt(1);
+    arr.PushInt(2);
+    arr.PushInt(3);
+
+    JSON_Array copy = arr.DeepCopy();
+    bool success = arr.Length == copy.Length
+        && copy.GetInt(0) == 1
+        && copy.GetInt(1) == 2
+        && copy.GetInt(2) == 3;
+
+    arr.PushInt(4);
+
+    success = success && arr.Length != copy.Length;
+
+    delete arr;
+    delete copy;
+
+    return success;
+}
+
+bool it_should_copy_flat_objects()
+{
+    JSON_Object obj = new JSON_Object();
+    obj.SetInt("key1", 1);
+    obj.SetInt("key2", 2);
+    obj.SetInt("key3", 3);
+
+    JSON_Object copy = obj.DeepCopy();
+    bool success = obj.Length == copy.Length
+        && copy.GetInt("key1") == 1
+        && copy.GetInt("key2") == 2
+        && copy.GetInt("key3") == 3;
+
+    obj.SetInt("key4", 4);
+
+    success = success && obj.Length != copy.Length;
+
+    delete obj;
+    delete copy;
+
+    return success;
+}
+
+bool it_should_shallow_copy_arrays()
+{
+    JSON_Array arr = new JSON_Array();
+    arr.PushObject(new JSON_Array());
+
+    JSON_Array copy = arr.ShallowCopy();
+
+    bool success = arr.Length == copy.Length
+        && arr.GetObject(0) == copy.GetObject(0);
+
+    arr.Cleanup();
+    delete arr;
+    delete copy;
+
+    return success;
+}
+
+bool it_should_shallow_copy_objects()
+{
+    JSON_Object obj = new JSON_Object();
+    obj.SetObject("nested", new JSON_Object());
+
+    JSON_Object copy = obj.ShallowCopy();
+
+    bool success = obj.Length == copy.Length
+        && obj.GetObject("nested") == copy.GetObject("nested");
+
+    obj.Cleanup();
+    delete obj;
+    delete copy;
+
+    return success;
+}
+
+bool it_should_deep_copy_arrays()
+{
+    JSON_Array arr = new JSON_Array();
+    arr.PushObject(new JSON_Array());
+
+    JSON_Array copy = arr.DeepCopy();
+
+    bool success = arr.Length == copy.Length
+        && arr.GetObject(0) != copy.GetObject(0);
+
+    arr.Cleanup();
+    delete arr;
+    delete copy;
+
+    return success;
+}
+
+bool it_should_deep_copy_objects()
+{
+    JSON_Object obj = new JSON_Object();
+    obj.SetObject("nested", new JSON_Object());
+
+    JSON_Object copy = obj.DeepCopy();
+
+    bool success = obj.Length == copy.Length
+        && obj.GetObject("nested") != copy.GetObject("nested");
+
+    obj.Cleanup();
+    delete obj;
+    delete copy;
+
+    return success;
+}
+
 public void OnPluginStart()
 {
     PrintToServer("Running tests...");
@@ -979,6 +1093,24 @@ public void OnPluginStart()
 
     PrintToServer("it_should_merge_objects_without_replacement");
     check_test(it_should_merge_objects_without_replacement());
+
+    PrintToServer("it_should_copy_flat_arrays");
+    check_test(it_should_copy_flat_arrays());
+
+    PrintToServer("it_should_copy_flat_objects");
+    check_test(it_should_copy_flat_objects());
+
+    PrintToServer("it_should_shallow_copy_arrays");
+    check_test(it_should_shallow_copy_arrays());
+
+    PrintToServer("it_should_shallow_copy_objects");
+    check_test(it_should_shallow_copy_objects());
+
+    PrintToServer("it_should_deep_copy_arrays");
+    check_test(it_should_deep_copy_arrays());
+
+    PrintToServer("it_should_deep_copy_objects");
+    check_test(it_should_deep_copy_objects());
 
     PrintToServer("");
     PrintToServer("%d OK, %d FAILED", passed, failed);

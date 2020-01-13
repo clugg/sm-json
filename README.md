@@ -30,6 +30,7 @@ Table of Contents
   * [Hiding Keys](#hiding-keys)
   * [Searching Arrays](#searching-arrays)
   * [Merging Instances](#merging-instances)
+  * [Copying Instances](#copying-instances)
   * [Decoding Over Existing Instances](#decoding-over-existing-instances)
   * [Working with Unknowns](#working-with-unknowns)
   * [Global Helper Functions](#global-helper-functions)
@@ -525,7 +526,6 @@ There are a few functions which make working with `JSON_Array`s a bit nicer.
 Please note that due to how the `any` type works in SourcePawn, `Contains` may return false positives for values that are stored the same in memory. For example, `0`, `null` and `false` are all stored as `0` in memory and `1` and `true` are both stored as `1` in memory. Because of this, `view_as<JSON_Array>(json_decode("[0]")).Contains(null)` will return true, and so on. You may use `Contains` in conjunction with `GetKeyType` to typecheck the returned index and ensure it matches what you expected.
 
 ### Merging Instances
-
 `JSON_Array`s can be merged with one another, and `JSON_Object`s can too. For obvious reasons, an array cannot be merged with an object (and vice versa). Other combinations will log an error and fail.
 
 Merging is shallow, which means that if the second object has child objects, the reference will be maintained to the existing object when merged, as opposed to copying the children. You can also disable key replacement by passing `false` as a parameter. For example, if you have two objects both containing key `x`, with replacement on (default behaviour), `x` will be taken from the second object, and with replacement off, from the first object.
@@ -558,6 +558,51 @@ obj2.SetInt("z", 4)
 obj1.Merge(obj2); // obj1 is now equivocally {"x":1,"y":3,"z":4}, obj2 remains unchanged
 // alternatively, without replacement
 obj1.Merge(obj2, false); // obj1 is now equivocally {"x":1,"y":2,"z":4}, obj2 remains unchanged
+```
+
+### Copying Instances
+`JSON_Array`s and `JSON_Object`s can both be copied either shallowly or deeply. A shallow copy will maintain reference to nested instances within the instance, while a deep copy will also copy all nested instances, yielding an entirely unrelated structure with all of the same values.
+
+```c
+arr.PushInt(1);
+arr.PushInt(2);
+arr.PushInt(3);
+arr.PushObject(new JSON_Array());
+// arr is now equivocally [1,2,3,[]]
+
+JSON_Array copied = arr.ShallowCopy();
+JSON_Array nested = view_as<JSON_Array>(copied.GetObject(3));
+nested.PushInt(4);
+copied.PushInt(5);
+// copied is now equivocally [1,2,3,[4],5] and arr is now equivocally [1,2,3,[4]]
+
+// alternatively, deep copying
+
+JSON_Array copied = arr.DeepCopy();
+JSON_Array nested = view_as<JSON_Array>(copied.GetObject(3));
+nested.PushInt(4);
+copied.PushInt(5);
+// copied is now equivocally [1,2,3,[4],5] but arr does not change
+```
+
+```c
+obj.SetString("hello", "world");
+obj.SetObject("nested", new JSON_Object());
+// obj is now equivocally {"hello":"world","nested":{}}
+
+JSON_Object copied = obj.ShallowCopy();
+JSON_Object nested = copied.GetObject("nested");
+nested.SetString("key", "value");
+copied.SetInt("test", 1);
+// copied is now equivocally {"hello":"world","nested":{"key":"value"},"test":1} and obj is now equivocally {"hello":"world","nested":{"key":"value"}}
+
+// alternatively, deep copying
+
+JSON_Object copied = obj.DeepCopy();
+JSON_Object nested = copied.GetObject("nested");
+nested.SetString("key", "value");
+copied.SetInt("test", 1);
+// copied is now equivocally {"hello":"world","nested":{"key":"value"},"test":1} but obj does not change
 ```
 
 ### Decoding Over Existing Instances
@@ -608,6 +653,14 @@ json_decode("[1,2,3]", arr);
 arr.Merge(other_arr);
 // is equivalent to
 json_merge(arr, other_arr);
+
+arr.ShallowCopy();
+// is equivalent to
+json_copy_shallow(arr);
+
+arr.DeepCopy();
+// is equivalent to
+json_copy_deep(arr);
 
 arr.Cleanup();
 // is equivalent to

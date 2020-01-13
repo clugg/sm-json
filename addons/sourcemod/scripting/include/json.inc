@@ -613,6 +613,56 @@ stock bool json_merge(JSON_Object to, JSON_Object from, bool replace = true)
 }
 
 /**
+ * Creates a shallow copy of the specified object.
+ *
+ * @param obj   Object to copy.
+ * @returns     A shallow copy of the specified object.
+ */
+stock JSON_Object json_copy_shallow(JSON_Object obj)
+{
+    JSON_Object result = (obj.IsArray) ? view_as<JSON_Object>(new JSON_Array()) : new JSON_Object();
+    result.Merge(obj);
+
+    return result;
+}
+
+/**
+ * Creates a deep copy of the specified object.
+ *
+ * @param obj   Object to copy.
+ * @returns     A deep copy of the specified object.
+ */
+stock JSON_Object json_copy_deep(JSON_Object obj)
+{
+    JSON_Object result = (obj.IsArray) ? view_as<JSON_Object>(new JSON_Array()) : new JSON_Object();
+    result.Merge(obj);
+
+    int key_length = 0;
+    StringMapSnapshot snap = result.Snapshot();
+    for (int i = 0; i < snap.Length; ++i) {
+        key_length = snap.KeyBufferSize(i);
+        char[] key = new char[key_length];
+
+        // ignore meta keys
+        snap.GetKey(i, key, key_length);
+        if (json_is_meta_key(key)) {
+            continue;
+        }
+
+        // only deep copy objects
+        JSON_CELL_TYPE type = obj.GetKeyType(key);
+        if (type != Type_Object) {
+            continue;
+        }
+
+        JSON_Object value = obj.GetObject(key);
+        result.SetObject(key, value.DeepCopy());
+    }
+
+    return result;
+}
+
+/**
  * Recursively cleans up a JSON instance and any JSON instances stored within.
  *
  * @param obj   JSON instance to clean up.

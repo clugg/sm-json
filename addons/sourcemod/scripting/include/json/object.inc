@@ -434,6 +434,26 @@ methodmap JSON_Object < StringMap
     }
 
     /**
+     * Calls the json_copy_shallow method, replacing the 'obj' parameter with this instance.
+     *
+     * @see json_copy_shallow
+     */
+    public JSON_Object ShallowCopy()
+    {
+        return json_copy_shallow(this);
+    }
+
+    /**
+     * Calls the json_copy_deep method, replacing the 'obj' parameter with this instance.
+     *
+     * @see json_copy_deep
+     */
+    public JSON_Object DeepCopy()
+    {
+        return json_copy_deep(this);
+    }
+
+    /**
      * Calls the json_cleanup method, replacing the 'obj' parameter with this instance.
      *
      * @see json_cleanup

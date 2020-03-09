@@ -987,6 +987,30 @@ bool it_should_allow_single_quotes()
     return success;
 }
 
+bool it_should_return_default_values_for_missing_elements()
+{
+    JSON_Object obj = new JSON_Object();
+    JSON_Array arr = new JSON_Array();
+
+    bool success = obj.GetInt("_", 1) == 1
+        && obj.GetFloat("_", 1.0) == 1.0
+        && obj.GetBool("_", true) == true
+        && obj.GetNull("_", null) == null
+        && obj.GetObject("_", obj) == obj
+        && arr.GetInt(0, 1) == 1
+        && arr.GetFloat(0, 1.0) == 1.0
+        && arr.GetBool(0, true) == true
+        && arr.GetNull(0, null) == null
+        && arr.GetObject(0, arr) == arr;
+
+    obj.Cleanup();
+    arr.Cleanup();
+    delete obj;
+    delete arr;
+
+    return success;
+}
+
 public void OnPluginStart()
 {
     PrintToServer("Running tests...");
@@ -1135,6 +1159,9 @@ public void OnPluginStart()
 
     PrintToServer("it_should_allow_single_quotes");
     check_test(it_should_allow_single_quotes());
+
+    PrintToServer("it_should_return_default_values_for_missing_elements");
+    check_test(it_should_return_default_values_for_missing_elements());
 
     PrintToServer("");
     PrintToServer("%d OK, %d FAILED", passed, failed);

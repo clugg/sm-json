@@ -278,81 +278,86 @@ methodmap JSON_Array < JSON_Object
     /**
      * Retrieves the int stored at an index.
      *
-     * @param index     Index to retrieve int value for.
-     * @returns         Value stored at index.
+     * @param index         Index to retrieve int value for.
+     * @param defaultValue  Value to return if the index does not exist.
+     * @returns             Value stored at index.
      */
-    public int GetInt(int index)
+    public int GetInt(int index, int defaultValue = -1)
     {
         char key[JSON_INDEX_BUFFER_SIZE];
         if (! this.GetIndexAsString(index, key, sizeof(key))) {
-            return -1;
+            return defaultValue;
         }
 
-        return this.parent.GetInt(key);
+        return this.parent.GetInt(key, defaultValue);
     }
 
     /**
      * Retrieves the float stored at an index.
      *
-     * @param index     Index to retrieve float value for.
-     * @returns         Value stored at index.
+     * @param index         Index to retrieve float value for.
+     * @param defaultValue  Value to return if the index does not exist.
+     * @returns             Value stored at index.
      */
-    public float GetFloat(int index)
+    public float GetFloat(int index, float defaultValue = -1.0)
     {
         char key[JSON_INDEX_BUFFER_SIZE];
         if (! this.GetIndexAsString(index, key, sizeof(key))) {
-            return -1.0;
+            return defaultValue;
         }
 
-        return this.parent.GetFloat(key);
+        return this.parent.GetFloat(key, defaultValue);
     }
 
     /**
      * Retrieves the bool stored at an index.
      *
-     * @param index     Index to retrieve bool value for.
-     * @returns         Value stored at index.
+     * @param index         Index to retrieve bool value for.
+     * @param defaultValue  Value to return if the index does not exist.
+     * @returns             Value stored at index.
      */
-    public bool GetBool(int index)
+    public bool GetBool(int index, bool defaultValue = false)
     {
         char key[JSON_INDEX_BUFFER_SIZE];
         if (! this.GetIndexAsString(index, key, sizeof(key))) {
-            return false;
+            return defaultValue;
         }
 
-        return this.parent.GetBool(key);
+        return this.parent.GetBool(key, defaultValue);
     }
 
     /**
      * Retrieves null stored at an index.
      *
-     * @param index     Index to retrieve null value for.
-     * @returns         Value stored at index.
+     * @param index         Index to retrieve null value for.
+     * @param defaultValue  Value to return if the index does not exist.
+     * @returns             Value stored at index.
      */
-    public Handle GetNull(int index)
+    public Handle GetNull(int index, Handle defaultValue = null)
     {
         char key[JSON_INDEX_BUFFER_SIZE];
         if (! this.GetIndexAsString(index, key, sizeof(key))) {
-            return null;
+            return defaultValue;
         }
 
-        return this.parent.GetNull(key);
+        return this.parent.GetNull(key, defaultValue);
     }
 
     /**
      * Retrieves the JSON object stored at an index.
      *
-     * @param index     Index to retrieve object value for.
-     * @returns         Value stored at index.
+     * @param index         Index to retrieve object value for.
+     * @param defaultValue  Value to return if the index does not exist.
+     * @returns             Value stored at index.
      */
-    public JSON_Object GetObject(int index)
+    public JSON_Object GetObject(int index, JSON_Object defaultValue = null)
     {
         char key[JSON_INDEX_BUFFER_SIZE];
         if (! this.GetIndexAsString(index, key, sizeof(key))) {
-            return null;
+            return defaultValue;
         }
 
-        return this.parent.GetObject(key);
+        return this.parent.GetObject(key, defaultValue);
     }
 
     /**

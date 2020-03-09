@@ -422,13 +422,13 @@ JSON_Object obj = new JSON_Object();
 
 ### Getters and Setters
 
-`JSON_Array` and `JSON_Object` contain the following getters. `JSON_Array` getters will accept an int index and `JSON_Object` getters will accept a string key.
+`JSON_Array` and `JSON_Object` contain the following getters. `JSON_Array` getters will accept an int index and `JSON_Object` getters will accept a string key. Getters also accept a second parameter specifying what value to return if the key/index was not found. Sensible default values have been set and are listed below.
 
 * `GetInt`, which will return the value or -1 if it was not found.
 * `GetFloat`, which will return the value or -1.0 if it was not found.
 * `GetBool`, which will return the value or false if it was not found.
 * `GetNull`, which will return null.
-* `GetObject`, which will return the value or -1 if it was not found.
+* `GetObject`, which will return the value or null if it was not found.
 
 It is recommended that you typecast objects to arrays if you believe the contents will be an array: `view_as<JSON_Array>(obj.GetObject("array"))`.
 

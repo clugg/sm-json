@@ -5,7 +5,7 @@
  * Provides a pure SourcePawn implementation of JSON encoding and decoding.
  * https://github.com/clugg/sm-json
  *
- * sm-json (C)2019 James Dickens. (clug)
+ * sm-json (C)2020 James Dickens. (clug)
  * SourceMod (C)2004-2008 AlliedModders LLC.  All rights reserved.
  * =============================================================================
  *

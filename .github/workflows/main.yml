@@ -24,4 +24,4 @@ jobs:
           version: ${{ matrix.sm_version }}
 
       - name: Compile Plugin
-        run: spcomp -i $SCRIPTS_PATH/include $SCRIPTS_PATH/json_test.sp
+        run: spcomp -i $SCRIPTS_PATH/include $SCRIPTS_PATH/json_test.sp -O2 -t4 -v2 -w234 -z9

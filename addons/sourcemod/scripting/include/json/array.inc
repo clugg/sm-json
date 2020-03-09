@@ -245,11 +245,11 @@ methodmap JSON_Array < JSON_Object
      * @returns         True on success. False if the key is not set,
      *                  or the key is set as an array or string (not a value).
      */
-    public any GetValue(int index, any &value)
+    public bool GetValue(int index, any &value)
     {
         char key[JSON_INDEX_BUFFER_SIZE];
         if (! this.GetIndexAsString(index, key, sizeof(key))) {
-            return -1;
+            return false;
         }
 
         return this.parent.GetValue(key, value);

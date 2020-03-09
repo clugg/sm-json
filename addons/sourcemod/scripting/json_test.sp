@@ -1016,6 +1016,50 @@ bool it_should_return_default_values_for_missing_elements()
     return success;
 }
 
+bool it_should_autocleanup_merged_objects()
+{
+    JSON_Object obj1 = new JSON_Object();
+    JSON_Object obj2 = new JSON_Object();
+    JSON_Object nested1 = new JSON_Object();
+    JSON_Object nested2 = new JSON_Object();
+
+    // ensure that both handles are valid after merging without replacement
+    obj1.SetObject("nested", nested1);
+    obj2.SetObject("nested", nested2);
+    obj1.Merge(obj2, false, true);
+    bool success = IsValidHandle(nested1) && IsValidHandle(nested2);
+
+    if (! success) {
+        LogError("json_test: nested handle became invalid after merge without replacement");
+
+        return false;
+    }
+
+    // ensure that both handles are valid after merging with replacement, without autocleanup
+    obj1.SetObject("nested", nested1);
+    obj2.SetObject("nested", nested2);
+    obj1.Merge(obj2, true, false);
+    success = success && IsValidHandle(nested1) && IsValidHandle(nested2);
+
+    if (! success) {
+        LogError("json_test: nested handle became invalid after merge without autocleanup");
+
+        return false;
+    }
+
+    // ensure that overriden handle is invalid after merging with replacement and autocleanup
+    obj1.SetObject("nested", nested1);
+    obj2.SetObject("nested", nested2);
+    obj1.Merge(obj2, true, true);
+    success = success && ! IsValidHandle(nested1) && IsValidHandle(nested2);
+
+    obj1.Cleanup();
+    delete obj1;
+    delete obj2;
+
+    return success;
+}
+
 public void OnPluginStart()
 {
     PrintToServer("Running tests...");
@@ -1167,6 +1211,9 @@ public void OnPluginStart()
 
     PrintToServer("it_should_return_default_values_for_missing_elements");
     check_test(it_should_return_default_values_for_missing_elements());
+
+    PrintToServer("it_should_autocleanup_merged_objects");
+    check_test(it_should_autocleanup_merged_objects());
 
     PrintToServer("");
     PrintToServer("%d OK, %d FAILED", passed, failed);

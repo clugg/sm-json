@@ -641,7 +641,7 @@ if (obj.IsArray) {
 ```
 
 ### Global Helper Functions
-All of the examples that you have seen in this documentation use object-oriented syntax for encoding, decoding, merging and cleaning up. In reality, these are wrappers which call functions: `json_encode`, `json_decode`, `json_merge` and `json_cleanup`. For example:
+All of the examples that you have seen in this documentation use object-oriented syntax. In reality, these are wrappers for global functions. A complete list of examples can be found below.
 
 ```c
 arr.Encode(output, sizeof(output));

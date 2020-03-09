@@ -477,9 +477,11 @@ stock JSON_Object json_decode(
  * Merges the entries from the second object to the first,
  * optionally replacing existing entries with the same key.
  *
- * @param to        Object to merge on to.
- * @param from      Object to merge entries from.
- * @param replace   Should existing keys be replaced if they exist in both objects?
+ * @param to            Object to merge on to.
+ * @param from          Object to merge entries from.
+ * @param replace       Should existing keys be replaced if they exist in both objects?
+ * @param autocleanup   Should existing objects be cleaned up if they
+ *                      exist in both objects? (only applies when replace is true)
  * @returns         True on success, false otherwise.
  * @error           If the objects are not the same structure type
  *                  as one another, an error will be thrown.
@@ -487,7 +489,12 @@ stock JSON_Object json_decode(
  *                  and vice versa. Only array over array and object over object
  *                  merging is supported.
  */
-stock bool json_merge(JSON_Object to, JSON_Object from, bool replace = true)
+stock bool json_merge(
+    JSON_Object to,
+    JSON_Object from,
+    bool replace = true,
+    bool autocleanup = false
+)
 {
     if (to.IsArray && ! from.IsArray) {
         LogError("json_merge: attempting to merge an object onto an array");
@@ -521,6 +528,7 @@ stock bool json_merge(JSON_Object to, JSON_Object from, bool replace = true)
         key_length = (is_array) ? JSON_INDEX_BUFFER_SIZE : snap.KeyBufferSize(i);
         char[] key = new char[key_length];
 
+        bool keyAlreadyExists = false;
         if (is_array) {
             IntToString(i, key, key_length);
         } else {
@@ -532,7 +540,8 @@ stock bool json_merge(JSON_Object to, JSON_Object from, bool replace = true)
             }
 
             // skip already existing keys if we aren't in replace mode
-            if (! replace && to.HasKey(key)) {
+            keyAlreadyExists = to.HasKey(key);
+            if (! replace && keyAlreadyExists) {
                 continue;
             }
         }
@@ -596,6 +605,14 @@ stock bool json_merge(JSON_Object to, JSON_Object from, bool replace = true)
                 if (is_array) {
                     to_arr.PushObject(value);
                 } else {
+                    if (autocleanup && keyAlreadyExists) {
+                        JSON_Object existing = to.GetObject(key);
+                        if (existing != null && existing != value) {
+                            existing.Cleanup();
+                            delete existing;
+                        }
+                    }
+
                     to.SetObject(key, value);
                 }
             }

@@ -982,6 +982,11 @@ bool it_should_allow_single_quotes()
 
     success = success && obj.HasKey("key");
 
+    obj.Cleanup();
+    arr.Cleanup();
+    delete obj;
+    delete arr;
+
     JSON_ALLOW_SINGLE_QUOTES = false;
 
     return success;

@@ -143,10 +143,10 @@ methodmap JSON_Object < StringMap
     public bool GetKeyHidden(const char[] key)
     {
         int max_size = strlen(key) + strlen(JSON_META_HIDDEN_KEY) + 1;
-        char[] length_key = new char[max_size];
-        Format(length_key, max_size, "%s%s", key, JSON_META_HIDDEN_KEY);
+        char[] hidden_key = new char[max_size];
+        Format(hidden_key, max_size, "%s%s", key, JSON_META_HIDDEN_KEY);
 
-        return this.HasKey(length_key);
+        return this.HasKey(hidden_key);
     }
 
     /**

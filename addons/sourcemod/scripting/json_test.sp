@@ -35,6 +35,7 @@
 #pragma newdecls required
 
 #include <sourcemod>
+#include <profiler>
 #include <json>
 
 public Plugin myinfo = {
@@ -1062,8 +1063,12 @@ bool it_should_autocleanup_merged_objects()
 
 public void OnPluginStart()
 {
+    Profiler profiler = new Profiler();
+
     PrintToServer("Running tests...");
     PrintToServer("");
+
+    profiler.Start();
 
     PrintToServer("it_should_encode_empty_objects");
     check_test(it_should_encode_empty_objects());
@@ -1215,6 +1220,9 @@ public void OnPluginStart()
     PrintToServer("it_should_autocleanup_merged_objects");
     check_test(it_should_autocleanup_merged_objects());
 
+    profiler.Stop();
+
     PrintToServer("");
+    PrintToServer("Tests completed in %f seconds", profiler.Time);
     PrintToServer("%d OK, %d FAILED", passed, failed);
 }

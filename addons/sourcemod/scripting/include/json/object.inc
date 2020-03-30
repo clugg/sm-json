@@ -111,7 +111,7 @@ methodmap JSON_Object < StringMap
     {
         int max_size = strlen(key) + strlen(JSON_META_TYPE_KEY) + 1;
         char[] type_key = new char[max_size];
-        Format(type_key, max_size, "%s%s", key, JSON_META_TYPE_KEY);
+        FormatEx(type_key, max_size, "%s%s", key, JSON_META_TYPE_KEY);
 
         JSON_CELL_TYPE type;
         return (this.GetValue(type_key, type)) ? type : Type_Invalid;
@@ -128,7 +128,7 @@ methodmap JSON_Object < StringMap
     {
         int max_size = strlen(key) + strlen(JSON_META_LENGTH_KEY) + 1;
         char[] length_key = new char[max_size];
-        Format(length_key, max_size, "%s%s", key, JSON_META_LENGTH_KEY);
+        FormatEx(length_key, max_size, "%s%s", key, JSON_META_LENGTH_KEY);
 
         int length;
         return (this.GetValue(length_key, length)) ? length : -1;
@@ -144,7 +144,7 @@ methodmap JSON_Object < StringMap
     {
         int max_size = strlen(key) + strlen(JSON_META_HIDDEN_KEY) + 1;
         char[] hidden_key = new char[max_size];
-        Format(hidden_key, max_size, "%s%s", key, JSON_META_HIDDEN_KEY);
+        FormatEx(hidden_key, max_size, "%s%s", key, JSON_META_HIDDEN_KEY);
 
         return this.HasKey(hidden_key);
     }
@@ -164,7 +164,7 @@ methodmap JSON_Object < StringMap
     {
         int max_size = strlen(key) + strlen(JSON_META_TYPE_KEY) + 1;
         char[] type_key = new char[max_size];
-        Format(type_key, max_size, "%s%s", key, JSON_META_TYPE_KEY);
+        FormatEx(type_key, max_size, "%s%s", key, JSON_META_TYPE_KEY);
 
         return this.SetValue(type_key, type);
     }
@@ -180,7 +180,7 @@ methodmap JSON_Object < StringMap
     {
         int max_size = strlen(key) + strlen(JSON_META_LENGTH_KEY) + 1;
         char[] length_key = new char[max_size];
-        Format(length_key, max_size, "%s%s", key, JSON_META_LENGTH_KEY);
+        FormatEx(length_key, max_size, "%s%s", key, JSON_META_LENGTH_KEY);
 
         return this.SetValue(length_key, length);
     }
@@ -196,7 +196,7 @@ methodmap JSON_Object < StringMap
     {
         int max_size = strlen(key) + strlen(JSON_META_HIDDEN_KEY) + 1;
         char[] hidden_key = new char[max_size];
-        Format(hidden_key, max_size, "%s%s", key, JSON_META_HIDDEN_KEY);
+        FormatEx(hidden_key, max_size, "%s%s", key, JSON_META_HIDDEN_KEY);
 
         if (hidden) {
             return this.SetValue(hidden_key, hidden);
@@ -384,7 +384,7 @@ methodmap JSON_Object < StringMap
 
         bool success = true;
         for (int i = 0; i < sizeof(meta_keys); ++i) {
-            Format(meta_key, meta_key_size, "%s%s", key, meta_keys[i]);
+            FormatEx(meta_key, meta_key_size, "%s%s", key, meta_keys[i]);
 
             if (this.HasKey(meta_key)) {
                 success = success && this.parent.Remove(meta_key);

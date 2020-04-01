@@ -109,7 +109,7 @@ stock void json_encode(
             continue;
         }
 
-        JSON_CELL_TYPE type = obj.GetKeyType(key);
+        JSONCellType type = obj.GetKeyType(key);
         // skip keys of unknown type
         if (type == Type_Invalid) {
             continue;
@@ -593,7 +593,7 @@ stock bool json_merge(
             }
         }
 
-        JSON_CELL_TYPE type = from.GetKeyType(key);
+        JSONCellType type = from.GetKeyType(key);
         // skip keys of unknown type
         if (type == Type_Invalid) {
             continue;
@@ -715,7 +715,7 @@ stock JSON_Object json_copy_deep(JSON_Object obj)
         }
 
         // only deep copy objects
-        JSON_CELL_TYPE type = obj.GetKeyType(key);
+        JSONCellType type = obj.GetKeyType(key);
         if (type != Type_Object) {
             continue;
         }
@@ -747,7 +747,7 @@ stock void json_cleanup(JSON_Object obj)
         }
 
         // only clean up objects
-        JSON_CELL_TYPE type = obj.GetKeyType(key);
+        JSONCellType type = obj.GetKeyType(key);
         if (type != Type_Object) {
             continue;
         }

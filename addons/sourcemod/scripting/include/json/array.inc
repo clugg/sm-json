@@ -133,7 +133,7 @@ methodmap JSON_Array < JSON_Object
      *
      * @see JSON_Object.GetKeyType
      */
-    public JSON_CELL_TYPE GetKeyType(int index)
+    public JSONCellType GetKeyType(int index)
     {
         char key[JSON_INT_BUFFER_SIZE];
         if (! this.GetIndexAsString(index, key, sizeof(key))) {
@@ -182,7 +182,7 @@ methodmap JSON_Array < JSON_Object
      *
      * @see JSON_Object.SetKeyType
      */
-    public bool SetKeyType(int index, JSON_CELL_TYPE type)
+    public bool SetKeyType(int index, JSONCellType type)
     {
         char key[JSON_INT_BUFFER_SIZE];
         if (! this.GetIndexAsString(index, key, sizeof(key))) {
@@ -552,7 +552,7 @@ methodmap JSON_Array < JSON_Object
                 return false;
             }
 
-            JSON_CELL_TYPE type = this.GetKeyType(i);
+            JSONCellType type = this.GetKeyType(i);
 
             switch (type) {
                 case Type_String: {

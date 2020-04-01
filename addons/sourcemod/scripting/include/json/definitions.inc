@@ -88,7 +88,7 @@ bool JSON_ALLOW_SINGLE_QUOTES = false;
 /**
  * Types of cells within a JSON object
  */
-enum JSON_CELL_TYPE {
+enum JSONCellType {
     Type_Invalid = -1,
     Type_String = 0,
     Type_Int,

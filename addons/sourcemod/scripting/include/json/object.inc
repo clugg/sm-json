@@ -107,13 +107,13 @@ methodmap JSON_Object < StringMap
      * @returns     Value type for key provided,
      *              or Type_Invalid if it does not exist.
      */
-    public JSON_CELL_TYPE GetKeyType(const char[] key)
+    public JSONCellType GetKeyType(const char[] key)
     {
         int max_size = strlen(key) + strlen(JSON_META_TYPE_KEY) + 1;
         char[] type_key = new char[max_size];
         FormatEx(type_key, max_size, "%s%s", key, JSON_META_TYPE_KEY);
 
-        JSON_CELL_TYPE type;
+        JSONCellType type;
         return (this.GetValue(type_key, type)) ? type : Type_Invalid;
     }
 
@@ -160,7 +160,7 @@ methodmap JSON_Object < StringMap
      * @param type  Type to set key to.
      * @returns     True on success, false otherwise.
      */
-    public bool SetKeyType(const char[] key, JSON_CELL_TYPE type)
+    public bool SetKeyType(const char[] key, JSONCellType type)
     {
         int max_size = strlen(key) + strlen(JSON_META_TYPE_KEY) + 1;
         char[] type_key = new char[max_size];

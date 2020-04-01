@@ -651,7 +651,7 @@ methodmap JSON_Array < JSON_Object
     public JSON_Array()
     {
         JSON_Array self = view_as<JSON_Array>(new JSON_Object());
-        self.Clear();
+        self.Length = 0;
 
         return self;
     }

@@ -685,7 +685,7 @@ bool it_should_remove_meta_keys_from_objects()
         success = false;
     }
 
-    if (obj.GetKeyType("hello") != Type_Int) {
+    if (obj.GetKeyType("zero") != Type_Int) {
         LogError("json_test: object removed incorrect meta-key");
 
         success = false;

@@ -24,7 +24,7 @@ Table of Contents
   * [Cleaning Up](#cleaning-up)
 * [API](#api)
   * [Getters and Setters](#getters-and-setters)
-  * [Accessing parent methods](#accessing-parent-methods)
+  * [Accessing super methods](#accessing-super-methods)
   * [Checking if a key exists](#checking-if-a-key-exists)
   * [Getting a key's type](#getting-a-keys-type)
   * [Getting a string's length](#getting-a-strings-length)
@@ -452,12 +452,12 @@ It is recommended that you typecast objects to arrays if you believe the content
 * `PushNull`, which does not accept a value (since the value MUST be null).
 * `PushObject`
 
-### Accessing parent methods
-`JSON_Array` inherits `JSON_Object` and `JSON_Object` inherits `StringMap`. There may be rare cases where you need to access underlying methods of a class. A `parent` property has been provided which views an instance as its parent class.
+### Accessing super methods
+`JSON_Array` inherits `JSON_Object` and `JSON_Object` inherits `StringMap`. There may be rare cases where you need to access underlying methods of a class. A `Super` property has been provided which views an instance as its superclass.
 
 ```c
-JSON_Object arr_parent = arr.parent;
-StringMap obj_parent = obj.parent;
+JSON_Object arr_super = arr.Super;
+StringMap obj_super = obj.Super;
 ```
 
 ### Checking if a key exists

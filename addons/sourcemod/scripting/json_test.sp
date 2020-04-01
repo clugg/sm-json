@@ -644,9 +644,7 @@ bool it_should_remove_meta_keys_from_arrays()
     arr.PushString("hello");
     arr.PushInt(0);
 
-    if (! arr.parent.HasKey("0:type") || arr.GetKeyType(0) != Type_String
-        || ! arr.parent.HasKey("0:length") || arr.GetKeyLength(0) != 5
-        || ! arr.parent.HasKey("1:type") || arr.GetKeyType(1) != Type_Int) {
+    if (arr.GetKeyType(0) != Type_String || arr.GetKeyLength(0) != 5 || arr.GetKeyType(1) != Type_Int) {
         LogError("json_test: array did not properly set meta-keys");
 
         success = false;
@@ -654,7 +652,7 @@ bool it_should_remove_meta_keys_from_arrays()
 
     arr.Remove(0);
 
-    if (arr.parent.HasKey("1:type") || arr.parent.HasKey("0:length") || arr.GetKeyType(0) != Type_Int) {
+    if (arr.GetKeyType(1) != Type_Invalid || arr.GetKeyLength(0) != -1 || arr.GetKeyType(0) != Type_Int) {
         LogError("json_test: array did not properly remove meta-keys");
 
         success = false;
@@ -673,9 +671,7 @@ bool it_should_remove_meta_keys_from_objects()
     obj.SetString("hello", "world");
     obj.SetInt("zero", 0);
 
-    if (! obj.HasKey("hello:type") || obj.GetKeyType("hello") != Type_String
-        || ! obj.HasKey("hello:length") || obj.GetKeyLength("hello") != 5
-        || ! obj.HasKey("zero:type") || obj.GetKeyType("zero") != Type_Int) {
+    if (obj.GetKeyType("hello") != Type_String || obj.GetKeyLength("hello") != 5 || obj.GetKeyType("zero") != Type_Int) {
         LogError("json_test: object did not properly set meta-keys");
 
         success = false;
@@ -683,13 +679,13 @@ bool it_should_remove_meta_keys_from_objects()
 
     obj.Remove("hello");
 
-    if (obj.HasKey("hello:type") || obj.HasKey("hello:length")) {
+    if (obj.GetKeyType("hello") != Type_Invalid || obj.GetKeyLength("hello") != -1) {
         LogError("json_test: object did not properly remove meta-keys");
 
         success = false;
     }
 
-    if (! obj.HasKey("zero:type")) {
+    if (obj.GetKeyType("hello") != Type_Int) {
         LogError("json_test: object removed incorrect meta-key");
 
         success = false;

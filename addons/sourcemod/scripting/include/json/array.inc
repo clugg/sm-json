@@ -129,11 +129,9 @@ methodmap JSON_Array < JSON_Object
      */
 
     /**
-     * Gets the cell type stored at an index.
+     * Converts index to a string ('key') and calls the relevant Super method.
      *
-     * @param index     Index to get value type for.
-     * @returns         Value type for index provided,
-     *                  or Type_Invalid if it does not exist.
+     * @see JSON_Object.GetKeyType
      */
     public JSON_CELL_TYPE GetKeyType(int index)
     {
@@ -147,11 +145,9 @@ methodmap JSON_Array < JSON_Object
     }
 
     /**
-     * Gets the length of the string stored at an index.
+     * Converts index to a string ('key') and calls the relevant Super method.
      *
-     * @param index     Index to get string length for.
-     * @returns         Length of string at index provided,
-     *                  or -1 if it is not a string/does not exist.
+     * @see JSON_Object.GetKeyLength
      */
     public int GetKeyLength(int index)
     {
@@ -165,10 +161,9 @@ methodmap JSON_Array < JSON_Object
     }
 
     /**
-     * Gets whether the index should be hidden from encoding.
+     * Converts index to a string ('key') and calls the relevant Super method.
      *
-     * @param index     Index to get hidden state for.
-     * @returns         Whether or not the index should be hidden.
+     * @see JSON_Object.GetKeyHidden
      */
     public bool GetKeyHidden(int index)
     {
@@ -186,11 +181,9 @@ methodmap JSON_Array < JSON_Object
      */
 
     /**
-     * Sets the cell type stored at a index.
+     * Converts index to a string ('key') and calls the relevant Super method.
      *
-     * @param index     Index to set value type for.
-     * @param type      Type to set index to.
-     * @returns         True on success, false otherwise.
+     * @see JSON_Object.SetKeyType
      */
     public bool SetKeyType(int index, JSON_CELL_TYPE type)
     {
@@ -204,11 +197,9 @@ methodmap JSON_Array < JSON_Object
     }
 
     /**
-     * Sets the length of the string stored at a index.
+     * Converts index to a string ('key') and calls the relevant Super method.
      *
-     * @param index     Index to set string length for.
-     * @param length    Length to set string to.
-     * @returns         True on success, false otherwise.
+     * @see JSON_Object.SetKeyLength
      */
     public bool SetKeyLength(int index, int length)
     {
@@ -222,11 +213,9 @@ methodmap JSON_Array < JSON_Object
     }
 
     /**
-     * Sets whether the index should be hidden from encoding.
+     * Converts index to a string ('key') and calls the relevant Super method.
      *
-     * @param index     Index to set hidden state for.
-     * @param hidden    Wheter or not the index should be hidden.
-     * @returns         True on success, false otherwise.
+     * @see JSON_Object.SetKeyHidden
      */
     public bool SetKeyHidden(int index, bool hidden)
     {
@@ -244,12 +233,9 @@ methodmap JSON_Array < JSON_Object
      */
 
     /**
-     * Retrieves the value stored at an index.
+     * Converts index to a string ('key') and calls the relevant Super method.
      *
-     * @param index     Index to retrieve value for.
-     * @param value     Variable to store value.
-     * @returns         True on success. False if the key is not set,
-     *                  or the key is set as an array or string (not a value).
+     * @see JSON_Object.GetValue
      */
     public bool GetValue(int index, any &value)
     {
@@ -263,14 +249,9 @@ methodmap JSON_Array < JSON_Object
     }
 
     /**
-     * Retrieves the string stored at an index.
+     * Converts index to a string ('key') and calls the relevant Super method.
      *
-     * @param index     Index to retrieve string value for.
-     * @param value     Buffer to store value.
-	 * @param max_size  Maximum size of string buffer.
-	 * @param size      Optional parameter to store the number of bytes written to the buffer.
-     * @returns         True on success. False if the key is not set,
-     *                  or the key is set as a value or array (not a string).
+     * @see JSON_Object.GetString
      */
     public bool GetString(int index, char[] value, int max_size, int &size = 0)
     {
@@ -284,11 +265,9 @@ methodmap JSON_Array < JSON_Object
     }
 
     /**
-     * Retrieves the int stored at an index.
+     * Converts index to a string ('key') and calls the relevant Super method.
      *
-     * @param index         Index to retrieve int value for.
-     * @param defaultValue  Value to return if the index does not exist.
-     * @returns             Value stored at index.
+     * @see JSON_Object.GetInt
      */
     public int GetInt(int index, int defaultValue = -1)
     {
@@ -302,11 +281,9 @@ methodmap JSON_Array < JSON_Object
     }
 
     /**
-     * Retrieves the float stored at an index.
+     * Converts index to a string ('key') and calls the relevant Super method.
      *
-     * @param index         Index to retrieve float value for.
-     * @param defaultValue  Value to return if the index does not exist.
-     * @returns             Value stored at index.
+     * @see JSON_Object.GetFloat
      */
     public float GetFloat(int index, float defaultValue = -1.0)
     {
@@ -320,11 +297,9 @@ methodmap JSON_Array < JSON_Object
     }
 
     /**
-     * Retrieves the bool stored at an index.
+     * Converts index to a string ('key') and calls the relevant Super method.
      *
-     * @param index         Index to retrieve bool value for.
-     * @param defaultValue  Value to return if the index does not exist.
-     * @returns             Value stored at index.
+     * @see JSON_Object.GetBool
      */
     public bool GetBool(int index, bool defaultValue = false)
     {
@@ -338,11 +313,9 @@ methodmap JSON_Array < JSON_Object
     }
 
     /**
-     * Retrieves null stored at an index.
+     * Converts index to a string ('key') and calls the relevant Super method.
      *
-     * @param index         Index to retrieve null value for.
-     * @param defaultValue  Value to return if the index does not exist.
-     * @returns             Value stored at index.
+     * @see JSON_Object.GetNull
      */
     public Handle GetNull(int index, Handle defaultValue = null)
     {
@@ -356,11 +329,9 @@ methodmap JSON_Array < JSON_Object
     }
 
     /**
-     * Retrieves the JSON object stored at an index.
+     * Converts index to a string ('key') and calls the relevant Super method.
      *
-     * @param index         Index to retrieve object value for.
-     * @param defaultValue  Value to return if the index does not exist.
-     * @returns             Value stored at index.
+     * @see JSON_Object.GetObject
      */
     public JSON_Object GetObject(int index, JSON_Object defaultValue = null)
     {

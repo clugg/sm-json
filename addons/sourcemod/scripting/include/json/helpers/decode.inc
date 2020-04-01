@@ -151,8 +151,8 @@ stock bool json_is_float(const char[] buffer)
 
                 after_decimal = true;
             } else if (buffer[i] == 'e' || buffer[i] == 'E') {
-                // if we encounter an exponent before any non-zero digits
-                if (starts_with_zero && ! has_digit_gt_zero) {
+                // if we encounter an exponent before any digits
+                if (! starts_with_zero && ! has_digit_gt_zero) {
                     return false;
                 }
 

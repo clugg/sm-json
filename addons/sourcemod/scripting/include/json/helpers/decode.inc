@@ -131,6 +131,10 @@ stock bool json_is_float(const char[] buffer)
     bool has_digit_after_exponent = false;
 
     int length = strlen(buffer);
+    if (length == 0) {
+        return false;
+    }
+
     for (int i = 0; i < length; i += 1) {
         // allow minus as first character only
         if (i == 0 && buffer[i] == '-') {
@@ -162,6 +166,11 @@ stock bool json_is_float(const char[] buffer)
                         starts_with_zero = true;
                     }
                 } else {
+                    if (starts_with_zero) {
+                        // detect numbers with leading zero
+                        return false;
+                    }
+
                     has_digit_gt_zero = true;
                 }
             } else {
@@ -194,12 +203,6 @@ stock bool json_is_float(const char[] buffer)
                 return false;
             }
         }
-    }
-
-    if (starts_with_zero && has_digit_gt_zero) {
-        /* if buffer starts with zero, there should
-           be no other digits before the decimal */
-        return false;
     }
 
     // if we have a decimal, there should be digit(s) after it

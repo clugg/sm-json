@@ -54,7 +54,7 @@ char JSON_STRING_ESCAPED[][] = {
  */
 stock void json_escape_string(char[] buffer, int max_size)
 {
-    for (int i = 0; i < sizeof(JSON_STRING_NORMAL); ++i) {
+    for (int i = 0; i < sizeof(JSON_STRING_NORMAL); i += 1) {
         ReplaceString(
             buffer,
             max_size,
@@ -72,7 +72,7 @@ stock void json_escape_string(char[] buffer, int max_size)
  */
 stock void json_unescape_string(char[] buffer, int max_size)
 {
-    for (int i = 0; i < sizeof(JSON_STRING_NORMAL); ++i) {
+    for (int i = 0; i < sizeof(JSON_STRING_NORMAL); i += 1) {
         ReplaceString(
             buffer,
             max_size,
@@ -98,7 +98,7 @@ stock bool json_string_startswith(const char[] haystack, const char[] needle)
         return false;
     }
 
-    for (int i = 0; i < needle_length; ++i) {
+    for (int i = 0; i < needle_length; i += 1) {
         if (haystack[i] != needle[i]) {
             return false;
         }
@@ -123,7 +123,7 @@ stock bool json_string_endswith(const char[] haystack, const char[] needle)
         return false;
     }
 
-    for (int i = 0; i < needle_length; ++i) {
+    for (int i = 0; i < needle_length; i += 1) {
         if (haystack[haystack_length - needle_length + i] != needle[i]) {
             return false;
         }

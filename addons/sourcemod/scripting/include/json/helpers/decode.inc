@@ -83,7 +83,7 @@ stock bool json_is_int(const char[] buffer)
     bool has_digit_gt_zero = false;
 
     int length = strlen(buffer);
-    for (int i = 0; i < length; ++i) {
+    for (int i = 0; i < length; i += 1) {
         // allow minus as first character only
         if (i == 0 && buffer[i] == '-') {
             continue;
@@ -127,7 +127,7 @@ stock bool json_is_float(const char[] buffer)
     bool has_digit_after_exponent = false;
 
     int length = strlen(buffer);
-    for (int i = 0; i < length; ++i) {
+    for (int i = 0; i < length; i += 1) {
         // allow minus as first character only
         if (i == 0 && buffer[i] == '-') {
             continue;
@@ -322,7 +322,7 @@ stock bool json_is_at_end(const char[] buffer, bool is_array)
 stock bool json_skip_whitespace(const char[] buffer, int max_size, int &pos)
 {
     while (json_is_whitespace(buffer[pos]) && pos < max_size) {
-        ++pos;
+        pos += 1;
     }
 
     return pos < max_size;
@@ -360,7 +360,7 @@ stock bool json_extract_until_end(
         && ! json_is_at_end(buffer[pos], is_array)
         && pos < max_size
     ) {
-        ++pos;
+        pos += 1;
     }
 
     // set end to the current position
@@ -407,7 +407,7 @@ stock bool json_extract_string(
     char quote = buffer[pos];
 
     // increment past opening quote
-    ++pos;
+    pos += 1;
 
     // set start to position of first character in string
     int start = pos;
@@ -430,7 +430,7 @@ stock bool json_extract_string(
             int search_pos = pos;
             int preceding_backslashes = 0;
             while (search_pos > 0 && buffer[--search_pos] == '\\') {
-                ++preceding_backslashes;
+                preceding_backslashes += 1;
             }
 
             // if we have an even number of backslashes, the quote is not escaped
@@ -440,14 +440,14 @@ stock bool json_extract_string(
         }
 
         // pass over the character as it is part of the string
-        ++pos;
+        pos += 1;
     }
 
     // set end to the current position
     int end = pos;
 
     // increment past closing quote
-    ++pos;
+    pos += 1;
 
     // skip trailing whitespace
     if (! json_skip_whitespace(buffer, max_size, pos)) {

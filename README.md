@@ -302,7 +302,7 @@ You can iterate through a JSON_Array because it is indexed numerically. You can 
 
 ```c
 JSON_Array arr = new JSON_Array();
-for (int i = 0; i < arr.Length; ++i) {
+for (int i = 0; i < arr.Length; i += 1) {
     JSON_CELL_TYPE type = arr.GetKeyType(i);
     // do whatever you want with the index and type information
 }
@@ -312,7 +312,7 @@ for (int i = 0; i < arr.Length; ++i) {
 JSON_Object obj = new JSON_Object();
 int key_length = 0;
 StringMapSnapshot snap = obj.Snapshot();
-for (int i = 0; i < obj.Length; ++i) {
+for (int i = 0; i < obj.Length; i += 1) {
     key_length = snap.KeyBufferSize(i);
     char[] key = new char[key_length];
 

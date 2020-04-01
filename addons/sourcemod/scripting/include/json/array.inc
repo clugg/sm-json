@@ -503,7 +503,7 @@ methodmap JSON_Array < JSON_Object
     public int IndexOf(any value)
     {
         any current;
-        for (int i = 0; i < this.Length; ++i) {
+        for (int i = 0; i < this.Length; i += 1) {
             if (this.GetValue(i, current) && value == current) {
                 return i;
             }
@@ -520,7 +520,7 @@ methodmap JSON_Array < JSON_Object
      */
     public int IndexOfString(const char[] value)
     {
-        for (int i = 0; i < this.Length; ++i) {
+        for (int i = 0; i < this.Length; i += 1) {
             if (this.GetKeyType(i) != Type_String) {
                 continue;
             }
@@ -592,7 +592,7 @@ methodmap JSON_Array < JSON_Object
         }
 
         // shift all following elements down
-        for (int i = index + 1; i < this.Length; ++i) {
+        for (int i = index + 1; i < this.Length; i += 1) {
             int max_target_size = json_cell_int_size(i - 1);
             char[] target = new char[max_target_size];
 

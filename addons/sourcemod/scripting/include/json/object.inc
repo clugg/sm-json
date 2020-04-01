@@ -47,9 +47,9 @@ methodmap JSON_Object < StringMap
      */
 
     /**
-     * Views the instance as its parent to access overridden methods.
+     * Views the instance as its superclass to access overridden methods.
      */
-    property StringMap parent
+    property StringMap Super
     {
         public get()
         {
@@ -201,7 +201,7 @@ methodmap JSON_Object < StringMap
         if (hidden) {
             return this.SetValue(hidden_key, hidden);
         } else {
-            this.parent.Remove(hidden_key);
+            this.Super.Remove(hidden_key);
 
             return true;
         }
@@ -293,7 +293,7 @@ methodmap JSON_Object < StringMap
      */
     public bool SetString(const char[] key, const char[] value)
     {
-        return this.parent.SetString(key, value)
+        return this.Super.SetString(key, value)
             && this.SetKeyType(key, Type_String)
             && this.SetKeyLength(key, strlen(value));
     }
@@ -387,11 +387,11 @@ methodmap JSON_Object < StringMap
             FormatEx(meta_key, meta_key_size, "%s%s", key, meta_keys[i]);
 
             if (this.HasKey(meta_key)) {
-                success = success && this.parent.Remove(meta_key);
+                success = success && this.Super.Remove(meta_key);
             }
         }
 
-        return success && this.parent.Remove(key);
+        return success && this.Super.Remove(key);
     }
 
     /**

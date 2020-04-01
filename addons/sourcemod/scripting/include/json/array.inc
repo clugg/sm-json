@@ -48,9 +48,9 @@ methodmap JSON_Array < JSON_Object
      */
 
     /**
-     * Views the instance as its parent to access overridden methods.
+     * Views the instance as its superclass to access overridden methods.
      */
-    property JSON_Object parent
+    property JSON_Object Super
     {
         public get()
         {
@@ -66,14 +66,14 @@ methodmap JSON_Array < JSON_Object
         public get()
         {
             int length = 0;
-            this.parent.GetValue(JSON_ARRAY_INDEX_KEY, length);
+            this.Super.GetValue(JSON_ARRAY_INDEX_KEY, length);
 
             return length;
         }
 
         public set(int value)
         {
-            this.parent.SetValue(JSON_ARRAY_INDEX_KEY, value);
+            this.Super.SetValue(JSON_ARRAY_INDEX_KEY, value);
         }
     }
 
@@ -140,7 +140,7 @@ methodmap JSON_Array < JSON_Object
             return Type_Invalid;
         }
 
-        return this.parent.GetKeyType(key);
+        return this.Super.GetKeyType(key);
     }
 
     /**
@@ -155,7 +155,7 @@ methodmap JSON_Array < JSON_Object
             return -1;
         }
 
-        return this.parent.GetKeyLength(key);
+        return this.Super.GetKeyLength(key);
     }
 
     /**
@@ -170,7 +170,7 @@ methodmap JSON_Array < JSON_Object
             return false;
         }
 
-        return this.parent.GetKeyHidden(key);
+        return this.Super.GetKeyHidden(key);
     }
 
     /**
@@ -189,7 +189,7 @@ methodmap JSON_Array < JSON_Object
             return false;
         }
 
-        return this.parent.SetKeyType(key, type);
+        return this.Super.SetKeyType(key, type);
     }
 
     /**
@@ -204,7 +204,7 @@ methodmap JSON_Array < JSON_Object
             return false;
         }
 
-        return this.parent.SetKeyLength(key, length);
+        return this.Super.SetKeyLength(key, length);
     }
 
     /**
@@ -219,7 +219,7 @@ methodmap JSON_Array < JSON_Object
             return false;
         }
 
-        return this.parent.SetKeyHidden(key, hidden);
+        return this.Super.SetKeyHidden(key, hidden);
     }
 
     /**
@@ -238,7 +238,7 @@ methodmap JSON_Array < JSON_Object
             return false;
         }
 
-        return this.parent.GetValue(key, value);
+        return this.Super.GetValue(key, value);
     }
 
     /**
@@ -253,7 +253,7 @@ methodmap JSON_Array < JSON_Object
             return false;
         }
 
-        return this.parent.GetString(key, value, max_size, size);
+        return this.Super.GetString(key, value, max_size, size);
     }
 
     /**
@@ -268,7 +268,7 @@ methodmap JSON_Array < JSON_Object
             return default_value;
         }
 
-        return this.parent.GetInt(key, default_value);
+        return this.Super.GetInt(key, default_value);
     }
 
     /**
@@ -283,7 +283,7 @@ methodmap JSON_Array < JSON_Object
             return default_value;
         }
 
-        return this.parent.GetFloat(key, default_value);
+        return this.Super.GetFloat(key, default_value);
     }
 
     /**
@@ -298,7 +298,7 @@ methodmap JSON_Array < JSON_Object
             return default_value;
         }
 
-        return this.parent.GetBool(key, default_value);
+        return this.Super.GetBool(key, default_value);
     }
 
     /**
@@ -313,7 +313,7 @@ methodmap JSON_Array < JSON_Object
             return default_value;
         }
 
-        return this.parent.GetNull(key, default_value);
+        return this.Super.GetNull(key, default_value);
     }
 
     /**
@@ -328,7 +328,7 @@ methodmap JSON_Array < JSON_Object
             return default_value;
         }
 
-        return this.parent.GetObject(key, default_value);
+        return this.Super.GetObject(key, default_value);
     }
 
     /**
@@ -349,7 +349,7 @@ methodmap JSON_Array < JSON_Object
             return false;
         }
 
-        return this.parent.SetString(key, value)
+        return this.Super.SetString(key, value)
             && this.IncrementIndex();
     }
 
@@ -367,7 +367,7 @@ methodmap JSON_Array < JSON_Object
             return false;
         }
 
-        return this.parent.SetInt(key, value)
+        return this.Super.SetInt(key, value)
             && this.IncrementIndex();
     }
 
@@ -385,7 +385,7 @@ methodmap JSON_Array < JSON_Object
             return false;
         }
 
-        return this.parent.SetFloat(key, value)
+        return this.Super.SetFloat(key, value)
             && this.IncrementIndex();
     }
 
@@ -403,7 +403,7 @@ methodmap JSON_Array < JSON_Object
             return false;
         }
 
-        return this.parent.SetBool(key, value)
+        return this.Super.SetBool(key, value)
             && this.IncrementIndex();
     }
 
@@ -420,7 +420,7 @@ methodmap JSON_Array < JSON_Object
             return false;
         }
 
-        return this.parent.SetNull(key)
+        return this.Super.SetNull(key)
             && this.IncrementIndex();
     }
 
@@ -438,7 +438,7 @@ methodmap JSON_Array < JSON_Object
             return false;
         }
 
-        return this.parent.SetObject(key, value)
+        return this.Super.SetObject(key, value)
             && this.IncrementIndex();
     }
 
@@ -519,7 +519,7 @@ methodmap JSON_Array < JSON_Object
      */
     public void Clear()
     {
-        this.parent.Clear();
+        this.Super.Clear();
         this.Length = 0;
     }
 
@@ -538,7 +538,7 @@ methodmap JSON_Array < JSON_Object
         }
 
         // remove existing value at index
-        if (! this.parent.Remove(key)) {
+        if (! this.Super.Remove(key)) {
             return false;
         }
 
@@ -560,27 +560,27 @@ methodmap JSON_Array < JSON_Object
                     char[] str_value = new char[str_length];
 
                     this.GetString(i, str_value, str_length + 1);
-                    this.parent.SetString(target, str_value);
+                    this.Super.SetString(target, str_value);
                 }
                 case Type_Int: {
-                    this.parent.SetInt(target, this.GetInt(i));
+                    this.Super.SetInt(target, this.GetInt(i));
                 }
                 case Type_Float: {
-                    this.parent.SetFloat(target, this.GetFloat(i));
+                    this.Super.SetFloat(target, this.GetFloat(i));
                 }
                 case Type_Bool: {
-                    this.parent.SetBool(target, this.GetBool(i));
+                    this.Super.SetBool(target, this.GetBool(i));
                 }
                 case Type_Null: {
-                    this.parent.SetNull(target);
+                    this.Super.SetNull(target);
                 }
                 case Type_Object: {
-                    this.parent.SetObject(target, this.GetObject(i));
+                    this.Super.SetObject(target, this.GetObject(i));
                 }
             }
 
-            this.parent.SetKeyHidden(target, this.GetKeyHidden(i));
-            this.parent.Remove(key);
+            this.Super.SetKeyHidden(target, this.GetKeyHidden(i));
+            this.Super.Remove(key);
         }
 
         this.Length -= 1;
@@ -613,7 +613,7 @@ methodmap JSON_Array < JSON_Object
      */
     public JSON_Array ShallowCopy()
     {
-        return view_as<JSON_Array>(this.parent.ShallowCopy());
+        return view_as<JSON_Array>(this.Super.ShallowCopy());
     }
 
     /**
@@ -624,6 +624,6 @@ methodmap JSON_Array < JSON_Object
      */
     public JSON_Array DeepCopy()
     {
-        return view_as<JSON_Array>(this.parent.DeepCopy());
+        return view_as<JSON_Array>(this.Super.DeepCopy());
     }
 };

@@ -196,10 +196,10 @@ void check_test(bool result)
 {
     if (result) {
         PrintToServer("\tOK");
-        ++passed;
+        passed += 1;
     } else {
         PrintToServer("\tFAILED");
-        ++failed;
+        failed += 1;
     }
 
     PrintToServer("");
@@ -1117,7 +1117,7 @@ public void OnPluginStart()
         "[[[[[[[[[[[[[[[[[[[\"Not too deep\"]]]]]]]]]]]]]]]]]]]",
         "{\n    \"JSON Test Pattern pass3\": {\n        \"The outermost value\": \"must be an object or array.\",\n        \"In this test\": \"It is an object.\"\n    }\n}\n"
     };
-    for (int i = 0; i < sizeof(should_decode); ++i) {
+    for (int i = 0; i < sizeof(should_decode); i += 1) {
         PrintToServer("it_should_decode %s", should_decode[i]);
         check_test(it_should_decode(should_decode[i]));
     }
@@ -1164,7 +1164,7 @@ public void OnPluginStart()
         "[\"Extra close\"]]",
         "{\"Extra comma\": true,}"
     };
-    for (int i = 0; i < sizeof(should_not_decode); ++i) {
+    for (int i = 0; i < sizeof(should_not_decode); i += 1) {
         PrintToServer("it_should_not_decode %s", should_not_decode[i]);
         check_test(it_should_not_decode(should_not_decode[i]));
     }

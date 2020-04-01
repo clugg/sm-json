@@ -383,7 +383,7 @@ methodmap JSON_Object < StringMap
         char[] meta_key = new char[meta_key_size];
 
         bool success = true;
-        for (int i = 0; i < sizeof(meta_keys); ++i) {
+        for (int i = 0; i < sizeof(meta_keys); i += 1) {
             FormatEx(meta_key, meta_key_size, "%s%s", key, meta_keys[i]);
 
             if (this.HasKey(meta_key)) {

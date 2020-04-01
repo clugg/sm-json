@@ -90,7 +90,7 @@ stock void json_encode(
     }
 
     int key_length = 0;
-    for (int i = 0; i < json_size; ++i) {
+    for (int i = 0; i < json_size; i += 1) {
         key_length = (is_array) ? json_cell_int_size(i) : snap.KeyBufferSize(i);
         char[] key = new char[key_length];
 
@@ -208,7 +208,7 @@ stock void json_encode(
         if (pretty_print) {
             StrCat(output, max_size, JSON_PP_NEWLINE);
 
-            for (int j = 0; j < depth + 1; ++j) {
+            for (int j = 0; j < depth + 1; j += 1) {
                 StrCat(output, max_size, JSON_PP_INDENT);
             }
         }
@@ -229,7 +229,7 @@ stock void json_encode(
         if (pretty_print) {
             StrCat(output, max_size, JSON_PP_NEWLINE);
 
-            for (int j = 0; j < depth; ++j) {
+            for (int j = 0; j < depth; j += 1) {
                 StrCat(output, max_size, JSON_PP_INDENT);
             }
         }
@@ -318,7 +318,7 @@ stock JSON_Object json_decode(
     while (! is_array && ! json_is_object_end(buffer[pos])
         || is_array && ! json_is_array_end(buffer[pos])) {
         // pos is either an opening structure or comma, so increment past it
-        ++pos;
+        pos += 1;
 
         // skip any whitespace preceding the element
         if (! json_skip_whitespace(buffer, length, pos)) {
@@ -456,7 +456,7 @@ stock JSON_Object json_decode(
     }
 
     // skip remaining whitespace and ensure we're at the end of the buffer
-    ++pos;
+    pos += 1;
     if (json_skip_whitespace(buffer, length, pos) && depth == 0) {
         LogError("json_decode: unexpected data after end of structure at position %d", pos);
 
@@ -524,7 +524,7 @@ stock bool json_merge(
     }
 
     int key_length = 0;
-    for (int i = 0; i < json_size; ++i) {
+    for (int i = 0; i < json_size; i += 1) {
         key_length = (is_array) ? json_cell_int_size(i) : snap.KeyBufferSize(i);
         char[] key = new char[key_length];
 
@@ -657,7 +657,7 @@ stock JSON_Object json_copy_deep(JSON_Object obj)
 
     int key_length = 0;
     StringMapSnapshot snap = result.Snapshot();
-    for (int i = 0; i < snap.Length; ++i) {
+    for (int i = 0; i < snap.Length; i += 1) {
         key_length = snap.KeyBufferSize(i);
         char[] key = new char[key_length];
 
@@ -689,7 +689,7 @@ stock void json_cleanup(JSON_Object obj)
 {
     int key_length = 0;
     StringMapSnapshot snap = obj.Snapshot();
-    for (int i = 0; i < snap.Length; ++i) {
+    for (int i = 0; i < snap.Length; i += 1) {
         key_length = snap.KeyBufferSize(i);
         char[] key = new char[key_length];
 

@@ -305,7 +305,7 @@ You can iterate through a JSON_Array because it is indexed numerically. You can 
 ```c
 JSON_Array arr = new JSON_Array();
 for (int i = 0; i < arr.Length; i += 1) {
-    JSON_CELL_TYPE type = arr.GetKeyType(i);
+    JSONCellType type = arr.GetKeyType(i);
     // do whatever you want with the index and type information
 }
 ```
@@ -325,7 +325,7 @@ for (int i = 0; i < obj.Length; i += 1) {
         continue;
     }
 
-    JSON_CELL_TYPE type = obj.GetKeyType(key);
+    JSONCellType type = obj.GetKeyType(key);
     // do whatever you want with the key and type information
 }
 delete snap;
@@ -469,7 +469,7 @@ obj.HasKey("my_key");
 ```
 
 ### Getting a key's type
-Returns a [JSON_CELL_TYPE](addons/sourcemod/scripting/include/json/definitions.inc#L81-L89). Useful if you are unsure what type of value a key contains.
+Returns a [JSONCellType](addons/sourcemod/scripting/include/json/definitions.inc#L81-L89). Useful if you are unsure what type of value a key contains.
 
 ```c
 arr.GetKeyType(0);

@@ -158,7 +158,7 @@ bool check_array_remove(JSON_Array arr, int index)
     PrintToServer("Removing element at index %d", index);
 
     // get current value at index
-    JSON_CELL_TYPE type = arr.GetKeyType(index);
+    JSONCellType type = arr.GetKeyType(index);
     int str_size = 0;
     if (type == Type_String) {
         str_size = arr.GetKeyLength(index) + 1;

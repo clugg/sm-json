@@ -137,8 +137,9 @@ methodmap JSON_Array < JSON_Object
      */
     public JSON_CELL_TYPE GetKeyType(int index)
     {
-        char key[JSON_INDEX_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+        int max_key_size = json_cell_int_size(index);
+        char[] key = new char[max_key_size];
+        if (! this.GetIndexAsString(index, key, max_key_size)) {
             return Type_Invalid;
         }
 
@@ -154,8 +155,9 @@ methodmap JSON_Array < JSON_Object
      */
     public int GetKeyLength(int index)
     {
-        char key[JSON_INDEX_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+        int max_key_size = json_cell_int_size(index);
+        char[] key = new char[max_key_size];
+        if (! this.GetIndexAsString(index, key, max_key_size)) {
             return -1;
         }
 
@@ -170,8 +172,9 @@ methodmap JSON_Array < JSON_Object
      */
     public bool GetKeyHidden(int index)
     {
-        char key[JSON_INDEX_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+        int max_key_size = json_cell_int_size(index);
+        char[] key = new char[max_key_size];
+        if (! this.GetIndexAsString(index, key, max_key_size)) {
             return false;
         }
 
@@ -191,8 +194,9 @@ methodmap JSON_Array < JSON_Object
      */
     public bool SetKeyType(int index, JSON_CELL_TYPE type)
     {
-        char key[JSON_INDEX_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+        int max_key_size = json_cell_int_size(index);
+        char[] key = new char[max_key_size];
+        if (! this.GetIndexAsString(index, key, max_key_size)) {
             return false;
         }
 
@@ -208,8 +212,9 @@ methodmap JSON_Array < JSON_Object
      */
     public bool SetKeyLength(int index, int length)
     {
-        char key[JSON_INDEX_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+        int max_key_size = json_cell_int_size(index);
+        char[] key = new char[max_key_size];
+        if (! this.GetIndexAsString(index, key, max_key_size)) {
             return false;
         }
 
@@ -225,8 +230,9 @@ methodmap JSON_Array < JSON_Object
      */
     public bool SetKeyHidden(int index, bool hidden)
     {
-        char key[JSON_INDEX_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+        int max_key_size = json_cell_int_size(index);
+        char[] key = new char[max_key_size];
+        if (! this.GetIndexAsString(index, key, max_key_size)) {
             return false;
         }
 
@@ -247,8 +253,9 @@ methodmap JSON_Array < JSON_Object
      */
     public bool GetValue(int index, any &value)
     {
-        char key[JSON_INDEX_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+        int max_key_size = json_cell_int_size(index);
+        char[] key = new char[max_key_size];
+        if (! this.GetIndexAsString(index, key, max_key_size)) {
             return false;
         }
 
@@ -267,8 +274,9 @@ methodmap JSON_Array < JSON_Object
      */
     public bool GetString(int index, char[] value, int max_size, int &size = 0)
     {
-        char key[JSON_INDEX_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+        int max_key_size = json_cell_int_size(index);
+        char[] key = new char[max_key_size];
+        if (! this.GetIndexAsString(index, key, max_key_size)) {
             return false;
         }
 
@@ -284,8 +292,9 @@ methodmap JSON_Array < JSON_Object
      */
     public int GetInt(int index, int defaultValue = -1)
     {
-        char key[JSON_INDEX_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+        int max_key_size = json_cell_int_size(index);
+        char[] key = new char[max_key_size];
+        if (! this.GetIndexAsString(index, key, max_key_size)) {
             return defaultValue;
         }
 
@@ -301,8 +310,9 @@ methodmap JSON_Array < JSON_Object
      */
     public float GetFloat(int index, float defaultValue = -1.0)
     {
-        char key[JSON_INDEX_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+        int max_key_size = json_cell_int_size(index);
+        char[] key = new char[max_key_size];
+        if (! this.GetIndexAsString(index, key, max_key_size)) {
             return defaultValue;
         }
 
@@ -318,8 +328,9 @@ methodmap JSON_Array < JSON_Object
      */
     public bool GetBool(int index, bool defaultValue = false)
     {
-        char key[JSON_INDEX_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+        int max_key_size = json_cell_int_size(index);
+        char[] key = new char[max_key_size];
+        if (! this.GetIndexAsString(index, key, max_key_size)) {
             return defaultValue;
         }
 
@@ -335,8 +346,9 @@ methodmap JSON_Array < JSON_Object
      */
     public Handle GetNull(int index, Handle defaultValue = null)
     {
-        char key[JSON_INDEX_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+        int max_key_size = json_cell_int_size(index);
+        char[] key = new char[max_key_size];
+        if (! this.GetIndexAsString(index, key, max_key_size)) {
             return defaultValue;
         }
 
@@ -352,8 +364,9 @@ methodmap JSON_Array < JSON_Object
      */
     public JSON_Object GetObject(int index, JSON_Object defaultValue = null)
     {
-        char key[JSON_INDEX_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+        int max_key_size = json_cell_int_size(index);
+        char[] key = new char[max_key_size];
+        if (! this.GetIndexAsString(index, key, max_key_size)) {
             return defaultValue;
         }
 
@@ -372,8 +385,10 @@ methodmap JSON_Array < JSON_Object
      */
     public bool PushString(const char[] value)
     {
-        char key[JSON_INDEX_BUFFER_SIZE];
-        if (! this.GetIndexAsString(this.Length, key, sizeof(key), false)) {
+        int index = this.Length;
+        int max_key_size = json_cell_int_size(index);
+        char[] key = new char[max_key_size];
+        if (! this.GetIndexAsString(index, key, max_key_size, false)) {
             return false;
         }
 
@@ -389,8 +404,10 @@ methodmap JSON_Array < JSON_Object
      */
     public bool PushInt(int value)
     {
-        char key[JSON_INDEX_BUFFER_SIZE];
-        if (! this.GetIndexAsString(this.Length, key, sizeof(key), false)) {
+        int index = this.Length;
+        int max_key_size = json_cell_int_size(index);
+        char[] key = new char[max_key_size];
+        if (! this.GetIndexAsString(index, key, max_key_size, false)) {
             return false;
         }
 
@@ -406,8 +423,10 @@ methodmap JSON_Array < JSON_Object
      */
     public bool PushFloat(float value)
     {
-        char key[JSON_INDEX_BUFFER_SIZE];
-        if (! this.GetIndexAsString(this.Length, key, sizeof(key), false)) {
+        int index = this.Length;
+        int max_key_size = json_cell_int_size(index);
+        char[] key = new char[max_key_size];
+        if (! this.GetIndexAsString(index, key, max_key_size, false)) {
             return false;
         }
 
@@ -423,8 +442,10 @@ methodmap JSON_Array < JSON_Object
      */
     public bool PushBool(bool value)
     {
-        char key[JSON_INDEX_BUFFER_SIZE];
-        if (! this.GetIndexAsString(this.Length, key, sizeof(key), false)) {
+        int index = this.Length;
+        int max_key_size = json_cell_int_size(index);
+        char[] key = new char[max_key_size];
+        if (! this.GetIndexAsString(index, key, max_key_size, false)) {
             return false;
         }
 
@@ -439,8 +460,10 @@ methodmap JSON_Array < JSON_Object
      */
     public bool PushNull()
     {
-        char key[JSON_INDEX_BUFFER_SIZE];
-        if (! this.GetIndexAsString(this.Length, key, sizeof(key), false)) {
+        int index = this.Length;
+        int max_key_size = json_cell_int_size(index);
+        char[] key = new char[max_key_size];
+        if (! this.GetIndexAsString(index, key, max_key_size, false)) {
             return false;
         }
 
@@ -456,8 +479,10 @@ methodmap JSON_Array < JSON_Object
      */
     public bool PushObject(JSON_Object value)
     {
-        char key[JSON_INDEX_BUFFER_SIZE];
-        if (! this.GetIndexAsString(this.Length, key, sizeof(key), false)) {
+        int index = this.Length;
+        int max_key_size = json_cell_int_size(index);
+        char[] key = new char[max_key_size];
+        if (! this.GetIndexAsString(index, key, max_key_size, false)) {
             return false;
         }
 
@@ -555,8 +580,9 @@ methodmap JSON_Array < JSON_Object
      */
     public bool Remove(int index)
     {
-        char key[JSON_INDEX_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key), false)) {
+        int max_key_size = json_cell_int_size(index);
+        char[] key = new char[max_key_size];
+        if (! this.GetIndexAsString(index, key, max_key_size)) {
             return false;
         }
 
@@ -566,11 +592,13 @@ methodmap JSON_Array < JSON_Object
         }
 
         // shift all following elements down
-        char target[JSON_INDEX_BUFFER_SIZE];
         for (int i = index + 1; i < this.Length; ++i) {
+            int max_target_size = json_cell_int_size(i - 1);
+            char[] target = new char[max_target_size];
+
             if (
-                ! this.GetIndexAsString(i, key, sizeof(key), false)
-                || ! this.GetIndexAsString(i - 1, target, sizeof(target), false)
+                ! this.GetIndexAsString(i, key, max_key_size, false)
+                || ! this.GetIndexAsString(i - 1, target, max_target_size, false)
             ) {
                 return false;
             }

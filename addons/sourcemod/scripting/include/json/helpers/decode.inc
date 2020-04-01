@@ -199,17 +199,13 @@ stock bool json_is_float(const char[] buffer)
     }
 
     // if we have a decimal, there should be digit(s) after it
-    if (after_decimal) {
-        if (! has_digit_after_decimal) {
-            return false;
-        }
+    if (after_decimal && ! has_digit_after_decimal) {
+        return false;
     }
 
     // if we have an exponent, there should be digit(s) after it
-    if (after_exponent) {
-        if (! has_digit_after_exponent) {
-            return false;
-        }
+    if (after_exponent && ! has_digit_after_exponent) {
+        return false;
     }
 
     /* we should have reached an exponent, decimal, or both.

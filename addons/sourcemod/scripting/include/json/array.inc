@@ -137,7 +137,7 @@ methodmap JSON_Array < JSON_Object
     {
         char key[JSON_INT_BUFFER_SIZE];
         if (! this.GetIndexAsString(index, key, sizeof(key))) {
-            return Type_Invalid;
+            return JSON_Type_Invalid;
         }
 
         return this.Super.GetKeyType(key);
@@ -473,7 +473,7 @@ methodmap JSON_Array < JSON_Object
     public int IndexOfString(const char[] value)
     {
         for (int i = 0; i < this.Length; i += 1) {
-            if (this.GetKeyType(i) != Type_String) {
+            if (this.GetKeyType(i) != JSON_Type_String) {
                 continue;
             }
 
@@ -555,26 +555,26 @@ methodmap JSON_Array < JSON_Object
             JSONCellType type = this.GetKeyType(i);
 
             switch (type) {
-                case Type_String: {
+                case JSON_Type_String: {
                     int str_length = this.GetKeyLength(i);
                     char[] str_value = new char[str_length];
 
                     this.GetString(i, str_value, str_length + 1);
                     this.Super.SetString(target, str_value);
                 }
-                case Type_Int: {
+                case JSON_Type_Int: {
                     this.Super.SetInt(target, this.GetInt(i));
                 }
-                case Type_Float: {
+                case JSON_Type_Float: {
                     this.Super.SetFloat(target, this.GetFloat(i));
                 }
-                case Type_Bool: {
+                case JSON_Type_Bool: {
                     this.Super.SetBool(target, this.GetBool(i));
                 }
-                case Type_Null: {
+                case JSON_Type_Null: {
                     this.Super.SetNull(target);
                 }
-                case Type_Object: {
+                case JSON_Type_Object: {
                     this.Super.SetObject(target, this.GetObject(i));
                 }
             }

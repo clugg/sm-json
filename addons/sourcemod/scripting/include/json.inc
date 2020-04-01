@@ -111,12 +111,12 @@ stock void json_encode(
 
         JSONCellType type = obj.GetKeyType(key);
         // skip keys of unknown type
-        if (type == Type_Invalid) {
+        if (type == JSON_Type_Invalid) {
             continue;
         }
 
         // if we are dealing with a string, prepare the str_value variable for fetching
-        if (type == Type_String) {
+        if (type == JSON_Type_String) {
             str_length = obj.GetKeyLength(key);
         }
         char[] str_value = new char[str_length + 1];
@@ -124,24 +124,31 @@ stock void json_encode(
         // determine the length of the char[] needed to represent our cell data
         cell_length = 0;
         switch (type) {
-            case Type_String: {
+            case JSON_Type_String: {
                 // get the string value early, as its cell_length is determined by its contents
                 obj.GetString(key, str_value, str_length + 1);
                 cell_length = json_cell_string_size(str_length);
             }
+<<<<<<< HEAD
             case Type_Int: {
                 cell_length = JSON_INT_BUFFER_SIZE;
+=======
+            case JSON_Type_Int: {
+                // get the int value early, as its cell_length is determined by its contents
+                int_value = obj.GetInt(key);
+                cell_length = json_cell_int_size(int_value);
+>>>>>>> 91b5327... Prefix all JSONCellType values with JSON_
             }
-            case Type_Float: {
+            case JSON_Type_Float: {
                 cell_length = JSON_FLOAT_BUFFER_SIZE;
             }
-            case Type_Bool: {
+            case JSON_Type_Bool: {
                 cell_length = JSON_BOOL_BUFFER_SIZE;
             }
-            case Type_Null: {
+            case JSON_Type_Null: {
                 cell_length = JSON_NULL_BUFFER_SIZE;
             }
-            case Type_Object: {
+            case JSON_Type_Object: {
                 cell_length = max_size;
             }
         }
@@ -149,25 +156,30 @@ stock void json_encode(
         // fit the contents into the cell
         char[] cell = new char[cell_length];
         switch (type) {
-            case Type_String: {
+            case JSON_Type_String: {
                 json_cell_string(str_value, cell, cell_length);
             }
+<<<<<<< HEAD
             case Type_Int: {
                 int value = obj.GetInt(key);
                 json_cell_int(value, cell, cell_length);
+=======
+            case JSON_Type_Int: {
+                json_cell_int(int_value, cell, cell_length);
+>>>>>>> 91b5327... Prefix all JSONCellType values with JSON_
             }
-            case Type_Float: {
+            case JSON_Type_Float: {
                 float value = obj.GetFloat(key);
                 json_cell_float(value, cell, cell_length);
             }
-            case Type_Bool: {
+            case JSON_Type_Bool: {
                 bool value = obj.GetBool(key);
                 json_cell_bool(value, cell, cell_length);
             }
-            case Type_Null: {
+            case JSON_Type_Null: {
                 json_cell_null(cell, cell_length);
             }
-            case Type_Object: {
+            case JSON_Type_Object: {
                 JSON_Object child = obj.GetObject(key);
                 json_encode(child, cell, cell_length, pretty_print, depth + 1);
             }
@@ -595,13 +607,13 @@ stock bool json_merge(
 
         JSONCellType type = from.GetKeyType(key);
         // skip keys of unknown type
-        if (type == Type_Invalid) {
+        if (type == JSON_Type_Invalid) {
             continue;
         }
 
         // merge value onto structure
         switch (type) {
-            case Type_String: {
+            case JSON_Type_String: {
                 int length = from.GetKeyLength(key);
                 char[] value = new char[length + 1];
                 from.GetString(key, value, length + 1);
@@ -612,7 +624,7 @@ stock bool json_merge(
                     to.SetString(key, value);
                 }
             }
-            case Type_Int: {
+            case JSON_Type_Int: {
                 int value = from.GetInt(key);
 
                 if (is_array) {
@@ -621,7 +633,7 @@ stock bool json_merge(
                     to.SetInt(key, value);
                 }
             }
-            case Type_Float: {
+            case JSON_Type_Float: {
                 float value = from.GetFloat(key);
 
                 if (is_array) {
@@ -630,7 +642,7 @@ stock bool json_merge(
                     to.SetFloat(key, value);
                 }
             }
-            case Type_Bool: {
+            case JSON_Type_Bool: {
                 bool value = from.GetBool(key);
 
                 if (is_array) {
@@ -639,14 +651,14 @@ stock bool json_merge(
                     to.SetBool(key, value);
                 }
             }
-            case Type_Null: {
+            case JSON_Type_Null: {
                 if (is_array) {
                     to_arr.PushNull();
                 } else {
                     to.SetNull(key);
                 }
             }
-            case Type_Object: {
+            case JSON_Type_Object: {
                 JSON_Object value = from.GetObject(key);
 
                 if (is_array) {
@@ -716,7 +728,7 @@ stock JSON_Object json_copy_deep(JSON_Object obj)
 
         // only deep copy objects
         JSONCellType type = obj.GetKeyType(key);
-        if (type != Type_Object) {
+        if (type != JSON_Type_Object) {
             continue;
         }
 
@@ -748,7 +760,7 @@ stock void json_cleanup(JSON_Object obj)
 
         // only clean up objects
         JSONCellType type = obj.GetKeyType(key);
-        if (type != Type_Object) {
+        if (type != JSON_Type_Object) {
             continue;
         }
 

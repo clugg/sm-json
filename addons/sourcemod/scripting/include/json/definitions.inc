@@ -89,13 +89,13 @@ bool JSON_ALLOW_SINGLE_QUOTES = false;
  * Types of cells within a JSON object
  */
 enum JSONCellType {
-    Type_Invalid = -1,
-    Type_String = 0,
-    Type_Int,
-    Type_Float,
-    Type_Bool,
-    Type_Null,
-    Type_Object
+    JSON_Type_Invalid = -1,
+    JSON_Type_String = 0,
+    JSON_Type_Int,
+    JSON_Type_Float,
+    JSON_Type_Bool,
+    JSON_Type_Null,
+    JSON_Type_Object
 };
 
 /**

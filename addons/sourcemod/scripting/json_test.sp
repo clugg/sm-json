@@ -160,14 +160,14 @@ bool check_array_remove(JSON_Array arr, int index)
     // get current value at index
     JSONCellType type = arr.GetKeyType(index);
     int str_size = 0;
-    if (type == Type_String) {
+    if (type == JSON_Type_String) {
         str_size = arr.GetKeyLength(index) + 1;
     }
 
     any value;
     char[] str = new char[str_size];
 
-    if (type == Type_String) {
+    if (type == JSON_Type_String) {
         arr.GetString(index, str, str_size);
     } else {
         arr.GetValue(index, value);
@@ -179,7 +179,7 @@ bool check_array_remove(JSON_Array arr, int index)
 
     // confirm that it is gone
     int found = -1;
-    if (type == Type_String) {
+    if (type == JSON_Type_String) {
         found = arr.IndexOfString(str);
     } else {
         found = arr.IndexOf(value);
@@ -646,7 +646,7 @@ bool it_should_remove_meta_keys_from_arrays()
     arr.PushString("hello");
     arr.PushInt(0);
 
-    if (arr.GetKeyType(0) != Type_String || arr.GetKeyLength(0) != 5 || arr.GetKeyType(1) != Type_Int) {
+    if (arr.GetKeyType(0) != JSON_Type_String || arr.GetKeyLength(0) != 5 || arr.GetKeyType(1) != JSON_Type_Int) {
         LogError("json_test: array did not properly set meta-keys");
 
         success = false;
@@ -654,7 +654,7 @@ bool it_should_remove_meta_keys_from_arrays()
 
     arr.Remove(0);
 
-    if (arr.GetKeyType(1) != Type_Invalid || arr.GetKeyLength(0) != -1 || arr.GetKeyType(0) != Type_Int) {
+    if (arr.GetKeyType(1) != JSON_Type_Invalid || arr.GetKeyLength(0) != -1 || arr.GetKeyType(0) != JSON_Type_Int) {
         LogError("json_test: array did not properly remove meta-keys");
 
         success = false;
@@ -673,7 +673,7 @@ bool it_should_remove_meta_keys_from_objects()
     obj.SetString("hello", "world");
     obj.SetInt("zero", 0);
 
-    if (obj.GetKeyType("hello") != Type_String || obj.GetKeyLength("hello") != 5 || obj.GetKeyType("zero") != Type_Int) {
+    if (obj.GetKeyType("hello") != JSON_Type_String || obj.GetKeyLength("hello") != 5 || obj.GetKeyType("zero") != JSON_Type_Int) {
         LogError("json_test: object did not properly set meta-keys");
 
         success = false;
@@ -681,13 +681,13 @@ bool it_should_remove_meta_keys_from_objects()
 
     obj.Remove("hello");
 
-    if (obj.GetKeyType("hello") != Type_Invalid || obj.GetKeyLength("hello") != -1) {
+    if (obj.GetKeyType("hello") != JSON_Type_Invalid || obj.GetKeyLength("hello") != -1) {
         LogError("json_test: object did not properly remove meta-keys");
 
         success = false;
     }
 
-    if (obj.GetKeyType("zero") != Type_Int) {
+    if (obj.GetKeyType("zero") != JSON_Type_Int) {
         LogError("json_test: object removed incorrect meta-key");
 
         success = false;
@@ -779,9 +779,9 @@ bool it_should_merge_arrays()
     print_json(arr1);
 
     bool success = arr1.Length == 4
-        && arr1.GetKeyType(2) == Type_Int
+        && arr1.GetKeyType(2) == JSON_Type_Int
         && arr1.GetInt(2) == 2
-        && arr1.GetKeyType(3) == Type_Bool
+        && arr1.GetKeyType(3) == JSON_Type_Bool
         && arr1.GetBool(3) == false
         && arr1.GetKeyHidden(1) == true
         && arr1.GetKeyHidden(3) == true
@@ -814,7 +814,7 @@ bool it_should_merge_objects_with_replacement()
     print_json(obj1);
 
     bool success = obj1.HasKey("key2")
-        && obj1.GetKeyType("key2") == Type_Int
+        && obj1.GetKeyType("key2") == JSON_Type_Int
         && obj1.GetInt("key2") == 2
         && obj1.GetBool("replaced") == true
         && obj1.GetKeyHidden("replaced") == true;
@@ -846,7 +846,7 @@ bool it_should_merge_objects_without_replacement()
     print_json(obj1);
 
     bool success = obj1.HasKey("key2")
-        && obj1.GetKeyType("key2") == Type_Int
+        && obj1.GetKeyType("key2") == JSON_Type_Int
         && obj1.GetInt("key2") == 2
         && obj1.GetBool("replaced") == false
         && obj1.GetKeyHidden("replaced") == false;

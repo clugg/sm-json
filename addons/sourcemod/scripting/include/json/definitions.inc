@@ -40,6 +40,12 @@
 #include <json/helpers/string>
 
 /**
+ * @section Settings
+ */
+
+bool JSON_ALLOW_SINGLE_QUOTES = false;
+
+/**
  * @section Pretty Print Constants
  *
  * Used to determine how pretty printed JSON should be formatted when encoded.
@@ -70,12 +76,6 @@
 #define JSON_META_TYPE_KEY   ":type"
 #define JSON_META_LENGTH_KEY ":length"
 #define JSON_META_HIDDEN_KEY ":hidden"
-
-/**
- * @section General
- */
-
-bool JSON_ALLOW_SINGLE_QUOTES = false;
 
 /**
  * Types of cells within a JSON object

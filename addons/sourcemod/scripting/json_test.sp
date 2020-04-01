@@ -34,8 +34,12 @@
 #pragma semicolon 1
 #pragma newdecls required
 
+#define HAS_PROFILER SOURCEMOD_V_MAJOR >= 1 && SOURCEMOD_V_MINOR >= 10
+
 #include <sourcemod>
+#if HAS_PROFILER
 #include <profiler>
+#endif
 #include <json>
 
 public Plugin myinfo = {
@@ -1063,12 +1067,14 @@ bool it_should_autocleanup_merged_objects()
 
 public void OnPluginStart()
 {
-    Profiler profiler = new Profiler();
 
     PrintToServer("Running tests...");
     PrintToServer("");
 
+    #if HAS_PROFILER
+    Profiler profiler = new Profiler();
     profiler.Start();
+    #endif
 
     PrintToServer("it_should_encode_empty_objects");
     check_test(it_should_encode_empty_objects());
@@ -1220,9 +1226,12 @@ public void OnPluginStart()
     PrintToServer("it_should_autocleanup_merged_objects");
     check_test(it_should_autocleanup_merged_objects());
 
-    profiler.Stop();
-
     PrintToServer("");
+
+    #if HAS_PROFILER
+    profiler.Stop();
     PrintToServer("Tests completed in %f seconds", profiler.Time);
+    #endif
+
     PrintToServer("%d OK, %d FAILED", passed, failed);
 }

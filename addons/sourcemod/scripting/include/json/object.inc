@@ -105,7 +105,7 @@ methodmap JSON_Object < StringMap
      *
      * @param key   Key to get value type for.
      * @returns     Value type for key provided,
-     *              or Type_Invalid if it does not exist.
+     *              or JSON_Type_Invalid if it does not exist.
      */
     public JSONCellType GetKeyType(const char[] key)
     {
@@ -114,7 +114,7 @@ methodmap JSON_Object < StringMap
         FormatEx(type_key, max_size, "%s%s", key, JSON_META_TYPE_KEY);
 
         JSONCellType type;
-        return (this.GetValue(type_key, type)) ? type : Type_Invalid;
+        return (this.GetValue(type_key, type)) ? type : JSON_Type_Invalid;
     }
 
     /**
@@ -294,7 +294,7 @@ methodmap JSON_Object < StringMap
     public bool SetString(const char[] key, const char[] value)
     {
         return this.Super.SetString(key, value)
-            && this.SetKeyType(key, Type_String)
+            && this.SetKeyType(key, JSON_Type_String)
             && this.SetKeyLength(key, strlen(value));
     }
 
@@ -308,7 +308,7 @@ methodmap JSON_Object < StringMap
     public bool SetInt(const char[] key, int value)
     {
         return this.SetValue(key, value)
-            && this.SetKeyType(key, Type_Int);
+            && this.SetKeyType(key, JSON_Type_Int);
     }
 
     /**
@@ -321,7 +321,7 @@ methodmap JSON_Object < StringMap
     public bool SetFloat(const char[] key, float value)
     {
         return this.SetValue(key, value)
-            && this.SetKeyType(key, Type_Float);
+            && this.SetKeyType(key, JSON_Type_Float);
     }
 
     /**
@@ -334,7 +334,7 @@ methodmap JSON_Object < StringMap
     public bool SetBool(const char[] key, bool value)
     {
         return this.SetValue(key, value)
-            && this.SetKeyType(key, Type_Bool);
+            && this.SetKeyType(key, JSON_Type_Bool);
     }
 
     /**
@@ -346,7 +346,7 @@ methodmap JSON_Object < StringMap
     public bool SetNull(const char[] key)
     {
         return this.SetValue(key, view_as<Handle>(null))
-            && this.SetKeyType(key, Type_Null);
+            && this.SetKeyType(key, JSON_Type_Null);
     }
 
     /**
@@ -359,7 +359,7 @@ methodmap JSON_Object < StringMap
     public bool SetObject(const char[] key, JSON_Object value)
     {
         return this.SetValue(key, value)
-            && this.SetKeyType(key, Type_Object);
+            && this.SetKeyType(key, JSON_Type_Object);
     }
 
     /**

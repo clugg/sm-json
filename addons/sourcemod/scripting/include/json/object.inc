@@ -345,8 +345,7 @@ methodmap JSON_Object < StringMap
      */
     public bool SetNull(const char[] key)
     {
-        Handle value = null;
-        return this.SetValue(key, value)
+        return this.SetValue(key, view_as<Handle>(null))
             && this.SetKeyType(key, Type_Null);
     }
 

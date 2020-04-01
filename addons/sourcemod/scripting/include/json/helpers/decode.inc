@@ -83,32 +83,36 @@ stock bool json_is_int(const char[] buffer)
     bool has_digit_gt_zero = false;
 
     int length = strlen(buffer);
+    if (length == 0) {
+        return false;
+    }
+
     for (int i = 0; i < length; i += 1) {
         // allow minus as first character only
         if (i == 0 && buffer[i] == '-') {
             continue;
         }
 
-        if (IsCharNumeric(buffer[i])) {
-            if (buffer[i] == '0') {
-                if (starts_with_zero) {
-                    // detect repeating leading zeros
-                    return false;
-                } else if (! has_digit_gt_zero) {
-                    starts_with_zero = true;
-                }
-            } else {
-                has_digit_gt_zero = true;
-            }
-        } else {
+        if (! IsCharNumeric(buffer[i])) {
             return false;
+        }
+
+        if (buffer[i] == '0') {
+            if (starts_with_zero) {
+                // detect repeating leading zeros
+                return false;
+            } else if (! has_digit_gt_zero) {
+                starts_with_zero = true;
+            }
+        } else if (starts_with_zero) {
+            // detect numbers with leading zero
+            return false;
+        } else {
+            has_digit_gt_zero = true;
         }
     }
 
-    // buffer must start with zero and have no other numerics before decimal
-    // OR not start with zero and have other numerics
-    return (starts_with_zero && ! has_digit_gt_zero)
-        || (! starts_with_zero && has_digit_gt_zero);
+    return true;
 }
 
 /**

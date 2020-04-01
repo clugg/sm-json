@@ -91,7 +91,7 @@ stock void json_encode(
 
     int key_length = 0;
     for (int i = 0; i < json_size; ++i) {
-        key_length = (is_array) ? JSON_INDEX_BUFFER_SIZE : snap.KeyBufferSize(i);
+        key_length = (is_array) ? json_cell_int_size(i) : snap.KeyBufferSize(i);
         char[] key = new char[key_length];
 
         if (is_array) {
@@ -525,7 +525,7 @@ stock bool json_merge(
 
     int key_length = 0;
     for (int i = 0; i < json_size; ++i) {
-        key_length = (is_array) ? JSON_INDEX_BUFFER_SIZE : snap.KeyBufferSize(i);
+        key_length = (is_array) ? json_cell_int_size(i) : snap.KeyBufferSize(i);
         char[] key = new char[key_length];
 
         bool keyAlreadyExists = false;

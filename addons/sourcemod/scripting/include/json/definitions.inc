@@ -63,7 +63,6 @@ bool JSON_ALLOW_SINGLE_QUOTES = false;
  */
 
 #define JSON_FLOAT_BUFFER_SIZE 32
-#define JSON_INDEX_BUFFER_SIZE 16
 
 /**
  * @section Meta-key Constants

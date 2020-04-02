@@ -528,7 +528,7 @@ stock bool json_merge(
         key_length = (is_array) ? json_cell_int_size(i) : snap.KeyBufferSize(i);
         char[] key = new char[key_length];
 
-        bool keyAlreadyExists = false;
+        bool key_already_exists = false;
         if (is_array) {
             IntToString(i, key, key_length);
         } else {
@@ -540,8 +540,8 @@ stock bool json_merge(
             }
 
             // skip already existing keys if we aren't in replace mode
-            keyAlreadyExists = to.HasKey(key);
-            if (! replace && keyAlreadyExists) {
+            key_already_exists = to.HasKey(key);
+            if (! replace && key_already_exists) {
                 continue;
             }
         }
@@ -605,7 +605,7 @@ stock bool json_merge(
                 if (is_array) {
                     to_arr.PushObject(value);
                 } else {
-                    if (autocleanup && keyAlreadyExists) {
+                    if (autocleanup && key_already_exists) {
                         JSON_Object existing = to.GetObject(key);
                         if (existing != null && existing != value) {
                             existing.Cleanup();

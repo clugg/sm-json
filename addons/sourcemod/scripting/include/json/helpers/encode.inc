@@ -187,7 +187,7 @@ stock void json_cell_float(float input, char[] output, int max_size)
  */
 stock void json_cell_bool(bool input, char[] output, int max_size)
 {
-    strcopy(output, max_size, (input) ? "true" : "false");
+    strcopy(output, max_size, input ? "true" : "false");
 }
 
 /**

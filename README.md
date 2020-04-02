@@ -251,11 +251,13 @@ methodmap OtherClass < JSON_Object
 {
     property YourClass instance
     {
-        public get() {
+        public get()
+        {
             return view_as<YourClass>(this.GetObject("instance"));
         }
 
-        public set(YourClass value) {
+        public set(YourClass value)
+        {
             this.SetObject("instance", value);
         }
     }

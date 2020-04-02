@@ -78,18 +78,6 @@ methodmap JSON_Array < JSON_Object
     }
 
     /**
-     * Increases the length of the array by 1 and returns true.
-     *
-     * @returns     True.
-     */
-    public bool IncrementIndex()
-    {
-        this.Length += 1;
-
-        return true;
-    }
-
-    /**
      * Checks whether the object has an index.
      *
      * @param index     Index to check existence of.
@@ -384,107 +372,137 @@ methodmap JSON_Array < JSON_Object
      * Pushes a string to the end of the array.
      *
      * @param value     Value to push.
-     * @returns         True on success, false otherwise.
+     * @returns         The element's index on success, -1 otherwise.
      */
-    public bool PushString(const char[] value)
+    public int PushString(const char[] value)
     {
         int index = this.Length;
         char key[JSON_INT_BUFFER_SIZE];
         if (! this.GetIndexAsString(index, key, sizeof(key), false)) {
-            return false;
+            return -1;
         }
 
-        return this.Super.SetString(key, value)
-            && this.IncrementIndex();
+        if (! this.Super.SetString(key, value)) {
+            return -1;
+        }
+
+        this.Length += 1;
+
+        return index;
     }
 
     /**
      * Pushes an int to the end of the array.
      *
      * @param value     Value to push.
-     * @returns         True on success, false otherwise.
+     * @returns         The element's index on success, -1 otherwise.
      */
-    public bool PushInt(int value)
+    public int PushInt(int value)
     {
         int index = this.Length;
         char key[JSON_INT_BUFFER_SIZE];
         if (! this.GetIndexAsString(index, key, sizeof(key), false)) {
-            return false;
+            return -1;
         }
 
-        return this.Super.SetInt(key, value)
-            && this.IncrementIndex();
+        if (! this.Super.SetInt(key, value)) {
+            return -1;
+        }
+
+        this.Length += 1;
+
+        return index;
     }
 
     /**
      * Pushes a float to the end of the array.
      *
      * @param value     Value to push.
-     * @returns         True on success, false otherwise.
+     * @returns         The element's index on success, -1 otherwise.
      */
-    public bool PushFloat(float value)
+    public int PushFloat(float value)
     {
         int index = this.Length;
         char key[JSON_INT_BUFFER_SIZE];
         if (! this.GetIndexAsString(index, key, sizeof(key), false)) {
-            return false;
+            return -1;
         }
 
-        return this.Super.SetFloat(key, value)
-            && this.IncrementIndex();
+        if (! this.Super.SetFloat(key, value)) {
+            return -1;
+        }
+
+        this.Length += 1;
+
+        return index;
     }
 
     /**
      * Pushes a bool to the end of the array.
      *
      * @param value     Value to push.
-     * @returns         True on success, false otherwise.
+     * @returns         The element's index on success, -1 otherwise.
      */
-    public bool PushBool(bool value)
+    public int PushBool(bool value)
     {
         int index = this.Length;
         char key[JSON_INT_BUFFER_SIZE];
         if (! this.GetIndexAsString(index, key, sizeof(key), false)) {
-            return false;
+            return -1;
         }
 
-        return this.Super.SetBool(key, value)
-            && this.IncrementIndex();
+        if (! this.Super.SetBool(key, value)) {
+            return -1;
+        }
+
+        this.Length += 1;
+
+        return index;
     }
 
     /**
      * Pushes null to the end of the array.
      *
-     * @returns         True on success, false otherwise.
+     * @returns         The element's index on success, -1 otherwise.
      */
-    public bool PushNull()
+    public int PushNull()
     {
         int index = this.Length;
         char key[JSON_INT_BUFFER_SIZE];
         if (! this.GetIndexAsString(index, key, sizeof(key), false)) {
-            return false;
+            return -1;
         }
 
-        return this.Super.SetNull(key)
-            && this.IncrementIndex();
+        if (! this.Super.SetNull(key)) {
+            return -1;
+        }
+
+        this.Length += 1;
+
+        return index;
     }
 
     /**
      * Pushes a JSON object to the end of the array.
      *
      * @param value     Value to push.
-     * @returns         True on success, false otherwise.
+     * @returns         The element's index on success, -1 otherwise.
      */
-    public bool PushObject(JSON_Object value)
+    public int PushObject(JSON_Object value)
     {
         int index = this.Length;
         char key[JSON_INT_BUFFER_SIZE];
         if (! this.GetIndexAsString(index, key, sizeof(key), false)) {
-            return false;
+            return -1;
         }
 
-        return this.Super.SetObject(key, value)
-            && this.IncrementIndex();
+        if (! this.Super.SetObject(key, value)) {
+            return -1;
+        }
+
+        this.Length += 1;
+
+        return index;
     }
 
     /**

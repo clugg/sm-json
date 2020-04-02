@@ -97,8 +97,22 @@ methodmap JSON_Object < StringMap
     }
 
     /**
-     * @section Internal Getters
+     * @section Metadata Getters
      */
+
+    public any GetMetadata(const char[] key, JSONMetaInfo meta, any default_value)
+    {
+        int max_size = json_meta_key_length(key);
+        char[] meta_key = new char[max_size];
+        json_format_meta_key(meta_key, max_size, key, meta);
+
+        if (meta == JSON_Meta_Hidden) {
+            return this.HasKey(meta_key);
+        }
+
+        any value;
+        return (this.GetValue(meta_key, value)) ? value : default_value;
+    }
 
     /**
      * Gets the cell type stored at a key.
@@ -109,12 +123,7 @@ methodmap JSON_Object < StringMap
      */
     public JSONCellType GetKeyType(const char[] key)
     {
-        int max_size = strlen(key) + strlen(JSON_META_TYPE_KEY) + 1;
-        char[] type_key = new char[max_size];
-        FormatEx(type_key, max_size, "%s%s", key, JSON_META_TYPE_KEY);
-
-        JSONCellType type;
-        return (this.GetValue(type_key, type)) ? type : JSON_Type_Invalid;
+        return view_as<JSONCellType>(this.GetMetadata(key, JSON_Meta_Type, JSON_Type_Invalid));
     }
 
     /**
@@ -126,12 +135,7 @@ methodmap JSON_Object < StringMap
      */
     public int GetKeyLength(const char[] key)
     {
-        int max_size = strlen(key) + strlen(JSON_META_LENGTH_KEY) + 1;
-        char[] length_key = new char[max_size];
-        FormatEx(length_key, max_size, "%s%s", key, JSON_META_LENGTH_KEY);
-
-        int length;
-        return (this.GetValue(length_key, length)) ? length : -1;
+        return view_as<int>(this.GetMetadata(key, JSON_Meta_Length, -1));
     }
 
     /**
@@ -142,16 +146,36 @@ methodmap JSON_Object < StringMap
      */
     public bool GetKeyHidden(const char[] key)
     {
-        int max_size = strlen(key) + strlen(JSON_META_HIDDEN_KEY) + 1;
-        char[] hidden_key = new char[max_size];
-        FormatEx(hidden_key, max_size, "%s%s", key, JSON_META_HIDDEN_KEY);
-
-        return this.HasKey(hidden_key);
+        return view_as<bool>(this.GetMetadata(key, JSON_Meta_Hidden, false));
     }
 
     /**
-     * @section Internal Setters
+     * @section Metadata Setters
      */
+
+    public bool SetMetadata(const char[] key, JSONMetaInfo meta, any value)
+    {
+        int max_size = json_meta_key_length(key);
+        char[] meta_key = new char[max_size];
+        json_format_meta_key(meta_key, max_size, key, meta);
+
+        if (meta == JSON_Meta_Hidden && ! view_as<bool>(value)) {
+            this.Super.Remove(meta_key);
+
+            return true;
+        }
+
+        return this.SetValue(meta_key, value);
+    }
+
+    public bool RemoveMetadata(const char[] key, JSONMetaInfo meta)
+    {
+        int max_size = json_meta_key_length(key);
+        char[] meta_key = new char[max_size];
+        json_format_meta_key(meta_key, max_size, key, meta);
+
+        return this.Super.Remove(meta_key);
+    }
 
     /**
      * Sets the cell type stored at a key.
@@ -162,11 +186,7 @@ methodmap JSON_Object < StringMap
      */
     public bool SetKeyType(const char[] key, JSONCellType type)
     {
-        int max_size = strlen(key) + strlen(JSON_META_TYPE_KEY) + 1;
-        char[] type_key = new char[max_size];
-        FormatEx(type_key, max_size, "%s%s", key, JSON_META_TYPE_KEY);
-
-        return this.SetValue(type_key, type);
+        return this.SetMetadata(key, JSON_Meta_Type, type);
     }
 
     /**
@@ -178,11 +198,7 @@ methodmap JSON_Object < StringMap
      */
     public bool SetKeyLength(const char[] key, int length)
     {
-        int max_size = strlen(key) + strlen(JSON_META_LENGTH_KEY) + 1;
-        char[] length_key = new char[max_size];
-        FormatEx(length_key, max_size, "%s%s", key, JSON_META_LENGTH_KEY);
-
-        return this.SetValue(length_key, length);
+        return this.SetMetadata(key, JSON_Meta_Length, length);
     }
 
     /**
@@ -194,17 +210,7 @@ methodmap JSON_Object < StringMap
      */
     public bool SetKeyHidden(const char[] key, bool hidden)
     {
-        int max_size = strlen(key) + strlen(JSON_META_HIDDEN_KEY) + 1;
-        char[] hidden_key = new char[max_size];
-        FormatEx(hidden_key, max_size, "%s%s", key, JSON_META_HIDDEN_KEY);
-
-        if (hidden) {
-            return this.SetValue(hidden_key, hidden);
-        } else {
-            this.Super.Remove(hidden_key);
-
-            return true;
-        }
+        return this.SetMetadata(key, JSON_Meta_Hidden, hidden);
     }
 
     /**
@@ -374,24 +380,11 @@ methodmap JSON_Object < StringMap
      */
     public bool Remove(const char[] key)
     {
-        static char meta_keys[][] = {
-            JSON_META_TYPE_KEY, JSON_META_LENGTH_KEY, JSON_META_HIDDEN_KEY
-        };
-
-        // create a new char[] which will fit the longest meta-key
-        int meta_key_size = strlen(key) + 8;
-        char[] meta_key = new char[meta_key_size];
-
-        bool success = true;
-        for (int i = 0; i < sizeof(meta_keys); i += 1) {
-            FormatEx(meta_key, meta_key_size, "%s%s", key, meta_keys[i]);
-
-            if (this.HasKey(meta_key)) {
-                success = success && this.Super.Remove(meta_key);
-            }
+        for (int i = 0; i < sizeof(JSON_ALL_METADATA); i += 1) {
+            this.RemoveMetadata(key, JSON_ALL_METADATA[i]);
         }
 
-        return success && this.Super.Remove(key);
+        return this.Super.Remove(key);
     }
 
     /**

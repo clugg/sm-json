@@ -125,8 +125,23 @@ methodmap JSON_Array < JSON_Object
     }
 
     /**
-     * @section Internal Getters
+     * @section Metadata Getters
      */
+
+    /**
+     * Converts index to a string ('key') and calls the relevant Super method.
+     *
+     * @see JSON_Object.GetMetadata
+     */
+    public any GetMetadata(int index, JSONMetaInfo meta, any default_value)
+    {
+        char key[JSON_INT_BUFFER_SIZE];
+        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+            return default_value;
+        }
+
+        return this.Super.GetMetadata(key, meta, default_value);
+    }
 
     /**
      * Converts index to a string ('key') and calls the relevant Super method.
@@ -174,8 +189,38 @@ methodmap JSON_Array < JSON_Object
     }
 
     /**
-     * @section Internal Setters
+     * @section Metadata Setters
      */
+
+    /**
+     * Converts index to a string ('key') and calls the relevant Super method.
+     *
+     * @see JSON_Object.SetMetadata
+     */
+    public bool SetMetadata(int index, JSONMetaInfo meta, any value)
+    {
+        char key[JSON_INT_BUFFER_SIZE];
+        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+            return false;
+        }
+
+        return this.Super.SetMetadata(key, meta, value);
+    }
+
+    /**
+     * Converts index to a string ('key') and calls the relevant Super method.
+     *
+     * @see JSON_Object.RemoveMetadata
+     */
+    public bool RemoveMetadata(int index, JSONMetaInfo meta)
+    {
+        char key[JSON_INT_BUFFER_SIZE];
+        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+            return false;
+        }
+
+        return this.Super.RemoveMetadata(key, meta);
+    }
 
     /**
      * Converts index to a string ('key') and calls the relevant Super method.

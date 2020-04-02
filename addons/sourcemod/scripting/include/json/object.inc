@@ -219,65 +219,65 @@ methodmap JSON_Object < StringMap
      * Retrieves the int stored at a key.
      *
      * @param key           Key to retrieve int value for.
-     * @param defaultValue  Value to return if the key does not exist.
+     * @param default_value  Value to return if the key does not exist.
      * @returns             Value stored at key.
      */
-    public int GetInt(const char[] key, int defaultValue = -1)
+    public int GetInt(const char[] key, int default_value = -1)
     {
         int value;
-        return (this.GetValue(key, value)) ? value : defaultValue;
+        return (this.GetValue(key, value)) ? value : default_value;
     }
 
     /**
      * Retrieves the float stored at a key.
      *
      * @param key           Key to retrieve float value for.
-     * @param defaultValue  Value to return if the key does not exist.
+     * @param default_value  Value to return if the key does not exist.
      * @returns             Value stored at key.
      */
-    public float GetFloat(const char[] key, float defaultValue = -1.0)
+    public float GetFloat(const char[] key, float default_value = -1.0)
     {
         float value;
-        return (this.GetValue(key, value)) ? value : defaultValue;
+        return (this.GetValue(key, value)) ? value : default_value;
     }
 
     /**
      * Retrieves the bool stored at a key.
      *
      * @param key           Key to retrieve bool value for.
-     * @param defaultValue  Value to return if the key does not exist.
+     * @param default_value  Value to return if the key does not exist.
      * @returns             Value stored at key.
      */
-    public bool GetBool(const char[] key, bool defaultValue = false)
+    public bool GetBool(const char[] key, bool default_value = false)
     {
         bool value;
-        return (this.GetValue(key, value)) ? value : defaultValue;
+        return (this.GetValue(key, value)) ? value : default_value;
     }
 
     /**
      * Retrieves null stored at a key.
      *
      * @param key           Key to retrieve null value for.
-     * @param defaultValue  Value to return if the key does not exist.
+     * @param default_value  Value to return if the key does not exist.
      * @returns             Value stored at key.
      */
-    public Handle GetNull(const char[] key, Handle defaultValue = null)
+    public Handle GetNull(const char[] key, Handle default_value = null)
     {
         Handle value;
-        return (this.GetValue(key, value)) ? value : defaultValue;
+        return (this.GetValue(key, value)) ? value : default_value;
     }
 
     /**
      * Retrieves the JSON object stored at a key.
      *
      * @param key           Key to retrieve object value for.
-     * @param defaultValue  Value to return if the key does not exist.
+     * @param default_value  Value to return if the key does not exist.
      * @returns             Value stored at key.
      */
-    public JSON_Object GetObject(const char[] key, JSON_Object defaultValue = null)
+    public JSON_Object GetObject(const char[] key, JSON_Object default_value = null)
     {
         JSON_Object value;
-        return this.GetValue(key, value) ? value : defaultValue;
+        return this.GetValue(key, value) ? value : default_value;
     }
 
     /**
@@ -372,7 +372,8 @@ methodmap JSON_Object < StringMap
      * @param key       Key of object to remove.
      * @returns         True on success, false if the value was never set.
      */
-    public bool Remove(const char[] key) {
+    public bool Remove(const char[] key)
+    {
         static char meta_keys[][] = {
             JSON_META_TYPE_KEY, JSON_META_LENGTH_KEY, JSON_META_HIDDEN_KEY
         };

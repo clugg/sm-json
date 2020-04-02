@@ -269,15 +269,15 @@ methodmap JSON_Array < JSON_Object
      *
      * @see JSON_Object.GetInt
      */
-    public int GetInt(int index, int defaultValue = -1)
+    public int GetInt(int index, int default_value = -1)
     {
         int max_key_size = json_cell_int_size(index);
         char[] key = new char[max_key_size];
         if (! this.GetIndexAsString(index, key, max_key_size)) {
-            return defaultValue;
+            return default_value;
         }
 
-        return this.parent.GetInt(key, defaultValue);
+        return this.parent.GetInt(key, default_value);
     }
 
     /**
@@ -285,15 +285,15 @@ methodmap JSON_Array < JSON_Object
      *
      * @see JSON_Object.GetFloat
      */
-    public float GetFloat(int index, float defaultValue = -1.0)
+    public float GetFloat(int index, float default_value = -1.0)
     {
         int max_key_size = json_cell_int_size(index);
         char[] key = new char[max_key_size];
         if (! this.GetIndexAsString(index, key, max_key_size)) {
-            return defaultValue;
+            return default_value;
         }
 
-        return this.parent.GetFloat(key, defaultValue);
+        return this.parent.GetFloat(key, default_value);
     }
 
     /**
@@ -301,15 +301,15 @@ methodmap JSON_Array < JSON_Object
      *
      * @see JSON_Object.GetBool
      */
-    public bool GetBool(int index, bool defaultValue = false)
+    public bool GetBool(int index, bool default_value = false)
     {
         int max_key_size = json_cell_int_size(index);
         char[] key = new char[max_key_size];
         if (! this.GetIndexAsString(index, key, max_key_size)) {
-            return defaultValue;
+            return default_value;
         }
 
-        return this.parent.GetBool(key, defaultValue);
+        return this.parent.GetBool(key, default_value);
     }
 
     /**
@@ -317,15 +317,15 @@ methodmap JSON_Array < JSON_Object
      *
      * @see JSON_Object.GetNull
      */
-    public Handle GetNull(int index, Handle defaultValue = null)
+    public Handle GetNull(int index, Handle default_value = null)
     {
         int max_key_size = json_cell_int_size(index);
         char[] key = new char[max_key_size];
         if (! this.GetIndexAsString(index, key, max_key_size)) {
-            return defaultValue;
+            return default_value;
         }
 
-        return this.parent.GetNull(key, defaultValue);
+        return this.parent.GetNull(key, default_value);
     }
 
     /**
@@ -333,15 +333,15 @@ methodmap JSON_Array < JSON_Object
      *
      * @see JSON_Object.GetObject
      */
-    public JSON_Object GetObject(int index, JSON_Object defaultValue = null)
+    public JSON_Object GetObject(int index, JSON_Object default_value = null)
     {
         int max_key_size = json_cell_int_size(index);
         char[] key = new char[max_key_size];
         if (! this.GetIndexAsString(index, key, max_key_size)) {
-            return defaultValue;
+            return default_value;
         }
 
-        return this.parent.GetObject(key, defaultValue);
+        return this.parent.GetObject(key, default_value);
     }
 
     /**

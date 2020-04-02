@@ -74,16 +74,10 @@ bool JSON_ALLOW_SINGLE_QUOTES = false;
 #define JSON_NULL_BUFFER_SIZE 5
 
 /**
- * @section Meta-key Constants
- *
- * Used to store metadata for each key in an object.
- * You shouldn't need to change these unless working with keys that may clash with them.
+ * @section Array Constants
  */
 
 #define JSON_ARRAY_INDEX_KEY "__array_index"
-#define JSON_META_TYPE_KEY   ":type"
-#define JSON_META_LENGTH_KEY ":length"
-#define JSON_META_HIDDEN_KEY ":hidden"
 
 /**
  * Types of cells within a JSON object
@@ -99,15 +93,66 @@ enum JSONCellType {
 };
 
 /**
+ * Types of metadata a JSON element can have
+ */
+enum JSONMetaInfo {
+    JSON_Meta_Type = 0,
+    JSON_Meta_Length,
+    JSON_Meta_Hidden
+}
+
+/**
+ * An array of all possible meta info values.
+ */
+JSONMetaInfo[] JSON_ALL_METADATA = { JSON_Meta_Type, JSON_Meta_Length, JSON_Meta_Hidden };
+
+/**
+ * Calculates the length required to store a meta key
+ * for a specified key/metainfo combination.
+ *
+ * @param   key
+ * @returns The length required to store the meta key.
+ */
+stock int json_meta_key_length(const char[] key)
+{
+    // %s:%d
+    return strlen(key) + 1 + JSON_INT_BUFFER_SIZE;
+}
+
+/**
+ * Formats the key/metainfo combination into a buffer.
+ *
+ * @param buffer    String buffer to store output.
+ * @param max_size  Maximum size of string buffer.
+ * @param key       Key to generate metakey for.
+ * @param meta      Meta information to generate metakey for.
+ */
+stock void json_format_meta_key(char[] output, int max_size, const char[] key, JSONMetaInfo meta)
+{
+    FormatEx(output, max_size, "%s:%d", key, view_as<int>(meta));
+}
+
+/**
  * Checks whether the key provided is a meta-key that should only be used internally.
  *
  * @param key   Key to check.
  * @returns     True when it is a meta-key, false otherwise.
  */
-stock bool json_is_meta_key(char[] key)
+stock bool json_is_meta_key(const char[] key)
 {
-    return json_string_endswith(key, JSON_META_TYPE_KEY)
-        || json_string_endswith(key, JSON_META_LENGTH_KEY)
-        || json_string_endswith(key, JSON_META_HIDDEN_KEY)
-        || StrEqual(key, JSON_ARRAY_INDEX_KEY);
+    if (StrEqual(key, JSON_ARRAY_INDEX_KEY)) {
+        return true;
+    }
+
+    int max_size = json_meta_key_length("");
+    char[] meta_key = new char[max_size];
+    for (int i = 0; i < sizeof(JSON_ALL_METADATA); i += 1) {
+        json_format_meta_key(meta_key, max_size, "", JSON_ALL_METADATA[i]);
+
+        if (json_string_endswith(key, meta_key)) {
+            return true;
+        }
+    }
+
+    return false;
 }

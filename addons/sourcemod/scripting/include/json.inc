@@ -129,15 +129,8 @@ stock void json_encode(
                 obj.GetString(key, str_value, str_length + 1);
                 cell_length = json_cell_string_size(str_length);
             }
-<<<<<<< HEAD
-            case Type_Int: {
-                cell_length = JSON_INT_BUFFER_SIZE;
-=======
             case JSON_Type_Int: {
-                // get the int value early, as its cell_length is determined by its contents
-                int_value = obj.GetInt(key);
-                cell_length = json_cell_int_size(int_value);
->>>>>>> 91b5327... Prefix all JSONCellType values with JSON_
+                cell_length = JSON_INT_BUFFER_SIZE;
             }
             case JSON_Type_Float: {
                 cell_length = JSON_FLOAT_BUFFER_SIZE;
@@ -159,14 +152,9 @@ stock void json_encode(
             case JSON_Type_String: {
                 json_cell_string(str_value, cell, cell_length);
             }
-<<<<<<< HEAD
-            case Type_Int: {
+            case JSON_Type_Int: {
                 int value = obj.GetInt(key);
                 json_cell_int(value, cell, cell_length);
-=======
-            case JSON_Type_Int: {
-                json_cell_int(int_value, cell, cell_length);
->>>>>>> 91b5327... Prefix all JSONCellType values with JSON_
             }
             case JSON_Type_Float: {
                 float value = obj.GetFloat(key);

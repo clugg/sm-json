@@ -187,9 +187,11 @@ bool check_array_remove(JSON_Array arr, int index)
 
     if (found != -1) {
         LogError("json_test: found value at position %d after removing it from array", found);
+
+        return false;
     }
 
-    return found == -1;
+    return true;
 }
 
 void check_test(bool result)

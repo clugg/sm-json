@@ -341,19 +341,19 @@ bool it_should_support_objects()
 bool it_should_support_arrays()
 {
     JSON_Array arr = new JSON_Array();
-    bool success = arr.PushString("leet")
-        && arr.PushString("\"leet\"")
-        && arr.PushInt(9001)
-        && arr.PushInt(-9001)
-        && arr.PushInt(0)
-        && arr.PushInt(-0)
-        && arr.PushFloat(13.37)
-        && arr.PushFloat(-13.37)
-        && arr.PushFloat(0.0)
-        && arr.PushFloat(-0.0)
-        && arr.PushBool(true)
-        && arr.PushBool(false)
-        && arr.PushNull();
+    bool success = arr.PushString("leet") > -1
+        && arr.PushString("\"leet\"") > -1
+        && arr.PushInt(9001) > -1
+        && arr.PushInt(-9001) > -1
+        && arr.PushInt(0) > -1
+        && arr.PushInt(-0) > -1
+        && arr.PushFloat(13.37) > -1
+        && arr.PushFloat(-13.37) > -1
+        && arr.PushFloat(0.0) > -1
+        && arr.PushFloat(-0.0) > -1
+        && arr.PushBool(true) > -1
+        && arr.PushBool(false) > -1
+        && arr.PushNull() > -1;
 
     print_json(arr);
     delete arr;
@@ -701,12 +701,12 @@ bool it_should_remove_meta_keys_from_objects()
 bool it_should_shift_array_down_after_removed_index()
 {
     JSON_Array arr = new JSON_Array();
-    bool success = arr.PushString("leet")
-        && arr.PushString("\"leet\"")
-        && arr.PushInt(9001)
-        && arr.PushFloat(-13.37)
-        && arr.PushBool(true)
-        && arr.PushBool(false);
+    bool success = arr.PushString("leet") > -1
+        && arr.PushString("\"leet\"") > -1
+        && arr.PushInt(9001) > -1
+        && arr.PushFloat(-13.37) > -1
+        && arr.PushBool(true) > -1
+        && arr.PushBool(false) > -1;
 
     print_json(arr);
 

@@ -369,6 +369,100 @@ methodmap JSON_Array < JSON_Object
      */
 
     /**
+     * Converts index to a string ('key') and calls the relevant Super method.
+     *
+     * @see JSON_Object.SetString
+     */
+    public bool SetString(int index, const char[] value)
+    {
+        char key[JSON_INT_BUFFER_SIZE];
+        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+            return false;
+        }
+
+        return this.Super.SetString(key, value);
+    }
+
+    /**
+     * Converts index to a string ('key') and calls the relevant Super method.
+     *
+     * @see JSON_Object.SetInt
+     */
+    public bool SetInt(int index, int value)
+    {
+        char key[JSON_INT_BUFFER_SIZE];
+        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+            return false;
+        }
+
+        return this.Super.SetInt(key, value);
+    }
+
+    /**
+     * Converts index to a string ('key') and calls the relevant Super method.
+     *
+     * @see JSON_Object.SetFloat
+     */
+    public bool SetFloat(int index, float value)
+    {
+        char key[JSON_INT_BUFFER_SIZE];
+        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+            return false;
+        }
+
+        return this.Super.SetFloat(key, value);
+    }
+
+    /**
+     * Converts index to a string ('key') and calls the relevant Super method.
+     *
+     * @see JSON_Object.SetBool
+     */
+    public bool SetBool(int index, bool value)
+    {
+        char key[JSON_INT_BUFFER_SIZE];
+        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+            return false;
+        }
+
+        return this.Super.SetBool(key, value);
+    }
+
+    /*
+     * Converts index to a string ('key') and calls the relevant Super method.
+     *
+     * @see JSON_Object.SetNull
+     */
+    public bool SetNull(int index)
+    {
+        char key[JSON_INT_BUFFER_SIZE];
+        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+            return false;
+        }
+
+        return this.Super.SetNull(key);
+    }
+
+    /**
+     * Converts index to a string ('key') and calls the relevant Super method.
+     *
+     * @see JSON_Object.SetObject
+     */
+    public bool SetObject(int index, JSON_Object value)
+    {
+        char key[JSON_INT_BUFFER_SIZE];
+        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+            return false;
+        }
+
+        return this.Super.SetObject(key, value);
+    }
+
+    /**
+     * @section Pushers
+     */
+
+    /**
      * Pushes a string to the end of the array.
      *
      * @param value     Value to push.
@@ -377,16 +471,12 @@ methodmap JSON_Array < JSON_Object
     public int PushString(const char[] value)
     {
         int index = this.Length;
-        char key[JSON_INT_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key), false)) {
-            return -1;
-        }
-
-        if (! this.Super.SetString(key, value)) {
-            return -1;
-        }
-
         this.Length += 1;
+        if (! this.SetString(index, value)) {
+            this.Length -= 1;
+
+            return -1;
+        }
 
         return index;
     }
@@ -400,16 +490,12 @@ methodmap JSON_Array < JSON_Object
     public int PushInt(int value)
     {
         int index = this.Length;
-        char key[JSON_INT_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key), false)) {
-            return -1;
-        }
-
-        if (! this.Super.SetInt(key, value)) {
-            return -1;
-        }
-
         this.Length += 1;
+        if (! this.SetInt(index, value)) {
+            this.Length -= 1;
+
+            return -1;
+        }
 
         return index;
     }
@@ -423,16 +509,12 @@ methodmap JSON_Array < JSON_Object
     public int PushFloat(float value)
     {
         int index = this.Length;
-        char key[JSON_INT_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key), false)) {
-            return -1;
-        }
-
-        if (! this.Super.SetFloat(key, value)) {
-            return -1;
-        }
-
         this.Length += 1;
+        if (! this.SetFloat(index, value)) {
+            this.Length -= 1;
+
+            return -1;
+        }
 
         return index;
     }
@@ -446,16 +528,12 @@ methodmap JSON_Array < JSON_Object
     public int PushBool(bool value)
     {
         int index = this.Length;
-        char key[JSON_INT_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key), false)) {
-            return -1;
-        }
-
-        if (! this.Super.SetBool(key, value)) {
-            return -1;
-        }
-
         this.Length += 1;
+        if (! this.SetBool(index, value)) {
+            this.Length -= 1;
+
+            return -1;
+        }
 
         return index;
     }
@@ -468,16 +546,12 @@ methodmap JSON_Array < JSON_Object
     public int PushNull()
     {
         int index = this.Length;
-        char key[JSON_INT_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key), false)) {
-            return -1;
-        }
-
-        if (! this.Super.SetNull(key)) {
-            return -1;
-        }
-
         this.Length += 1;
+        if (! this.SetNull(index)) {
+            this.Length -= 1;
+
+            return -1;
+        }
 
         return index;
     }
@@ -491,16 +565,12 @@ methodmap JSON_Array < JSON_Object
     public int PushObject(JSON_Object value)
     {
         int index = this.Length;
-        char key[JSON_INT_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key), false)) {
-            return -1;
-        }
-
-        if (! this.Super.SetObject(key, value)) {
-            return -1;
-        }
-
         this.Length += 1;
+        if (! this.SetObject(index, value)) {
+            this.Length -= 1;
+
+            return -1;
+        }
 
         return index;
     }
@@ -606,15 +676,8 @@ methodmap JSON_Array < JSON_Object
         }
 
         // shift all following elements down
-        char target[JSON_INT_BUFFER_SIZE];
         for (int i = index + 1; i < this.Length; i += 1) {
-            if (
-                ! this.GetIndexAsString(i, key, sizeof(key), false)
-                || ! this.GetIndexAsString(i - 1, target, sizeof(target), false)
-            ) {
-                return false;
-            }
-
+            int target = i - 1;
             JSONCellType type = this.GetKeyType(i);
 
             switch (type) {
@@ -623,27 +686,31 @@ methodmap JSON_Array < JSON_Object
                     char[] str_value = new char[str_length];
 
                     this.GetString(i, str_value, str_length + 1);
-                    this.Super.SetString(target, str_value);
+                    this.SetString(target, str_value);
                 }
                 case JSON_Type_Int: {
-                    this.Super.SetInt(target, this.GetInt(i));
+                    this.SetInt(target, this.GetInt(i));
                 }
                 case JSON_Type_Float: {
-                    this.Super.SetFloat(target, this.GetFloat(i));
+                    this.SetFloat(target, this.GetFloat(i));
                 }
                 case JSON_Type_Bool: {
-                    this.Super.SetBool(target, this.GetBool(i));
+                    this.SetBool(target, this.GetBool(i));
                 }
                 case JSON_Type_Null: {
-                    this.Super.SetNull(target);
+                    this.SetNull(target);
                 }
                 case JSON_Type_Object: {
-                    this.Super.SetObject(target, this.GetObject(i));
+                    this.SetObject(target, this.GetObject(i));
                 }
             }
 
-            this.Super.SetKeyHidden(target, this.GetKeyHidden(i));
-            this.Super.Remove(key);
+            this.SetKeyHidden(target, this.GetKeyHidden(i));
+
+            char current_key[JSON_INT_BUFFER_SIZE];
+            if (this.GetIndexAsString(i, current_key, sizeof(current_key), false)) {
+                this.Super.Remove(current_key);
+            }
         }
 
         this.Length -= 1;

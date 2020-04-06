@@ -1063,6 +1063,45 @@ bool it_should_autocleanup_merged_objects()
     return success;
 }
 
+bool it_should_enforce_types_in_arrays()
+{
+    JSON_Array arr = new JSON_Array(JSON_Type_Int);
+    bool success = arr.PushInt(9001) > -1
+        && arr.PushInt(-9001) > -1
+        && arr.PushString("leet") == -1
+        && arr.PushString("\"leet\"") == -1
+        && arr.PushFloat(13.37) == -1
+        && arr.PushFloat(-13.37) == -1
+        && arr.PushFloat(0.0) == -1
+        && arr.PushFloat(-0.0) == -1
+        && arr.PushBool(true) == -1
+        && arr.PushBool(false) == -1
+        && arr.PushNull() == -1;
+
+    print_json(arr);
+    delete arr;
+
+    if (! success) {
+        LogError("json_test: unexpected value pushed successfully");
+
+        return false;
+    }
+
+    return success;
+}
+
+bool it_should_not_set_type_when_array_contains_another_type()
+{
+    JSON_Array arr = new JSON_Array();
+    arr.PushNull();
+    bool success = ! arr.SetType(JSON_Type_Int);
+
+    print_json(arr);
+    delete arr;
+
+    return success;
+}
+
 public void OnPluginStart()
 {
 
@@ -1223,6 +1262,12 @@ public void OnPluginStart()
 
     PrintToServer("it_should_autocleanup_merged_objects");
     check_test(it_should_autocleanup_merged_objects());
+
+    PrintToServer("it_should_enforce_types_in_arrays");
+    check_test(it_should_enforce_types_in_arrays());
+
+    PrintToServer("it_should_not_set_type_when_array_contains_another_type");
+    check_test(it_should_not_set_type_when_array_contains_another_type());
 
     PrintToServer("");
 

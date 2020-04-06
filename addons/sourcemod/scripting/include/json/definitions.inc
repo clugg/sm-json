@@ -44,6 +44,7 @@
  * @section Settings
  */
 
+// Turning this on will allow the decoder to accept strings wrapped in single quotes.
 bool JSON_ALLOW_SINGLE_QUOTES = false;
 
 /**
@@ -78,6 +79,7 @@ bool JSON_ALLOW_SINGLE_QUOTES = false;
  */
 
 #define JSON_ARRAY_INDEX_KEY "__array_index"
+#define JSON_ARRAY_TYPE_KEY "__array_type"
 
 /**
  * Types of cells within a JSON object

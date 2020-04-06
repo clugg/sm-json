@@ -73,7 +73,6 @@ stock void json_encode(
 
     // used in key iterator
     int str_length = 1;
-    int int_value;
     int cell_length = 0;
 
     StringMapSnapshot snap = null;
@@ -91,7 +90,7 @@ stock void json_encode(
 
     int key_length = 0;
     for (int i = 0; i < json_size; i += 1) {
-        key_length = (is_array) ? json_cell_int_size(i) : snap.KeyBufferSize(i);
+        key_length = (is_array) ? JSON_INT_BUFFER_SIZE : snap.KeyBufferSize(i);
         char[] key = new char[key_length];
 
         if (is_array) {
@@ -131,18 +130,16 @@ stock void json_encode(
                 cell_length = json_cell_string_size(str_length);
             }
             case Type_Int: {
-                // get the int value early, as its cell_length is determined by its contents
-                int_value = obj.GetInt(key);
-                cell_length = json_cell_int_size(int_value);
+                cell_length = JSON_INT_BUFFER_SIZE;
             }
             case Type_Float: {
-                cell_length = json_cell_float_size();
+                cell_length = JSON_FLOAT_BUFFER_SIZE;
             }
             case Type_Bool: {
-                cell_length = json_cell_bool_size();
+                cell_length = JSON_BOOL_BUFFER_SIZE;
             }
             case Type_Null: {
-                cell_length = json_cell_null_size();
+                cell_length = JSON_NULL_BUFFER_SIZE;
             }
             case Type_Object: {
                 cell_length = max_size;
@@ -156,7 +153,8 @@ stock void json_encode(
                 json_cell_string(str_value, cell, cell_length);
             }
             case Type_Int: {
-                json_cell_int(int_value, cell, cell_length);
+                int value = obj.GetInt(key);
+                json_cell_int(value, cell, cell_length);
             }
             case Type_Float: {
                 float value = obj.GetFloat(key);
@@ -525,7 +523,7 @@ stock bool json_merge(
 
     int key_length = 0;
     for (int i = 0; i < json_size; i += 1) {
-        key_length = (is_array) ? json_cell_int_size(i) : snap.KeyBufferSize(i);
+        key_length = (is_array) ? JSON_INT_BUFFER_SIZE : snap.KeyBufferSize(i);
         char[] key = new char[key_length];
 
         bool key_already_exists = false;

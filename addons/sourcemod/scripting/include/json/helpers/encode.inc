@@ -37,6 +37,8 @@
 #define _json_helpers_encode_included
 
 #include <string>
+#include <json/definitions>
+#include <json/helpers/string>
 
 /**
  * @section Calculate Buffer Size for Value

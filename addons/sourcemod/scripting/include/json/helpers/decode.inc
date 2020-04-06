@@ -37,6 +37,7 @@
 #define _json_helpers_decode_included
 
 #include <string>
+#include <json/helpers/string>
 
 /**
  * @section Determine Buffer Contents

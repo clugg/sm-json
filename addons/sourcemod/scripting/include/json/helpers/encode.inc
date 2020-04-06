@@ -58,51 +58,6 @@ stock int json_cell_string_size(int length)
 }
 
 /**
- * Calculates the maximum buffer length required to
- * store the JSON cell representation of an int.
- *
- * @param input     Value to calculate maximum buffer length for.
- * @returns         Maximum buffer length.
- */
-stock int json_cell_int_size(int input)
-{
-    return JSON_INT_BUFFER_SIZE;
-}
-
-/**
- * Calculates the maximum buffer length required to
- * store the JSON cell representation of a float.
- *
- * @returns     Maximum buffer length.
- */
-stock int json_cell_float_size()
-{
-    return JSON_FLOAT_BUFFER_SIZE;
-}
-
-/**
- * Calculates the maximum buffer length required to
- * store the JSON cell representation of a bool.
- *
- * @returns     Maximum buffer length.
- */
-stock int json_cell_bool_size()
-{
-    return JSON_BOOL_BUFFER_SIZE;
-}
-
-/**
- * Calculates the maximum buffer length required to
- * store the JSON cell representation of null.
- *
- * @returns     Maximum buffer length.
- */
-stock int json_cell_null_size()
-{
-    return JSON_NULL_BUFFER_SIZE;
-}
-
-/**
  * @section Convert Values to JSON Cells
  */
 

@@ -66,24 +66,7 @@ stock int json_cell_string_size(int length)
  */
 stock int json_cell_int_size(int input)
 {
-    if (input == 0) {
-        // "0" + NULL terminator
-        return 2;
-    }
-
-    int result = 0;
-    if (input < 0) {
-        // negative sign
-        result += 1;
-    }
-
-    // calculate number of digits in number
-    result += RoundToFloor(Logarithm(FloatAbs(float(input)), 10.0)) + 1;
-
-    // NULL terminator
-    result += 1;
-
-    return result;
+    return JSON_INT_BUFFER_SIZE;
 }
 
 /**

@@ -78,6 +78,40 @@ methodmap JSON_Array < JSON_Object
     }
 
     /**
+     * The enforced type of the array.
+     */
+    property JSONCellType Type
+    {
+        public get()
+        {
+            JSONCellType type = JSON_Type_Invalid;
+            this.Super.GetValue(JSON_ARRAY_TYPE_KEY, type);
+
+            return type;
+        }
+
+        public set(JSONCellType value)
+        {
+            if (value == JSON_Type_Invalid) {
+                this.Super.Super.Remove(JSON_ARRAY_TYPE_KEY);
+            } else {
+                this.Super.SetValue(JSON_ARRAY_TYPE_KEY, value);
+            }
+        }
+    }
+
+    /**
+     * Checks whether the array accepts the type provided.
+     *
+     * @param type  Type to check for enforcement.
+     * @returns     True if the type can be used, false otherwise.
+     */
+    public bool CanUseType(JSONCellType type)
+    {
+        return this.Type == JSON_Type_Invalid || this.Type == type;
+    }
+
+    /**
      * Checks whether the object has an index.
      *
      * @param index     Index to check existence of.
@@ -375,6 +409,10 @@ methodmap JSON_Array < JSON_Object
      */
     public bool SetString(int index, const char[] value)
     {
+        if (! this.CanUseType(JSON_Type_String)){
+            return false;
+        }
+
         char key[JSON_INT_BUFFER_SIZE];
         if (! this.GetIndexAsString(index, key, sizeof(key))) {
             return false;
@@ -390,6 +428,10 @@ methodmap JSON_Array < JSON_Object
      */
     public bool SetInt(int index, int value)
     {
+        if (! this.CanUseType(JSON_Type_Int)){
+            return false;
+        }
+
         char key[JSON_INT_BUFFER_SIZE];
         if (! this.GetIndexAsString(index, key, sizeof(key))) {
             return false;
@@ -405,6 +447,10 @@ methodmap JSON_Array < JSON_Object
      */
     public bool SetFloat(int index, float value)
     {
+        if (! this.CanUseType(JSON_Type_Float)){
+            return false;
+        }
+
         char key[JSON_INT_BUFFER_SIZE];
         if (! this.GetIndexAsString(index, key, sizeof(key))) {
             return false;
@@ -420,6 +466,10 @@ methodmap JSON_Array < JSON_Object
      */
     public bool SetBool(int index, bool value)
     {
+        if (! this.CanUseType(JSON_Type_Bool)){
+            return false;
+        }
+
         char key[JSON_INT_BUFFER_SIZE];
         if (! this.GetIndexAsString(index, key, sizeof(key))) {
             return false;
@@ -435,6 +485,10 @@ methodmap JSON_Array < JSON_Object
      */
     public bool SetNull(int index)
     {
+        if (! this.CanUseType(JSON_Type_Null)){
+            return false;
+        }
+
         char key[JSON_INT_BUFFER_SIZE];
         if (! this.GetIndexAsString(index, key, sizeof(key))) {
             return false;
@@ -450,6 +504,10 @@ methodmap JSON_Array < JSON_Object
      */
     public bool SetObject(int index, JSON_Object value)
     {
+        if (! this.CanUseType(JSON_Type_Object)){
+            return false;
+        }
+
         char key[JSON_INT_BUFFER_SIZE];
         if (! this.GetIndexAsString(index, key, sizeof(key))) {
             return false;
@@ -719,18 +777,55 @@ methodmap JSON_Array < JSON_Object
     }
 
     /**
+     * Typed Helpers
+     */
+
+    /**
+     * Sets the array to enforce a specific type.
+     * This will fail if there are any existing elements
+     * in the array which are not of the same type.
+     *
+     * @param type  Type to enforce.
+     * @returns     True if the type was enforced successfully, false otherwise.
+     */
+    public bool SetType(JSONCellType type)
+    {
+        if (type == JSON_Type_Invalid) {
+            this.Type = type;
+
+            return true;
+        }
+
+        for (int i = 0; i < this.Length; i += 1) {
+            if (this.GetKeyType(i) != type) {
+                return false;
+            }
+        }
+
+        this.Type = type;
+
+        return true;
+    }
+
+    /**
      * @section Constructor and json.inc Aliases
      */
 
     /**
      * Creates a new JSON_Array.
      *
+     * @param type  The type to enforce for this array, or
+     *              JSON_Type_Invalid for no enforced type.
      * @returns     A new JSON_Array.
      */
-    public JSON_Array()
+    public JSON_Array(JSONCellType type = JSON_Type_Invalid)
     {
         JSON_Array self = view_as<JSON_Array>(new JSON_Object());
         self.Length = 0;
+
+        if (type != JSON_Type_Invalid) {
+            self.SetType(type);
+        }
 
         return self;
     }

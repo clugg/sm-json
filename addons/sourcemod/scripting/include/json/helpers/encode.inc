@@ -105,8 +105,7 @@ stock int json_cell_float_size()
  */
 stock int json_cell_bool_size()
 {
-    // "true"|"false" + NULL terminator
-    return 6;
+    return JSON_BOOL_BUFFER_SIZE;
 }
 
 /**
@@ -117,8 +116,7 @@ stock int json_cell_bool_size()
  */
 stock int json_cell_null_size()
 {
-    // "null" + NULL terminator
-    return 5;
+    return JSON_NULL_BUFFER_SIZE;
 }
 
 /**

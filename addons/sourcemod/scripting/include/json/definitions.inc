@@ -59,11 +59,19 @@ bool JSON_ALLOW_SINGLE_QUOTES = false;
 
 /**
  * @section Buffer Size Constants
- *
- * You may need to change these if you are working with very large arrays or floating point numbers.
  */
 
+// The longest representable integer ("-2147483648") + NULL terminator
+#define JSON_INT_BUFFER_SIZE 12
+
+// You may need to change this if you are working with large floating point numbers.
 #define JSON_FLOAT_BUFFER_SIZE 32
+
+// "true"|"false" + NULL terminator
+#define JSON_BOOL_BUFFER_SIZE 6
+
+// "null" + NULL terminator
+#define JSON_NULL_BUFFER_SIZE 5
 
 /**
  * @section Meta-key Constants

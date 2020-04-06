@@ -115,18 +115,11 @@ stock void json_encode(
             continue;
         }
 
-        // if we are dealing with a string, prepare the str_value variable for fetching
-        if (type == JSON_Type_String) {
-            str_length = obj.GetKeyLength(key);
-        }
-        char[] str_value = new char[str_length + 1];
-
         // determine the length of the char[] needed to represent our cell data
         cell_length = 0;
         switch (type) {
             case JSON_Type_String: {
-                // get the string value early, as its cell_length is determined by its contents
-                obj.GetString(key, str_value, str_length + 1);
+                str_length = obj.GetKeyLength(key);
                 cell_length = json_cell_string_size(str_length);
             }
             case JSON_Type_Int: {
@@ -150,7 +143,9 @@ stock void json_encode(
         char[] cell = new char[cell_length];
         switch (type) {
             case JSON_Type_String: {
-                json_cell_string(str_value, cell, cell_length);
+                char[] value = new char[str_length + 1];
+                obj.GetString(key, value, str_length + 1);
+                json_cell_string(value, cell, cell_length);
             }
             case JSON_Type_Int: {
                 int value = obj.GetInt(key);

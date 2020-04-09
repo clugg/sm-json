@@ -1070,6 +1070,54 @@ bool it_should_not_set_type_when_array_contains_another_type()
     return success;
 }
 
+bool it_should_import_ints()
+{
+    int ints[] = {1, 2, 3};
+    JSON_Array arr = new JSON_Array();
+    bool success = arr.ImportValues(JSON_Type_Int, ints, sizeof(ints));
+
+    print_json(arr);
+    json_cleanup_and_delete(arr);
+
+    return success && StrEqual(json_encode_output, "[1,2,3]");
+}
+
+bool it_should_import_floats()
+{
+    float floats[] = {1.1, 2.2, 3.3};
+    JSON_Array arr = new JSON_Array();
+    bool success = arr.ImportValues(JSON_Type_Float, floats, sizeof(floats));
+
+    print_json(arr);
+    json_cleanup_and_delete(arr);
+
+    return success && StrEqual(json_encode_output, "[1.1,2.2,3.3]");
+}
+
+bool it_should_import_bools()
+{
+    bool bools[] = {true, false};
+    JSON_Array arr = new JSON_Array();
+    bool success = arr.ImportValues(JSON_Type_Bool, bools, sizeof(bools));
+
+    print_json(arr);
+    json_cleanup_and_delete(arr);
+
+    return success && StrEqual(json_encode_output, "[true,false]");
+}
+
+bool it_should_import_strings()
+{
+    char strings[][] = {"hello", "world"};
+    JSON_Array arr = new JSON_Array();
+    bool success = arr.ImportStrings(strings, sizeof(strings));
+
+    print_json(arr);
+    json_cleanup_and_delete(arr);
+
+    return success && StrEqual(json_encode_output, "[\"hello\",\"world\"]");
+}
+
 public void OnPluginStart()
 {
     PrintToServer("Running tests...");
@@ -1232,6 +1280,18 @@ public void OnPluginStart()
 
     PrintToServer("it_should_not_set_type_when_array_contains_another_type");
     check_test(it_should_not_set_type_when_array_contains_another_type());
+
+    PrintToServer("it_should_import_ints");
+    check_test(it_should_import_ints());
+
+    PrintToServer("it_should_import_floats");
+    check_test(it_should_import_floats());
+
+    PrintToServer("it_should_import_bools");
+    check_test(it_should_import_bools());
+
+    PrintToServer("it_should_import_strings");
+    check_test(it_should_import_strings());
 
     PrintToServer("");
 

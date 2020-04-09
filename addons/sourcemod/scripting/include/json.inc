@@ -39,7 +39,6 @@
 #include <string>
 #include <json/definitions>
 #include <json/helpers/decode>
-#include <json/helpers/encode>
 #include <json/helpers/string>
 #include <json/object>
 #include <json/array>

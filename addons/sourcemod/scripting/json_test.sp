@@ -216,7 +216,7 @@ bool it_should_encode_empty_objects()
     JSON_Object obj = new JSON_Object();
 
     print_json(obj);
-    delete obj;
+    json_cleanup_and_delete(obj);
 
     return StrEqual(json_encode_output, "{}");
 }
@@ -226,7 +226,7 @@ bool it_should_encode_empty_arrays()
     JSON_Array arr = new JSON_Array();
 
     print_json(arr);
-    delete arr;
+    json_cleanup_and_delete(arr);
 
     return StrEqual(json_encode_output, "[]");
 }
@@ -249,7 +249,7 @@ bool it_should_support_objects()
         && obj.SetNull("handle");
 
     print_json(obj);
-    delete obj;
+    json_cleanup_and_delete(obj);
 
     if (! success) {
         LogError("json_test: failed while setting object values");
@@ -333,7 +333,7 @@ bool it_should_support_objects()
         success = false;
     }
 
-    delete decoded_obj;
+    json_cleanup_and_delete(decoded_obj);
 
     return success;
 }
@@ -356,7 +356,7 @@ bool it_should_support_arrays()
         && arr.PushNull() > -1;
 
     print_json(arr);
-    delete arr;
+    json_cleanup_and_delete(arr);
 
     if (! success) {
         LogError("json_test: failed while pushing array values");
@@ -441,7 +441,7 @@ bool it_should_support_arrays()
         success = false;
     }
 
-    delete decoded_arr;
+    json_cleanup_and_delete(decoded_arr);
 
     return success;
 }
@@ -458,8 +458,7 @@ bool it_should_support_objects_nested_in_objects()
     print_json(obj);
 
     bool success = obj.GetObject("object").GetBool("nested");
-    obj.Cleanup();
-    delete obj;
+    json_cleanup_and_delete(obj);
 
     return success;
 }
@@ -475,8 +474,7 @@ bool it_should_support_objects_nested_in_arrays()
     print_json(arr);
 
     bool success = arr.GetObject(0).GetBool("nested");
-    arr.Cleanup();
-    delete arr;
+    json_cleanup_and_delete(arr);
 
     return success;
 }
@@ -493,8 +491,7 @@ bool it_should_support_arrays_nested_in_objects()
 
     JSON_Array obj_array = view_as<JSON_Array>(obj.GetObject("array"));
     bool success = obj_array.GetBool(0);
-    obj.Cleanup();
-    delete obj;
+    json_cleanup_and_delete(obj);
 
     return success;
 }
@@ -511,8 +508,7 @@ bool it_should_support_arrays_nested_in_arrays()
 
     JSON_Array arr_array = view_as<JSON_Array>(arr.GetObject(0));
     bool success = arr_array.GetBool(0);
-    arr.Cleanup();
-    delete arr;
+    json_cleanup_and_delete(arr);
 
     return success;
 }
@@ -524,7 +520,7 @@ bool it_should_support_basic_methodmaps()
 
     print_json(player);
 
-    delete player;
+    json_cleanup_and_delete(player);
 
     return true;
 }
@@ -542,8 +538,7 @@ bool it_should_support_nested_methodmaps()
     print_json(player);
 
     bool success = player.weapon.id == 2;
-    player.Cleanup();
-    delete player;
+    json_cleanup_and_delete(player);
 
     return success;
 }
@@ -587,20 +582,19 @@ bool it_should_pretty_print()
     parent_obj.SetObject("first_depth", child_obj);
 
     print_json(parent_obj, true);
-    parent_obj.Cleanup();
-    delete parent_obj;
+    json_cleanup_and_delete(parent_obj);
 
     bool success = StrEqual(json_encode_output, "{\n    \"first_depth\": {\n        \"im_indented\": null,\n        \"second_depth\": [\n            1,\n            []\n        ]\n    },\n    \"pretty_printing\": true\n}");
 
     JSON_Array empty_arr = new JSON_Array();
     print_json(empty_arr, true);
-    delete empty_arr;
+    json_cleanup_and_delete(empty_arr);
 
     success = success && StrEqual(json_encode_output, "[]");
 
     JSON_Object empty_object = new JSON_Object();
     print_json(empty_object, true);
-    delete empty_object;
+    json_cleanup_and_delete(empty_object);
 
     success = success && StrEqual(json_encode_output, "{}");
 
@@ -644,7 +638,7 @@ bool it_should_remove_meta_keys_from_arrays()
         success = false;
     }
 
-    delete arr;
+    json_cleanup_and_delete(arr);
 
     return success;
 }
@@ -677,7 +671,7 @@ bool it_should_remove_meta_keys_from_objects()
         success = false;
     }
 
-    delete obj;
+    json_cleanup_and_delete(obj);
 
     return success;
 }
@@ -711,7 +705,7 @@ bool it_should_shift_array_down_after_removed_index()
         success = false;
     }
 
-    delete arr;
+    json_cleanup_and_delete(arr);
 
     return success;
 }
@@ -723,8 +717,8 @@ bool it_should_not_merge_array_onto_object()
 
     bool success = obj.Merge(arr) == false;
 
-    delete obj;
-    delete arr;
+    json_cleanup_and_delete(obj);
+    json_cleanup_and_delete(arr);
 
     return success;
 }
@@ -736,8 +730,8 @@ bool it_should_not_merge_object_onto_array()
 
     bool success = arr.Merge(obj) == false;
 
-    delete arr;
-    delete obj;
+    json_cleanup_and_delete(arr);
+    json_cleanup_and_delete(obj);
 
     return success;
 }
@@ -771,8 +765,8 @@ bool it_should_merge_arrays()
         && arr1.GetKeyHidden(3) == true
         && StrEqual(json_encode_output, "[1,2]");
 
-    delete arr1;
-    delete arr2;
+    json_cleanup_and_delete(arr1);
+    json_cleanup_and_delete(arr2);
 
     return success;
 }
@@ -803,8 +797,8 @@ bool it_should_merge_objects_with_replacement()
         && obj1.GetBool("replaced") == true
         && obj1.GetKeyHidden("replaced") == true;
 
-    delete obj1;
-    delete obj2;
+    json_cleanup_and_delete(obj1);
+    json_cleanup_and_delete(obj2);
 
     return success;
 }
@@ -835,8 +829,8 @@ bool it_should_merge_objects_without_replacement()
         && obj1.GetBool("replaced") == false
         && obj1.GetKeyHidden("replaced") == false;
 
-    delete obj1;
-    delete obj2;
+    json_cleanup_and_delete(obj1);
+    json_cleanup_and_delete(obj2);
 
     return success;
 }
@@ -858,8 +852,8 @@ bool it_should_copy_flat_arrays()
 
     success = success && arr.Length != copy.Length;
 
-    delete arr;
-    delete copy;
+    json_cleanup_and_delete(arr);
+    json_cleanup_and_delete(copy);
 
     return success;
 }
@@ -881,8 +875,8 @@ bool it_should_copy_flat_objects()
 
     success = success && obj.Length != copy.Length;
 
-    delete obj;
-    delete copy;
+    json_cleanup_and_delete(obj);
+    json_cleanup_and_delete(copy);
 
     return success;
 }
@@ -897,9 +891,9 @@ bool it_should_shallow_copy_arrays()
     bool success = arr.Length == copy.Length
         && arr.GetObject(0) == copy.GetObject(0);
 
-    arr.Cleanup();
-    delete arr;
-    delete copy;
+    json_cleanup_and_delete(arr);
+    copy.Remove(0);
+    json_cleanup_and_delete(copy);
 
     return success;
 }
@@ -914,9 +908,9 @@ bool it_should_shallow_copy_objects()
     bool success = obj.Length == copy.Length
         && obj.GetObject("nested") == copy.GetObject("nested");
 
-    obj.Cleanup();
-    delete obj;
-    delete copy;
+    json_cleanup_and_delete(obj);
+    copy.Remove("nested");
+    json_cleanup_and_delete(copy);
 
     return success;
 }
@@ -931,9 +925,8 @@ bool it_should_deep_copy_arrays()
     bool success = arr.Length == copy.Length
         && arr.GetObject(0) != copy.GetObject(0);
 
-    arr.Cleanup();
-    delete arr;
-    delete copy;
+    json_cleanup_and_delete(arr);
+    json_cleanup_and_delete(copy);
 
     return success;
 }
@@ -948,9 +941,8 @@ bool it_should_deep_copy_objects()
     bool success = obj.Length == copy.Length
         && obj.GetObject("nested") != copy.GetObject("nested");
 
-    obj.Cleanup();
-    delete obj;
-    delete copy;
+    json_cleanup_and_delete(obj);
+    json_cleanup_and_delete(copy);
 
     return success;
 }
@@ -969,10 +961,8 @@ bool it_should_allow_single_quotes()
 
     success = success && obj.HasKey("key");
 
-    obj.Cleanup();
-    arr.Cleanup();
-    delete obj;
-    delete arr;
+    json_cleanup_and_delete(obj);
+    json_cleanup_and_delete(arr);
 
     JSON_ALLOW_SINGLE_QUOTES = false;
 
@@ -995,10 +985,8 @@ bool it_should_return_default_values_for_missing_elements()
         && arr.GetNull(0, null) == null
         && arr.GetObject(0, arr) == arr;
 
-    obj.Cleanup();
-    arr.Cleanup();
-    delete obj;
-    delete arr;
+    json_cleanup_and_delete(obj);
+    json_cleanup_and_delete(arr);
 
     return success;
 }
@@ -1040,9 +1028,9 @@ bool it_should_autocleanup_merged_objects()
     obj1.Merge(obj2, true, true);
     success = success && ! IsValidHandle(nested1) && IsValidHandle(nested2);
 
-    obj1.Cleanup();
-    delete obj1;
-    delete obj2;
+    json_cleanup_and_delete(obj1);
+    obj2.Remove("nested");
+    json_cleanup_and_delete(obj2);
 
     return success;
 }
@@ -1063,7 +1051,7 @@ bool it_should_enforce_types_in_arrays()
         && arr.PushNull() == -1;
 
     print_json(arr);
-    delete arr;
+    json_cleanup_and_delete(arr);
 
     if (! success) {
         LogError("json_test: unexpected value pushed successfully");
@@ -1081,14 +1069,13 @@ bool it_should_not_set_type_when_array_contains_another_type()
     bool success = ! arr.SetType(JSON_Type_Int);
 
     print_json(arr);
-    delete arr;
+    json_cleanup_and_delete(arr);
 
     return success;
 }
 
 public void OnPluginStart()
 {
-
     PrintToServer("Running tests...");
     PrintToServer("");
 

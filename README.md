@@ -531,7 +531,11 @@ Please note that due to how the `any` type works in SourcePawn, `Contains` may r
 ### Merging Instances
 `JSON_Array`s can be merged with one another, and `JSON_Object`s can too. For obvious reasons, an array cannot be merged with an object (and vice versa). Other combinations will log an error and fail.
 
-Merging is shallow, which means that if the second object has child objects, the reference will be maintained to the existing object when merged, as opposed to copying the children. You can also disable key replacement by passing `false` as a parameter. For example, if you have two objects both containing key `x`, with replacement on (default behaviour), `x` will be taken from the second object, and with replacement off, from the first object.
+Merging is shallow, which means that if the second object has child objects, the reference will be maintained to the existing object when merged, as opposed to copying the children.
+
+By default, merging will replace existing keys. For example, if you have two objects both containing key `x`, with replacement on, the value of `x` will be taken from the second object, and with replacement off, from the first object. You can explicitly disable replacement by passing `JSON_NONE` as an option.
+
+It is also possible to tell merge to clean up any existing nested instances if they are going to be replaced by passing `JSON_MERGE_CLEANUP` as an option. Since this only has an effect while replacement is enabled, you will need to pass `JSON_MERGE_REPLACE | JSON_MERGE_CLEANUP` as options.
 
 Merged keys will respect their previous hidden state when merged on to the first object.
 

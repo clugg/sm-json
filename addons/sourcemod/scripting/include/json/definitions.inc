@@ -49,6 +49,11 @@ bool JSON_ALLOW_SINGLE_QUOTES = false;
 
 #define JSON_NONE 0
 #define JSON_ENCODE_PRETTY 1 << 0
+// During merge, should existing keys be replaced if they exist in both objects?
+#define JSON_MERGE_REPLACE 1 << 1
+/* During merge, should existing objects be cleaned up if they exist in
+ * both objects? (only applies when JSON_MERGE_REPLACE is also set) */
+#define JSON_MERGE_CLEANUP 1 << 2
 
 /**
  * @section Pretty Print Constants

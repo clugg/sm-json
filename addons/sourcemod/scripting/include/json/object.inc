@@ -416,9 +416,9 @@ methodmap JSON_Object < StringMap
      *
      * @see json_merge
      */
-    public bool Merge(JSON_Object from, bool replace = true, bool autocleanup = false)
+    public bool Merge(JSON_Object from, int options = JSON_MERGE_REPLACE)
     {
-        return json_merge(this, from, replace, autocleanup);
+        return json_merge(this, from, options);
     }
 
     /**

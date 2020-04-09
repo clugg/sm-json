@@ -461,11 +461,9 @@ stock JSON_Object json_decode(
  * Merges the entries from the second object to the first,
  * optionally replacing existing entries with the same key.
  *
- * @param to            Object to merge on to.
- * @param from          Object to merge entries from.
- * @param replace       Should existing keys be replaced if they exist in both objects?
- * @param autocleanup   Should existing objects be cleaned up if they
- *                      exist in both objects? (only applies when replace is true)
+ * @param to        Object to merge on to.
+ * @param from      Object to merge entries from.
+ * @param options   Bitwise combination of JSON_MERGE_* options. [default: JSON_MERGE_REPLACE]
  * @returns         True on success, false otherwise.
  * @error           If the objects are not the same structure type
  *                  as one another, an error will be thrown.
@@ -476,8 +474,7 @@ stock JSON_Object json_decode(
 stock bool json_merge(
     JSON_Object to,
     JSON_Object from,
-    bool replace = true,
-    bool autocleanup = false
+    int options = JSON_MERGE_REPLACE
 )
 {
     if (to.IsArray && ! from.IsArray) {
@@ -490,9 +487,11 @@ stock bool json_merge(
         return false;
     }
 
-    JSON_Array to_arr = null;
+    bool replace = (options & JSON_MERGE_REPLACE) > 0;
+    bool autocleanup = (options & JSON_MERGE_CLEANUP) > 0;
 
     bool is_array = to.IsArray;
+    JSON_Array to_arr = null;
     if (is_array) {
         to_arr = view_as<JSON_Array>(to);
     }

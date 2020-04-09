@@ -406,9 +406,9 @@ methodmap JSON_Object < StringMap
      *
      * @see json_encode
      */
-    public void Encode(char[] output, int max_size, bool pretty_print = false, int depth = 0)
+    public void Encode(char[] output, int max_size, int options = JSON_NONE, int depth = 0)
     {
-        json_encode(this, output, max_size, pretty_print, depth);
+        json_encode(this, output, max_size, options, depth);
     }
 
     /**

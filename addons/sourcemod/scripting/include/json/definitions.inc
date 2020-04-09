@@ -47,6 +47,9 @@
 // Turning this on will allow the decoder to accept strings wrapped in single quotes.
 bool JSON_ALLOW_SINGLE_QUOTES = false;
 
+#define JSON_NONE 0
+#define JSON_ENCODE_PRETTY 1 << 0
+
 /**
  * @section Pretty Print Constants
  *

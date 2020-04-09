@@ -780,6 +780,30 @@ methodmap JSON_Array < JSON_Object
      */
 
     /**
+     * The length of the longest string in the array.
+     */
+    property int MaxStringLength
+    {
+        public get()
+        {
+            int max = -1;
+            int current = -1;
+            for (int i = 0; i < this.Length; i += 1) {
+                if (this.GetKeyType(i) != JSON_Type_String) {
+                    continue;
+                }
+
+                current = this.GetKeyLength(i);
+                if (current > max) {
+                    max = current;
+                }
+            }
+
+            return max;
+        }
+    }
+
+    /**
      * Sets the array to enforce a specific type.
      * This will fail if there are any existing elements
      * in the array which are not of the same type.

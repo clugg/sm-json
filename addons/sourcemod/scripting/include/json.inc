@@ -47,24 +47,25 @@
 /**
  * Encodes a JSON instance into its string representation.
  *
- * @param obj           Object to encode.
- * @param output        String buffer to store output.
- * @param max_size      Maximum size of string buffer.
- * @param pretty_print  Should the output be pretty printed (newlines and spaces)? [default: false]
- * @param depth         The current depth of the encoder. [default: 0]
+ * @param obj       Object to encode.
+ * @param output    String buffer to store output.
+ * @param max_size  Maximum size of string buffer.
+ * @param options   Bitwise combination of JSON_ENCODE_* options. [default: JSON_NONE]
+ * @param depth     The current depth of the encoder. [default: 0]
  */
 stock void json_encode(
     JSON_Object obj,
     char[] output,
     int max_size,
-    bool pretty_print = false,
+    int options = JSON_NONE,
     int depth = 0
 )
 {
-    JSON_Array arr = null;
+    bool pretty_print = (options & JSON_ENCODE_PRETTY) != 0;
 
     bool is_empty = true;
     bool is_array = obj.IsArray;
+    JSON_Array arr = null;
     if (is_array) {
         arr = view_as<JSON_Array>(obj);
     }
@@ -164,7 +165,7 @@ stock void json_encode(
             }
             case JSON_Type_Object: {
                 JSON_Object child = obj.GetObject(key);
-                json_encode(child, cell, cell_length, pretty_print, depth + 1);
+                json_encode(child, cell, cell_length, options, depth + 1);
             }
         }
 

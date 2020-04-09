@@ -331,7 +331,7 @@ delete snap;
 ```
 
 ### Pretty Printing
-You can enable pretty printed encoded JSON by passing `true` as a parameter. You can customise pretty printing by manually updating the `JSON_PP_*` constants in [`addons/sourcemod/scripting/include/json/definitions.inc`](addons/sourcemod/scripting/include/json/definitions.inc#L49-L51).
+You can enable pretty printed encoded JSON by passing `JSON_ENCODE_PRETTY` as an option. You can customise pretty printing by manually updating the `JSON_PP_*` constants in [`addons/sourcemod/scripting/include/json/definitions.inc`](addons/sourcemod/scripting/include/json/definitions.inc#L49-L51).
 
 ```c
 JSON_Array child_arr = new JSON_Array();
@@ -345,7 +345,7 @@ JSON_Object parent_obj = new JSON_Object();
 parent_obj.SetBool("pretty_printing", true);
 parent_obj.SetObject("first_depth", child_obj);
 
-parent_obj.Encode(output, sizeof(output), /* pretty print: */ true);
+parent_obj.Encode(output, sizeof(output), JSON_ENCODE_PRETTY);
 parent_obj.Cleanup();
 delete parent_obj;
 ```

@@ -147,9 +147,9 @@ bool equal_enough(float x, float y, float tolerance = 0.0005)
         && difference < (1 + tolerance);
 }
 
-void print_json(JSON_Object obj, bool pretty = false)
+void print_json(JSON_Object obj, int options = JSON_NONE)
 {
-    obj.Encode(json_encode_output, sizeof(json_encode_output), pretty);
+    obj.Encode(json_encode_output, sizeof(json_encode_output), options);
     PrintToServer("%s", json_encode_output);
 }
 
@@ -581,19 +581,19 @@ bool it_should_pretty_print()
     parent_obj.SetBool("pretty_printing", true);
     parent_obj.SetObject("first_depth", child_obj);
 
-    print_json(parent_obj, true);
+    print_json(parent_obj, JSON_ENCODE_PRETTY);
     json_cleanup_and_delete(parent_obj);
 
     bool success = StrEqual(json_encode_output, "{\n    \"first_depth\": {\n        \"im_indented\": null,\n        \"second_depth\": [\n            1,\n            []\n        ]\n    },\n    \"pretty_printing\": true\n}");
 
     JSON_Array empty_arr = new JSON_Array();
-    print_json(empty_arr, true);
+    print_json(empty_arr, JSON_ENCODE_PRETTY);
     json_cleanup_and_delete(empty_arr);
 
     success = success && StrEqual(json_encode_output, "[]");
 
     JSON_Object empty_object = new JSON_Object();
-    print_json(empty_object, true);
+    print_json(empty_object, JSON_ENCODE_PRETTY);
     json_cleanup_and_delete(empty_object);
 
     success = success && StrEqual(json_encode_output, "{}");

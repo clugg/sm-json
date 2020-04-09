@@ -543,6 +543,30 @@ arr.Encode(output, sizeof(output)); // output now contains [\"hello\",\"world\"]
 json_cleanup_and_delete(arr);
 ```
 
+### Array Exporting
+It is possible to export a `JSON_Array`'s values to a native array. The following code snippet works for every native type except char[]s. *Note: there is no type checking done during export - it is entirely up to you to ensure that your array only contains the type that you expect (see [Array Type Enforcement](#array-type-enforcement)).*
+
+```c
+JSON_Array arr = view_as<JSON_Array>(json_decode("[1,2,3]"));
+int size = arr.Length;
+int[] values = new int[size];
+arr.ExportValues(values, size);
+json_cleanup_and_delete(arr);
+// values now contains {1, 2, 3}
+```
+
+For strings, you need to use a separate function.
+
+```c
+JSON_Array arr = view_as<JSON_Array>(json_decode("[\"hello\",\"world\"]"));
+int size = arr.Length;
+int str_length = arr.MaxStringLength + 1;
+char[][] values = new char[size][str_length];
+arr.ExportStrings(values, size, str_length);
+json_cleanup_and_delete(arr);
+// values now contains {"hello", "world"}
+```
+
 ### Merging
 `JSON_Array`s can be merged with one another, and `JSON_Object`s can too. For obvious reasons, an array cannot be merged with an object (and vice versa).
 

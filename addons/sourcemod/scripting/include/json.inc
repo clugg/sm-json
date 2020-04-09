@@ -321,8 +321,10 @@ stock JSON_Object json_decode(
         // skip any whitespace preceding the element
         if (! json_skip_whitespace(buffer, length, pos)) {
             LogError("json_decode: buffer ended early at position %d", pos);
-            json_cleanup_and_delete(obj);
-            json_cleanup_and_delete(arr);
+            if (existing == null) {
+                json_cleanup_and_delete(obj);
+                json_cleanup_and_delete(arr);
+            }
 
             return null;
         }
@@ -341,8 +343,10 @@ stock JSON_Object json_decode(
         if (! is_array) {
             if (! json_is_string(buffer[pos])) {
                 LogError("json_decode: expected key string at position %d", pos);
-                json_cleanup_and_delete(obj);
-                json_cleanup_and_delete(arr);
+                if (existing == null) {
+                    json_cleanup_and_delete(obj);
+                    json_cleanup_and_delete(arr);
+                }
 
                 return null;
             }
@@ -353,8 +357,10 @@ stock JSON_Object json_decode(
             // skip any whitespace following the key
             if (! json_skip_whitespace(buffer, length, pos)) {
                 LogError("json_decode: buffer ended early at position %d", pos);
-                json_cleanup_and_delete(obj);
-                json_cleanup_and_delete(arr);
+                if (existing == null) {
+                    json_cleanup_and_delete(obj);
+                    json_cleanup_and_delete(arr);
+                }
 
                 return null;
             }
@@ -362,8 +368,10 @@ stock JSON_Object json_decode(
             // ensure that we find a colon
             if (buffer[pos++] != ':') {
                 LogError("json_decode: expected colon after key at position %d", pos);
-                json_cleanup_and_delete(obj);
-                json_cleanup_and_delete(arr);
+                if (existing == null) {
+                    json_cleanup_and_delete(obj);
+                    json_cleanup_and_delete(arr);
+                }
 
                 return null;
             }
@@ -371,8 +379,10 @@ stock JSON_Object json_decode(
             // skip any whitespace following the colon
             if (! json_skip_whitespace(buffer, length, pos)) {
                 LogError("json_decode: buffer ended early at position %d", pos);
-                json_cleanup_and_delete(obj);
-                json_cleanup_and_delete(arr);
+                if (existing == null) {
+                    json_cleanup_and_delete(obj);
+                    json_cleanup_and_delete(arr);
+                }
 
                 return null;
             }
@@ -388,8 +398,10 @@ stock JSON_Object json_decode(
 
             // decoding failed, error will be logged in json_decode
             if (value == null) {
-                json_cleanup_and_delete(obj);
-                json_cleanup_and_delete(arr);
+                if (existing == null) {
+                    json_cleanup_and_delete(obj);
+                    json_cleanup_and_delete(arr);
+                }
 
                 return null;
             }
@@ -403,8 +415,10 @@ stock JSON_Object json_decode(
             // if we are dealing with a string, attempt to extract it
             if (! json_extract_string(buffer, length, pos, cell, length, is_array)) {
                 LogError("json_decode: couldn't extract string at position %d", pos);
-                json_cleanup_and_delete(obj);
-                json_cleanup_and_delete(arr);
+                if (existing == null) {
+                    json_cleanup_and_delete(obj);
+                    json_cleanup_and_delete(arr);
+                }
 
                 return null;
             }
@@ -417,16 +431,20 @@ stock JSON_Object json_decode(
         } else {
             if (! json_extract_until_end(buffer, length, pos, cell, length, is_array)) {
                 LogError("json_decode: couldn't extract until end at position %d", pos);
-                json_cleanup_and_delete(obj);
-                json_cleanup_and_delete(arr);
+                if (existing == null) {
+                    json_cleanup_and_delete(obj);
+                    json_cleanup_and_delete(arr);
+                }
 
                 return null;
             }
 
             if (strlen(cell) == 0) {
                 LogError("json_decode: empty cell encountered at position %d", pos);
-                json_cleanup_and_delete(obj);
-                json_cleanup_and_delete(arr);
+                if (existing == null) {
+                    json_cleanup_and_delete(obj);
+                    json_cleanup_and_delete(arr);
+                }
 
                 return null;
             }
@@ -460,8 +478,10 @@ stock JSON_Object json_decode(
                 }
             } else {
                 LogError("json_decode: unknown type encountered at position %d: %s", pos, cell);
-                json_cleanup_and_delete(obj);
-                json_cleanup_and_delete(arr);
+                if (existing == null) {
+                    json_cleanup_and_delete(obj);
+                    json_cleanup_and_delete(arr);
+                }
 
                 return null;
             }
@@ -469,8 +489,10 @@ stock JSON_Object json_decode(
 
         if (! json_skip_whitespace(buffer, length, pos)) {
             LogError("json_decode: buffer ended early at position %d", pos);
-            json_cleanup_and_delete(obj);
-            json_cleanup_and_delete(arr);
+            if (existing == null) {
+                json_cleanup_and_delete(obj);
+                json_cleanup_and_delete(arr);
+            }
 
             return null;
         }
@@ -480,8 +502,10 @@ stock JSON_Object json_decode(
     pos += 1;
     if (json_skip_whitespace(buffer, length, pos) && depth == 0) {
         LogError("json_decode: unexpected data after end of structure at position %d", pos);
-        json_cleanup_and_delete(obj);
-        json_cleanup_and_delete(arr);
+        if (existing == null) {
+            json_cleanup_and_delete(obj);
+            json_cleanup_and_delete(arr);
+        }
 
         return null;
     }

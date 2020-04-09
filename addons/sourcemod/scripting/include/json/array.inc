@@ -882,6 +882,40 @@ methodmap JSON_Array < JSON_Object
     }
 
     /**
+     * Exports the instance's values into a native array.
+     *
+     * @param values    Array to export to.
+     * @param size      Size of array.
+     */
+    public void ExportValues(any[] values, int max_size)
+    {
+        if (this.Length < max_size) {
+            max_size = this.Length;
+        }
+
+        for (int i = 0; i < max_size; i += 1) {
+            this.GetValue(i, values[i]);
+        }
+    }
+
+    /**
+     * Exports the instance's strings into a native array.
+     *
+     * @param values    Array to export to.
+     * @param size      Size of array.
+     */
+    public void ExportStrings(char[][] values, int max_size, int max_string_size)
+    {
+        if (this.Length < max_size) {
+            max_size = this.Length;
+        }
+
+        for (int i = 0; i < max_size; i += 1) {
+            this.GetString(i, values[i], max_string_size);
+        }
+    }
+
+    /**
      * @section Constructor and json.inc Aliases
      */
 

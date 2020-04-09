@@ -1118,6 +1118,59 @@ bool it_should_import_strings()
     return success && StrEqual(json_encode_output, "[\"hello\",\"world\"]");
 }
 
+bool it_should_export_ints()
+{
+    JSON_Array arr = view_as<JSON_Array>(json_decode("[1,2,3]"));
+    int size = arr.Length;
+    int[] values = new int[size];
+    arr.ExportValues(values, size);
+
+    print_json(arr);
+    json_cleanup_and_delete(arr);
+
+    return values[0] == 1 && values[1] == 2 && values[2] == 3;
+}
+
+bool it_should_export_floats()
+{
+    JSON_Array arr = view_as<JSON_Array>(json_decode("[1.1,2.2,3.3]"));
+    int size = arr.Length;
+    float[] values = new float[size];
+    arr.ExportValues(values, size);
+
+    print_json(arr);
+    json_cleanup_and_delete(arr);
+
+    return values[0] == 1.1 && values[1] == 2.2 && values[2] == 3.3;
+}
+
+bool it_should_export_bools()
+{
+    JSON_Array arr = view_as<JSON_Array>(json_decode("[true, false]"));
+    int size = arr.Length;
+    bool[] values = new bool[size];
+    arr.ExportValues(values, size);
+
+    print_json(arr);
+    json_cleanup_and_delete(arr);
+
+    return values[0] == true && values[1] == false;
+}
+
+bool it_should_export_strings()
+{
+    JSON_Array arr = view_as<JSON_Array>(json_decode("[\"hello\",\"world\"]"));
+    int size = arr.Length;
+    int str_length = arr.MaxStringLength + 1;
+    char[][] values = new char[size][str_length];
+    arr.ExportStrings(values, size, str_length);
+
+    print_json(arr);
+    json_cleanup_and_delete(arr);
+
+    return StrEqual(values[0], "hello") && StrEqual(values[1], "world");
+}
+
 public void OnPluginStart()
 {
     PrintToServer("Running tests...");
@@ -1292,6 +1345,18 @@ public void OnPluginStart()
 
     PrintToServer("it_should_import_strings");
     check_test(it_should_import_strings());
+
+    PrintToServer("it_should_export_ints");
+    check_test(it_should_export_ints());
+
+    PrintToServer("it_should_export_floats");
+    check_test(it_should_export_floats());
+
+    PrintToServer("it_should_export_bools");
+    check_test(it_should_export_bools());
+
+    PrintToServer("it_should_export_strings");
+    check_test(it_should_export_strings());
 
     PrintToServer("");
 

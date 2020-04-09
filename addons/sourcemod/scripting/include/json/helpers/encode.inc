@@ -41,10 +41,6 @@
 #include <json/helpers/string>
 
 /**
- * @section Calculate Buffer Size for Value
- */
-
-/**
  * Calculates the maximum buffer length required to
  * store the JSON cell representation of a string.
  *
@@ -56,10 +52,6 @@ stock int json_cell_string_size(int length)
     // double for potential escaping, + 2 for outside quotes + NULL terminator
     return (length * 2) + 3;
 }
-
-/**
- * @section Convert Values to JSON Cells
- */
 
 /**
  * Generates the JSON cell representation of a string.
@@ -82,57 +74,4 @@ stock void json_cell_string(const char[] input, char[] output, int max_size)
     // surround string with quotations
     output[0] = '"';
     StrCat(output, max_size, "\"");
-}
-
-/**
- * Generates the JSON cell representation of an int.
- *
- * @param input     Value to generate output for.
- * @param output    String buffer to store output.
- * @param max_size  Maximum size of string buffer.
- */
-stock void json_cell_int(int input, char[] output, int max_size)
-{
-    IntToString(input, output, max_size);
-}
-
-/**
- * Generates the JSON cell representation of a float.
- *
- * @param input     Value to generate output for.
- * @param output    String buffer to store output.
- * @param max_size  Maximum size of string buffer.
- */
-stock void json_cell_float(float input, char[] output, int max_size)
-{
-    FloatToString(input, output, max_size);
-
-    // trim trailing 0s from float output up until decimal point
-    int last_char = strlen(output) - 1;
-    while (output[last_char] == '0' && output[last_char - 1] != '.') {
-        output[last_char--] = '\0';
-    }
-}
-
-/**
- * Generates the JSON cell representation of a bool.
- *
- * @param input     Value to generate output for.
- * @param output    String buffer to store output.
- * @param max_size  Maximum size of string buffer.
- */
-stock void json_cell_bool(bool input, char[] output, int max_size)
-{
-    strcopy(output, max_size, input ? "true" : "false");
-}
-
-/**
- * Generates the JSON cell representation of null.
- *
- * @param output    String buffer to store output.
- * @param max_size  Maximum size of string buffer.
- */
-stock void json_cell_null(char[] output, int max_size)
-{
-    strcopy(output, max_size, "null");
 }

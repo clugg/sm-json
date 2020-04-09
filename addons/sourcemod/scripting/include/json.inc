@@ -150,18 +150,24 @@ stock void json_encode(
             }
             case JSON_Type_Int: {
                 int value = obj.GetInt(key);
-                json_cell_int(value, cell, cell_length);
+                IntToString(value, cell, cell_length);
             }
             case JSON_Type_Float: {
                 float value = obj.GetFloat(key);
-                json_cell_float(value, cell, cell_length);
+                FloatToString(value, cell, cell_length);
+
+                // trim trailing 0s from float output up until decimal point
+                int last_char = strlen(cell) - 1;
+                while (cell[last_char] == '0' && cell[last_char - 1] != '.') {
+                    cell[last_char--] = '\0';
+                }
             }
             case JSON_Type_Bool: {
                 bool value = obj.GetBool(key);
-                json_cell_bool(value, cell, cell_length);
+                strcopy(cell, cell_length, value ? "true" : "false");
             }
             case JSON_Type_Null: {
-                json_cell_null(cell, cell_length);
+                strcopy(cell, cell_length, "null");
             }
             case JSON_Type_Object: {
                 JSON_Object child = obj.GetObject(key);

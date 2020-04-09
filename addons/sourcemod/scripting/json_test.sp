@@ -815,7 +815,7 @@ bool it_should_merge_objects_without_replacement()
     obj2.SetBool("replaced", true);
     obj2.SetKeyHidden("replaced", true);
 
-    if (! obj1.Merge(obj2, false)) {
+    if (! obj1.Merge(obj2, JSON_NONE)) {
         LogError("json_test: failed while merging objects");
 
         return false;
@@ -1001,7 +1001,7 @@ bool it_should_autocleanup_merged_objects()
     // ensure that both handles are valid after merging without replacement
     obj1.SetObject("nested", nested1);
     obj2.SetObject("nested", nested2);
-    obj1.Merge(obj2, false, true);
+    obj1.Merge(obj2, JSON_MERGE_CLEANUP);
     bool success = IsValidHandle(nested1) && IsValidHandle(nested2);
 
     if (! success) {
@@ -1013,7 +1013,7 @@ bool it_should_autocleanup_merged_objects()
     // ensure that both handles are valid after merging with replacement, without autocleanup
     obj1.SetObject("nested", nested1);
     obj2.SetObject("nested", nested2);
-    obj1.Merge(obj2, true, false);
+    obj1.Merge(obj2, JSON_MERGE_REPLACE);
     success = success && IsValidHandle(nested1) && IsValidHandle(nested2);
 
     if (! success) {
@@ -1025,7 +1025,7 @@ bool it_should_autocleanup_merged_objects()
     // ensure that overriden handle is invalid after merging with replacement and autocleanup
     obj1.SetObject("nested", nested1);
     obj2.SetObject("nested", nested2);
-    obj1.Merge(obj2, true, true);
+    obj1.Merge(obj2, JSON_MERGE_REPLACE | JSON_MERGE_CLEANUP);
     success = success && ! IsValidHandle(nested1) && IsValidHandle(nested2);
 
     json_cleanup_and_delete(obj1);

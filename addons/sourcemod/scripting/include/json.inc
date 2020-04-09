@@ -400,21 +400,21 @@ stock JSON_Object json_decode(
             }
 
             if (json_is_int(cell)) {
-                int value = json_extract_int(cell);
+                int value = StringToInt(cell);
                 if (is_array) {
                     arr.PushInt(value);
                 } else {
                     obj.SetInt(key, value);
                 }
             } else if (json_is_float(cell)) {
-                float value = json_extract_float(cell);
+                float value = StringToFloat(cell);
                 if (is_array) {
                     arr.PushFloat(value);
                 } else {
                     obj.SetFloat(key, value);
                 }
             } else if (json_is_bool(cell)) {
-                bool value = json_extract_bool(cell);
+                bool value = StrEqual(cell, "true");
                 if (is_array) {
                     arr.PushBool(value);
                 } else {

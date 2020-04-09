@@ -479,36 +479,3 @@ stock bool json_extract_string(
 
     return pos < max_size;
 }
-
-/**
- * Extracts an int from the buffer.
- *
- * @param buffer    String buffer of data.
- * @returns         Int value of the buffer.
- */
-stock int json_extract_int(const char[] buffer)
-{
-    return StringToInt(buffer);
-}
-
-/**
- * Extracts a float from the buffer.
- *
- * @param buffer    String buffer of data.
- * @returns         Float value of the buffer.
- */
-stock float json_extract_float(const char[] buffer)
-{
-    return StringToFloat(buffer);
-}
-
-/**
- * Extracts a bool from the buffer.
- *
- * @param buffer    String buffer of data.
- * @returns         Bool value of the buffer.
- */
-stock bool json_extract_bool(const char[] buffer)
-{
-    return StrEqual(buffer, "true");
-}

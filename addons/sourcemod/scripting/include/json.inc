@@ -237,6 +237,7 @@ stock void json_encode(
  * Decodes a JSON string into a JSON instance.
  *
  * @param buffer    Buffer to decode.
+ * @param options   Bitwise combination of JSON_DECODE_* options. [default: JSON_NONE]
  * @param pos       Current position of the decoder as a bytes offset into the buffer.
  * @param depth     Current depth of the decoder as child elements in the object.
  * @returns         JSON instance or null if decoding failed (buffer didn't contain valid JSON).
@@ -244,13 +245,12 @@ stock void json_encode(
  */
 stock JSON_Object json_decode(
     const char[] buffer,
+    int options = JSON_NONE,
     int &pos = 0,
     int depth = 0
 )
 {
     int length = strlen(buffer);
-    bool is_array = false;
-
     // skip preceding whitespace
     if (! json_skip_whitespace(buffer, length, pos)) {
         LogError("json_decode: buffer ended early at position %d", pos);
@@ -258,9 +258,9 @@ stock JSON_Object json_decode(
         return null;
     }
 
+    bool is_array = false;
     JSON_Array arr = null;
     JSON_Object obj = null;
-
     if (json_is_object(buffer[pos])) {
         is_array = false;
         obj = new JSON_Object();
@@ -272,6 +272,8 @@ stock JSON_Object json_decode(
 
         return null;
     }
+
+    bool allow_single_quotes = (options & JSON_DECODE_SINGLE_QUOTES) > 0;
 
     bool empty_checked = false;
     char[] key = new char[length];
@@ -304,7 +306,7 @@ stock JSON_Object json_decode(
 
         // if dealing with an object, look for the key
         if (! is_array) {
-            if (! json_is_string(buffer[pos])) {
+            if (! json_is_string(buffer[pos], allow_single_quotes)) {
                 LogError("json_decode: expected key string at position %d", pos);
                 json_cleanup_and_delete(obj);
                 json_cleanup_and_delete(arr);
@@ -345,7 +347,7 @@ stock JSON_Object json_decode(
 
         if (json_is_object(buffer[pos]) || json_is_array(buffer[pos])) {
             // if we are dealing with an object or array, decode recursively
-            JSON_Object value = json_decode(buffer, pos, depth + 1);
+            JSON_Object value = json_decode(buffer, options, pos, depth + 1);
 
             // decoding failed, error will be logged in json_decode
             if (value == null) {
@@ -360,7 +362,7 @@ stock JSON_Object json_decode(
             } else {
                 obj.SetObject(key, value);
             }
-        } else if (json_is_string(buffer[pos])) {
+        } else if (json_is_string(buffer[pos], allow_single_quotes)) {
             // if we are dealing with a string, attempt to extract it
             if (! json_extract_string(buffer, length, pos, cell, length, is_array)) {
                 LogError("json_decode: couldn't extract string at position %d", pos);

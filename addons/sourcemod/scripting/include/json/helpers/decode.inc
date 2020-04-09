@@ -63,13 +63,14 @@ stock bool json_is_whitespace(const char[] buffer)
  * Checks whether the character at the beginning
  * of the buffer is the start of a string.
  *
- * @param buffer    String buffer of data.
- * @returns         True if the first character in the buffer
- *                  is the start of a string, false otherwise.
+ * @param buffer                String buffer of data.
+ * @param allow_single_quotes   Should strings wrapped in single quotes be accepted?
+ * @returns                     True if the first character in the buffer
+ *                              is the start of a string, false otherwise.
  */
-stock bool json_is_string(const char[] buffer)
+stock bool json_is_string(const char[] buffer, bool allow_single_quotes = false)
 {
-    return buffer[0] == '"' || (JSON_ALLOW_SINGLE_QUOTES && buffer[0] == '\'');
+    return buffer[0] == '"' || (allow_single_quotes && buffer[0] == '\'');
 }
 
 /**

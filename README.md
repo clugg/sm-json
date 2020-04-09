@@ -7,8 +7,6 @@ Follows the JSON specification ([RFC7159](https://tools.ietf.org/html/rfc7159)) 
 * Any singular value not contained with a structure (e.g. `"string"`, `1`, `0.1`, `true`, `false`, `null`, etc.)
 * Escaping/unescaping unicode values in strings (\uXXXX)
 
-Additionally, users may opt to allow for `'single quote strings'` during decoding by setting `JSON_ALLOW_SINGLE_QUOTES = true` in their code (it is already declared by the library, defaulting to `false`). A mixture of single and double quoted strings can be used in a structure (e.g. `['single', "double"]`) as long as quotes are matched correctly. Note that encoded output will still use double quotes, and unescaping of single quotes in double quoted strings does not occur.
-
 Table of Contents
 =================
 
@@ -123,6 +121,8 @@ objval = obj.GetObject("object");
 obj.Cleanup();
 delete obj;
 ```
+
+Additionally, users may opt to allow for `'single quote strings'` during decoding by passing `JSON_DECODE_SINGLE_QUOTES` as an option. A mixture of single and double quoted strings can be used in a structure (e.g. `['single', "double"]`) as long as quotes are matched correctly. Note that encoded output will still use double quotes, and unescaping of single quotes in double quoted strings does not occur.
 
 ### Creating a 'Class'
 `JSON_Object`s and `JSON_Array`s can be inherited once you understand a little bit about methodmaps. This can be abused to create pseudo-classes with properties. Since these use StringMaps under the hood, they will probably not be as efficient as arrays or enum structs, but in most cases they should be more than fine.

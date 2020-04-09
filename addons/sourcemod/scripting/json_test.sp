@@ -949,22 +949,18 @@ bool it_should_deep_copy_objects()
 
 bool it_should_allow_single_quotes()
 {
-    JSON_ALLOW_SINGLE_QUOTES = true;
-
-    JSON_Array arr = view_as<JSON_Array>(json_decode("['single quotes', \"double quotes\", 'single \\'single\\' quotes', 'single \\\"double\\\" quotes', \"double \\'single\\' quotes\", \"double \\\"double\\\" quotes\"]"));
+    JSON_Array arr = view_as<JSON_Array>(json_decode("['single quotes', \"double quotes\", 'single \\'single\\' quotes', 'single \\\"double\\\" quotes', \"double \\'single\\' quotes\", \"double \\\"double\\\" quotes\"]", JSON_DECODE_SINGLE_QUOTES));
     print_json(arr);
 
     bool success = arr.Length == 6;
 
-    JSON_Object obj = json_decode("{'key': \"value\"}");
+    JSON_Object obj = json_decode("{'key': \"value\"}", JSON_DECODE_SINGLE_QUOTES);
     print_json(obj);
 
     success = success && obj.HasKey("key");
 
     json_cleanup_and_delete(obj);
     json_cleanup_and_delete(arr);
-
-    JSON_ALLOW_SINGLE_QUOTES = false;
 
     return success;
 }

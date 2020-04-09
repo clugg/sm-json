@@ -831,6 +831,57 @@ methodmap JSON_Array < JSON_Object
     }
 
     /**
+     * Imports a native array's values into the instance.
+     *
+     * @param type      Type of native values.
+     * @param values    Array of values.
+     * @param size      Size of array.
+     * @returns         True on success, false otherwise.
+     */
+    public bool ImportValues(JSONCellType type, any[] values, int size)
+    {
+        bool success = true;
+        for (int i = 0; i < size; i += 1) {
+            switch (type) {
+                case JSON_Type_Int: {
+                    success = success && this.PushInt(values[i]) > -1;
+                }
+                case JSON_Type_Float: {
+                    success = success && this.PushFloat(values[i]) > -1;
+                }
+                case JSON_Type_Bool: {
+                    success = success && this.PushBool(values[i]) > -1;
+                }
+                case JSON_Type_Null: {
+                    success = success && this.PushNull() > -1;
+                }
+                case JSON_Type_Object: {
+                    success = success && this.PushObject(values[i]) > -1;
+                }
+            }
+        }
+
+        return success;
+    }
+
+    /**
+     * Imports a native array's strings into the instance.
+     *
+     * @param strings   Array of strings.
+     * @param size      Size of array.
+     * @returns         True on success, false otherwise.
+     */
+    public bool ImportStrings(const char[][] strings, int size)
+    {
+        bool success = true;
+        for (int i = 0; i < size; i += 1) {
+            success = success && this.PushString(strings[i]) > -1;
+        }
+
+        return success;
+    }
+
+    /**
      * @section Constructor and json.inc Aliases
      */
 

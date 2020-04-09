@@ -24,6 +24,7 @@ Table of Contents
   * [Removing Elements](#removing-elements)
   * [Array Helpers](#array-helpers)
   * [Array Type Enforcement](#array-type-enforcement)
+  * [Array Importing](#array-importing)
   * [Merging](#merging)
   * [Copying](#copying)
   * [Working with Unknowns](#working-with-unknowns)
@@ -517,6 +518,29 @@ values.SetType(JSON_Type_Int); // fails and returns false, array doesn't only co
 values.Remove(0);
 values.SetType(JSON_Type_Int); // returns true
 json_cleanup_and_delete(values);
+```
+
+### Array Importing
+It is possible to import any native array of values into a `JSON_Array`. The following code snippet works for every native type except char[]s.
+
+```c
+int ints[] = {1, 2, 3};
+JSON_Array arr = new JSON_Array();
+arr.ImportValues(JSON_Type_Int, ints, sizeof(ints));
+
+arr.Encode(output, sizeof(output)); // output now contains [1,2,3]
+json_cleanup_and_delete(arr);
+```
+
+For strings, you need to use a separate function.
+
+```c
+char strings[][] = {"hello", "world"};
+JSON_Array arr = new JSON_Array();
+arr.ImportStrings(strings, sizeof(strings));
+
+arr.Encode(output, sizeof(output)); // output now contains [\"hello\",\"world\"]
+json_cleanup_and_delete(arr);
 ```
 
 ### Merging

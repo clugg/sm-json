@@ -131,3 +131,39 @@ stock bool json_string_endswith(const char[] haystack, const char[] needle)
 
     return true;
 }
+
+/**
+ * Calculates the maximum buffer length required to
+ * store the JSON cell representation of a string.
+ *
+ * @param length    The length of the string.
+ * @returns         Maximum buffer length.
+ */
+stock int json_cell_string_size(int length)
+{
+    // double for potential escaping, + 2 for outside quotes + NULL terminator
+    return (length * 2) + 3;
+}
+
+/**
+ * Generates the JSON cell representation of a string.
+ *
+ * @param input     Value to generate output for.
+ * @param output    String buffer to store output.
+ * @param max_size  Maximum size of string buffer.
+ */
+stock void json_cell_string(const char[] input, char[] output, int max_size)
+{
+    // add dummy char that won't be escaped to replace with a quote later
+    strcopy(output, max_size, "?");
+
+    // add input string to output
+    StrCat(output, max_size, input);
+
+    // escape the output string
+    json_escape_string(output, max_size);
+
+    // surround string with quotations
+    output[0] = '"';
+    StrCat(output, max_size, "\"");
+}

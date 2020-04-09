@@ -37,7 +37,6 @@
 #define _json_definitions_included
 
 #include <string>
-#include <json/helpers/encode>
 #include <json/helpers/string>
 
 /**

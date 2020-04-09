@@ -38,7 +38,6 @@
 
 #include <string>
 #include <json/definitions>
-#include <json/helpers/encode>
 
 methodmap JSON_Object < StringMap
 {

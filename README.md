@@ -33,7 +33,6 @@ Table of Contents
   * [Searching Arrays](#searching-arrays)
   * [Merging Instances](#merging-instances)
   * [Copying Instances](#copying-instances)
-  * [Decoding Over Existing Instances](#decoding-over-existing-instances)
   * [Working with Unknowns](#working-with-unknowns)
   * [Global Helper Functions](#global-helper-functions)
 * [Testing](#testing)
@@ -607,25 +606,6 @@ JSON_Object nested = copied.GetObject("nested");
 nested.SetString("key", "value");
 copied.SetInt("test", 1);
 // copied is now equivocally {"hello":"world","nested":{"key":"value"},"test":1} but obj does not change
-```
-
-### Decoding Over Existing Instances
-It is possible that you already have a `JSON_Array` or `JSON_Object` instance which you wish to decode over the top of. As with [Merging Instances](#merging-instances), only array/array and object/object decoding is possible.
-
-```c
-arr.PushInt(1);
-arr.PushInt(2);
-arr.PushInt(3);
-// arr is now equivocally [1,2,3]
-arr.Decode("[4,5,6]");
-// arr is now equivocally [1,2,3,4,5,6]
-```
-
-```c
-obj.SetBool("loaded", true);
-// obj is now equivocally {"loaded":true}
-obj.Decode("{\"hello\":\"world\"}");
-// obj is now equivocally {"hello":"world","loaded":true}
 ```
 
 ### Working with Unknowns

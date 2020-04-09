@@ -446,22 +446,6 @@ bool it_should_support_arrays()
     return success;
 }
 
-bool it_should_reload_an_object()
-{
-    JSON_Object obj = new JSON_Object();
-    obj.SetBool("loaded", false);
-    obj.Decode("{\"reloaded\": true}");
-
-    print_json(obj);
-
-    bool success = obj.HasKey("loaded") && obj.GetBool("loaded") == false
-        && obj.HasKey("reloaded") && obj.GetBool("reloaded") == true;
-
-    delete obj;
-
-    return success;
-}
-
 bool it_should_support_objects_nested_in_objects()
 {
     JSON_Object nested_obj = new JSON_Object();
@@ -1124,9 +1108,6 @@ public void OnPluginStart()
 
     PrintToServer("it_should_support_arrays");
     check_test(it_should_support_arrays());
-
-    PrintToServer("it_should_reload_an_object");
-    check_test(it_should_reload_an_object());
 
     PrintToServer("it_should_support_objects_nested_in_objects");
     check_test(it_should_support_objects_nested_in_objects());

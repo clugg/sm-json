@@ -412,16 +412,6 @@ methodmap JSON_Object < StringMap
     }
 
     /**
-     * Calls the json_decode method, replacing the 'existing' parameter with this instance.
-     *
-     * @see json_decode
-     */
-    public void Decode(const char[] buffer)
-    {
-        json_decode(buffer, this);
-    }
-
-    /**
      * Calls the json_merge method, replacing the 'to' parameter with this instance.
      *
      * @see json_merge

@@ -1,5 +1,7 @@
 # sm-json
-![Build Status](https://github.com/clugg/sm-json/workflows/Compile%20with%20SourceMod/badge.svg) [![Latest Release](https://img.shields.io/github/v/release/clugg/sm-json)](https://github.com/clugg/sm-json/releases/latest)
+![Build Status](https://github.com/clugg/sm-json/workflows/Compile%20with%20SourceMod/badge.svg) [![Latest Release](https://img.shields.io/github/v/release/clugg/sm-json?include_prereleases&sort=semver)](https://github.com/clugg/sm-json/releases)
+
+**This README covers documentation for v3.x. If you're looking for v2.x docs, please use the [v2.x branch](../../tree/v2.x).**
 
 A pure SourcePawn JSON encoder/decoder. Also offers a nice way of implementing pseudo-classes with properties and methods.
 

@@ -137,7 +137,8 @@ methodmap Player < JSON_Object
  *
  * @param float x           First value to compare.
  * @param float y           Second value to compare.
- * @param float tolerance   Maximum allowed tolerance for floats to be considered equal.
+ * @param float tolerance   Maximum allowed tolerance for
+ *                          floats to be considered equal.
  * @returns True if the floats are equal within the distance, false otherwise.
  */
 bool equal_enough(float x, float y, float tolerance = 0.0005)
@@ -186,7 +187,10 @@ bool check_array_remove(JSON_Array arr, int index)
     }
 
     if (found != -1) {
-        LogError("json_test: found value at position %d after removing it from array", found);
+        LogError(
+            "json_test: found removed value in array at position %d",
+            found
+        );
 
         return false;
     }
@@ -268,12 +272,18 @@ bool it_should_support_objects()
     any value;
     Handle hndl;
 
-    if (! decoded_obj.GetString("str", string, sizeof(string)) || ! StrEqual(string, "leet")) {
+    if (
+        ! decoded_obj.GetString("str", string, sizeof(string))
+        || ! StrEqual(string, "leet")
+    ) {
         LogError("json_test: unexpected value for key str: %s", string);
         success = false;
     }
 
-    if (! decoded_obj.GetString("escaped_str", string, sizeof(string)) || ! StrEqual(string, "\"leet\"")) {
+    if (
+        ! decoded_obj.GetString("escaped_str", string, sizeof(string))
+        || ! StrEqual(string, "\"leet\"")
+    ) {
         LogError("json_test: unexpected value for key escaped_str: %s", string);
         success = false;
     }
@@ -294,7 +304,10 @@ bool it_should_support_objects()
     }
 
     if ((value = decoded_obj.GetInt("negative_int_zero")) != -0) {
-        LogError("json_test: unexpected value for key negative_int_zero: %d", value);
+        LogError(
+            "json_test: unexpected value for key negative_int_zero: %d",
+            value
+        );
         success = false;
     }
 
@@ -303,8 +316,13 @@ bool it_should_support_objects()
         success = false;
     }
 
-    if (! equal_enough((value = decoded_obj.GetFloat("negative_float")), -13.37)) {
-        LogError("json_test: unexpected value for key negative_float: %f", value);
+    if (
+        ! equal_enough((value = decoded_obj.GetFloat("negative_float")), -13.37)
+    ) {
+        LogError(
+            "json_test: unexpected value for key negative_float: %f",
+            value
+        );
         success = false;
     }
 
@@ -314,7 +332,10 @@ bool it_should_support_objects()
     }
 
     if ((value = decoded_obj.GetFloat("negative_float_zero")) != -0.0) {
-        LogError("json_test: unexpected value for key negative_float_zero: %f", value);
+        LogError(
+            "json_test: unexpected value for key negative_float_zero: %f",
+            value
+        );
         success = false;
     }
 
@@ -329,7 +350,10 @@ bool it_should_support_objects()
     }
 
     if ((hndl = decoded_obj.GetObject("handle")) != null) {
-        LogError("json_test: unexpected value for key handle: %d", view_as<int>(hndl));
+        LogError(
+            "json_test: unexpected value for key handle: %d",
+            view_as<int>(hndl)
+        );
         success = false;
     }
 
@@ -364,7 +388,9 @@ bool it_should_support_arrays()
         return false;
     }
 
-    JSON_Array decoded_arr = view_as<JSON_Array>(json_decode(json_encode_output));
+    JSON_Array decoded_arr = view_as<JSON_Array>(
+        json_decode(json_encode_output)
+    );
     if (decoded_arr == null) {
         LogError("json_test: unable to decode array");
 
@@ -376,12 +402,18 @@ bool it_should_support_arrays()
     any value;
     Handle hndl;
 
-    if (! decoded_arr.GetString(index++, string, sizeof(string)) || ! StrEqual(string, "leet")) {
+    if (
+        ! decoded_arr.GetString(index++, string, sizeof(string))
+        || ! StrEqual(string, "leet")
+    ) {
         LogError("json_test: unexpected value for index %d: %s", index, string);
         success = false;
     }
 
-    if (! decoded_arr.GetString(index++, string, sizeof(string)) || ! StrEqual(string, "\"leet\"")) {
+    if (
+        ! decoded_arr.GetString(index++, string, sizeof(string))
+        || ! StrEqual(string, "\"leet\"")
+    ) {
         LogError("json_test: unexpected value for index %d: %s", index, string);
         success = false;
     }
@@ -437,7 +469,11 @@ bool it_should_support_arrays()
     }
 
     if ((hndl = decoded_arr.GetObject(index++)) != null) {
-        LogError("json_test: unexpected value for index %d: %d", index, view_as<int>(hndl));
+        LogError(
+            "json_test: unexpected value for index %d: %d",
+            index,
+            view_as<int>(hndl)
+        );
         success = false;
     }
 
@@ -560,7 +596,10 @@ bool it_should_not_decode(char[] data)
     JSON_Object obj = json_decode(data);
     if (obj != null) {
         obj.Encode(json_encode_output, sizeof(json_encode_output));
-        LogError("json_test: malformed JSON was parsed as valid: %s", json_encode_output);
+        LogError(
+            "json_test: malformed JSON was parsed as valid: %s",
+            json_encode_output
+        );
         return false;
     }
 
@@ -624,7 +663,11 @@ bool it_should_remove_meta_keys_from_arrays()
     arr.PushString("hello");
     arr.PushInt(0);
 
-    if (arr.GetKeyType(0) != JSON_Type_String || arr.GetKeyLength(0) != 5 || arr.GetKeyType(1) != JSON_Type_Int) {
+    if (
+        arr.GetKeyType(0) != JSON_Type_String
+        || arr.GetKeyLength(0) != 5
+        || arr.GetKeyType(1) != JSON_Type_Int
+    ) {
         LogError("json_test: array did not properly set meta-keys");
 
         success = false;
@@ -632,7 +675,11 @@ bool it_should_remove_meta_keys_from_arrays()
 
     arr.Remove(0);
 
-    if (arr.GetKeyType(1) != JSON_Type_Invalid || arr.GetKeyLength(0) != -1 || arr.GetKeyType(0) != JSON_Type_Int) {
+    if (
+        arr.GetKeyType(1) != JSON_Type_Invalid
+        || arr.GetKeyLength(0) != -1
+        || arr.GetKeyType(0) != JSON_Type_Int
+    ) {
         LogError("json_test: array did not properly remove meta-keys");
 
         success = false;
@@ -651,7 +698,11 @@ bool it_should_remove_meta_keys_from_objects()
     obj.SetString("hello", "world");
     obj.SetInt("zero", 0);
 
-    if (obj.GetKeyType("hello") != JSON_Type_String || obj.GetKeyLength("hello") != 5 || obj.GetKeyType("zero") != JSON_Type_Int) {
+    if (
+        obj.GetKeyType("hello") != JSON_Type_String
+        || obj.GetKeyLength("hello") != 5
+        || obj.GetKeyType("zero") != JSON_Type_Int
+    ) {
         LogError("json_test: object did not properly set meta-keys");
 
         success = false;
@@ -659,7 +710,10 @@ bool it_should_remove_meta_keys_from_objects()
 
     obj.Remove("hello");
 
-    if (obj.GetKeyType("hello") != JSON_Type_Invalid || obj.GetKeyLength("hello") != -1) {
+    if (
+        obj.GetKeyType("hello") != JSON_Type_Invalid
+        || obj.GetKeyLength("hello") != -1
+    ) {
         LogError("json_test: object did not properly remove meta-keys");
 
         success = false;
@@ -949,12 +1003,20 @@ bool it_should_deep_copy_objects()
 
 bool it_should_allow_single_quotes()
 {
-    JSON_Array arr = view_as<JSON_Array>(json_decode("['single quotes', \"double quotes\", 'single \\'single\\' quotes', 'single \\\"double\\\" quotes', \"double \\'single\\' quotes\", \"double \\\"double\\\" quotes\"]", JSON_DECODE_SINGLE_QUOTES));
+    JSON_Array arr = view_as<JSON_Array>(
+        json_decode(
+            "['single quotes', \"double quotes\", 'single \\'single\\' quotes', 'single \\\"double\\\" quotes', \"double \\'single\\' quotes\", \"double \\\"double\\\" quotes\"]",
+            JSON_DECODE_SINGLE_QUOTES
+        )
+    );
     print_json(arr);
 
     bool success = arr.Length == 6;
 
-    JSON_Object obj = json_decode("{'key': \"value\"}", JSON_DECODE_SINGLE_QUOTES);
+    JSON_Object obj = json_decode(
+        "{'key': \"value\"}",
+        JSON_DECODE_SINGLE_QUOTES
+    );
     print_json(obj);
 
     success = success && obj.HasKey("key");
@@ -1001,24 +1063,28 @@ bool it_should_autocleanup_merged_objects()
     bool success = IsValidHandle(nested1) && IsValidHandle(nested2);
 
     if (! success) {
-        LogError("json_test: nested handle became invalid after merge without replacement");
+        LogError(
+            "json_test: nested handle became invalid after no-replace merge"
+        );
 
         return false;
     }
 
-    // ensure that both handles are valid after merging with replacement, without autocleanup
+    // ensure that both handles are valid after replace no-cleanup merge
     obj1.SetObject("nested", nested1);
     obj2.SetObject("nested", nested2);
     obj1.Merge(obj2, JSON_MERGE_REPLACE);
     success = success && IsValidHandle(nested1) && IsValidHandle(nested2);
 
     if (! success) {
-        LogError("json_test: nested handle became invalid after merge without autocleanup");
+        LogError(
+            "json_test: nested handle became invalid after no-cleanup merge"
+        );
 
         return false;
     }
 
-    // ensure that overriden handle is invalid after merging with replacement and autocleanup
+    // ensure that overriden handle is invalid after replace cleanup merge
     obj1.SetObject("nested", nested1);
     obj2.SetObject("nested", nested2);
     obj1.Merge(obj2, JSON_MERGE_REPLACE | JSON_MERGE_CLEANUP);

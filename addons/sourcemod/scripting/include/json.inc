@@ -49,7 +49,8 @@
  * @param obj       Object to encode.
  * @param output    String buffer to store output.
  * @param max_size  Maximum size of string buffer.
- * @param options   Bitwise combination of JSON_ENCODE_* options. [default: JSON_NONE]
+ * @param options   Bitwise combination of JSON_ENCODE_* options.
+ *                  [default: JSON_NONE]
  * @param depth     The current depth of the encoder. [default: 0]
  */
 stock void json_encode(
@@ -91,7 +92,7 @@ stock void json_encode(
 
     int key_length = 0;
     for (int i = 0; i < json_size; i += 1) {
-        key_length = (is_array) ? JSON_INT_BUFFER_SIZE : snap.KeyBufferSize(i);
+        key_length = is_array ? JSON_INT_BUFFER_SIZE : snap.KeyBufferSize(i);
         char[] key = new char[key_length];
 
         if (is_array) {
@@ -134,7 +135,9 @@ stock void json_encode(
             }
             case JSON_Type_Object: {
                 child = obj.GetObject(key);
-                cell_length = (child != null) ? max_size : JSON_NULL_BUFFER_SIZE;
+                cell_length = (child != null) ?
+                    max_size
+                    : JSON_NULL_BUFFER_SIZE;
             }
         }
 
@@ -234,18 +237,22 @@ stock void json_encode(
     }
 
     // append closing bracket
-    StrCat(output, max_size, (is_array) ? "]" : "}");
+    StrCat(output, max_size, is_array ? "]" : "}");
 }
 
 /**
  * Decodes a JSON string into a JSON instance.
  *
  * @param buffer    Buffer to decode.
- * @param options   Bitwise combination of JSON_DECODE_* options. [default: JSON_NONE]
- * @param pos       Current position of the decoder as a bytes offset into the buffer.
- * @param depth     Current depth of the decoder as child elements in the object.
- * @returns         JSON instance or null if decoding failed (buffer didn't contain valid JSON).
- * @error           If the buffer does not contain valid JSON, an error will be thrown.
+ * @param options   Bitwise combination of JSON_DECODE_* options.
+ *                  [default: JSON_NONE]
+ * @param pos       Current position of the decoder as bytes
+ *                  offset into the buffer.
+ * @param depth     Current nested depth of the decoder.
+ * @returns         JSON instance or null if decoding failed becase
+ *                  the buffer didn't contain valid JSON.
+ * @error           If the buffer does not contain valid JSON,
+ *                  an error will be thrown.
  */
 stock JSON_Object json_decode(
     const char[] buffer,
@@ -272,7 +279,10 @@ stock JSON_Object json_decode(
         is_array = true;
         arr = new JSON_Array();
     } else {
-        LogError("json_decode: character not identified as object or array at position %d", pos);
+        LogError(
+            "json_decode: no object or array found at position %d",
+            pos
+        );
 
         return null;
     }
@@ -311,7 +321,10 @@ stock JSON_Object json_decode(
         // if dealing with an object, look for the key
         if (! is_array) {
             if (! json_is_string(buffer[pos], allow_single_quotes)) {
-                LogError("json_decode: expected key string at position %d", pos);
+                LogError(
+                    "json_decode: expected key string at position %d",
+                    pos
+                );
                 json_cleanup_and_delete(obj);
                 json_cleanup_and_delete(arr);
 
@@ -332,7 +345,10 @@ stock JSON_Object json_decode(
 
             // ensure that we find a colon
             if (buffer[pos++] != ':') {
-                LogError("json_decode: expected colon after key at position %d", pos);
+                LogError(
+                    "json_decode: expected colon after key at position %d",
+                    pos
+                );
                 json_cleanup_and_delete(obj);
                 json_cleanup_and_delete(arr);
 
@@ -368,8 +384,18 @@ stock JSON_Object json_decode(
             }
         } else if (json_is_string(buffer[pos], allow_single_quotes)) {
             // if we are dealing with a string, attempt to extract it
-            if (! json_extract_string(buffer, length, pos, cell, length, is_array)) {
-                LogError("json_decode: couldn't extract string at position %d", pos);
+            if (! json_extract_string(
+                buffer,
+                length,
+                pos,
+                cell,
+                length,
+                is_array
+            )) {
+                LogError(
+                    "json_decode: couldn't extract string at position %d",
+                    pos
+                );
                 json_cleanup_and_delete(obj);
                 json_cleanup_and_delete(arr);
 
@@ -382,8 +408,18 @@ stock JSON_Object json_decode(
                 obj.SetString(key, cell);
             }
         } else {
-            if (! json_extract_until_end(buffer, length, pos, cell, length, is_array)) {
-                LogError("json_decode: couldn't extract until end at position %d", pos);
+            if (! json_extract_until_end(
+                buffer,
+                length,
+                pos,
+                cell,
+                length,
+                is_array
+            )) {
+                LogError(
+                    "json_decode: couldn't extract until end at position %d",
+                    pos
+                );
                 json_cleanup_and_delete(obj);
                 json_cleanup_and_delete(arr);
 
@@ -391,7 +427,10 @@ stock JSON_Object json_decode(
             }
 
             if (strlen(cell) == 0) {
-                LogError("json_decode: empty cell encountered at position %d", pos);
+                LogError(
+                    "json_decode: empty cell encountered at position %d",
+                    pos
+                );
                 json_cleanup_and_delete(obj);
                 json_cleanup_and_delete(arr);
 
@@ -426,7 +465,11 @@ stock JSON_Object json_decode(
                     obj.SetObject(key, null);
                 }
             } else {
-                LogError("json_decode: unknown type encountered at position %d: %s", pos, cell);
+                LogError(
+                    "json_decode: unknown type encountered at position %d: %s",
+                    pos,
+                    cell
+                );
                 json_cleanup_and_delete(obj);
                 json_cleanup_and_delete(arr);
 
@@ -446,7 +489,10 @@ stock JSON_Object json_decode(
     // skip remaining whitespace and ensure we're at the end of the buffer
     pos += 1;
     if (json_skip_whitespace(buffer, length, pos) && depth == 0) {
-        LogError("json_decode: unexpected data after end of structure at position %d", pos);
+        LogError(
+            "json_decode: unexpected data after structure end at position %d",
+            pos
+        );
         json_cleanup_and_delete(obj);
         json_cleanup_and_delete(arr);
 
@@ -469,13 +515,14 @@ stock JSON_Object json_decode(
  *
  * @param to        Object to merge on to.
  * @param from      Object to merge entries from.
- * @param options   Bitwise combination of JSON_MERGE_* options. [default: JSON_MERGE_REPLACE]
+ * @param options   Bitwise combination of JSON_MERGE_* options.
+ *                  [default: JSON_MERGE_REPLACE]
  * @returns         True on success, false otherwise.
  * @error           If the objects are not the same structure type
  *                  as one another, an error will be thrown.
- *                  For example, an object cannot be reliably merged over an array
- *                  and vice versa. Only array over array and object over object
- *                  merging is supported.
+ *                  For example, an object cannot be reliably merged over an
+ *                  array and vice versa. Only array over array and
+ *                  object over object merging is supported.
  */
 stock bool json_merge(
     JSON_Object to,
@@ -514,7 +561,7 @@ stock bool json_merge(
 
     int key_length = 0;
     for (int i = 0; i < json_size; i += 1) {
-        key_length = (is_array) ? JSON_INT_BUFFER_SIZE : snap.KeyBufferSize(i);
+        key_length = is_array ? JSON_INT_BUFFER_SIZE : snap.KeyBufferSize(i);
         char[] key = new char[key_length];
 
         bool key_already_exists = false;
@@ -620,7 +667,9 @@ stock bool json_merge(
  */
 stock JSON_Object json_copy_shallow(JSON_Object obj)
 {
-    JSON_Object result = (obj.IsArray) ? view_as<JSON_Object>(new JSON_Array()) : new JSON_Object();
+    JSON_Object result = obj.IsArray ?
+        view_as<JSON_Object>(new JSON_Array())
+        : new JSON_Object();
     result.Merge(obj);
 
     return result;
@@ -634,7 +683,9 @@ stock JSON_Object json_copy_shallow(JSON_Object obj)
  */
 stock JSON_Object json_copy_deep(JSON_Object obj)
 {
-    JSON_Object result = (obj.IsArray) ? view_as<JSON_Object>(new JSON_Array()) : new JSON_Object();
+    JSON_Object result = obj.IsArray ?
+        view_as<JSON_Object>(new JSON_Array())
+        : new JSON_Object();
     result.Merge(obj);
 
     int key_length = 0;

@@ -434,10 +434,11 @@ In every case where a method denotes that it accepts a `key/index`, it means the
 
 `JSON_Array` and `JSON_Object` contain the following getters. These getters also accept a second parameter specifying a default value to return if the key/index was not found. Sensible default values have been set and are listed below.
 
+* `obj/arr.GetString(key/index, buffer, max_size)`, which will place the string in the buffer provided and return true, or false if it fails.
 * `obj/arr.GetInt(key/index)`, which will return the value or -1 if it was not found.
 * `obj/arr.GetFloat(key/index)`, which will return the value or -1.0 if it was not found.
 * `obj/arr.GetBool(key/index)`, which will return the value or false if it was not found.
-* `obj/arr.GetObject(key/index)`, which will return the value or null if it was not found. It is recommended that you typecast objects to arrays if you know the contents to be an array: `view_as<JSON_Array>(obj.GetObject("array"))`.
+* `obj/arr.GetObject(key/index)`, which will return the value or null if it was not found. You should typecast objects to arrays if you know the contents to be an array: `view_as<JSON_Array>(obj.GetObject("array"))`.
 
 `JSON_Array` and `JSON_Object` contain the following setters. These methods will return true if setting was successful, or false otherwise.
 

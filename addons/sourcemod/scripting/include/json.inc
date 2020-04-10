@@ -73,6 +73,7 @@ stock void json_encode(
 
     // used in key iterator
     int str_length = 1;
+    JSON_Object child = null;
     int cell_length = 0;
 
     StringMapSnapshot snap = null;
@@ -131,11 +132,9 @@ stock void json_encode(
             case JSON_Type_Bool: {
                 cell_length = JSON_BOOL_BUFFER_SIZE;
             }
-            case JSON_Type_Null: {
-                cell_length = JSON_NULL_BUFFER_SIZE;
-            }
             case JSON_Type_Object: {
-                cell_length = max_size;
+                child = obj.GetObject(key);
+                cell_length = (child != null) ? max_size : JSON_NULL_BUFFER_SIZE;
             }
         }
 
@@ -165,12 +164,12 @@ stock void json_encode(
                 bool value = obj.GetBool(key);
                 strcopy(cell, cell_length, value ? "true" : "false");
             }
-            case JSON_Type_Null: {
-                strcopy(cell, cell_length, "null");
-            }
             case JSON_Type_Object: {
-                JSON_Object child = obj.GetObject(key);
-                json_encode(child, cell, cell_length, options, depth + 1);
+                if (child != null) {
+                    json_encode(child, cell, cell_length, options, depth + 1);
+                } else {
+                    strcopy(cell, cell_length, "null");
+                }
             }
         }
 
@@ -422,9 +421,9 @@ stock JSON_Object json_decode(
                 }
             } else if (json_is_null(cell)) {
                 if (is_array) {
-                    arr.PushNull();
+                    arr.PushObject(null);
                 } else {
-                    obj.SetNull(key);
+                    obj.SetObject(key, null);
                 }
             } else {
                 LogError("json_decode: unknown type encountered at position %d: %s", pos, cell);
@@ -580,13 +579,6 @@ stock bool json_merge(
                     to_arr.PushBool(value);
                 } else {
                     to.SetBool(key, value);
-                }
-            }
-            case JSON_Type_Null: {
-                if (is_array) {
-                    to_arr.PushNull();
-                } else {
-                    to.SetNull(key);
                 }
             }
             case JSON_Type_Object: {

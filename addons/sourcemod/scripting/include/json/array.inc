@@ -370,21 +370,6 @@ methodmap JSON_Array < JSON_Object
     /**
      * Converts index to a string ('key') and calls the relevant Super method.
      *
-     * @see JSON_Object.GetNull
-     */
-    public Handle GetNull(int index, Handle default_value = null)
-    {
-        char key[JSON_INT_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key))) {
-            return default_value;
-        }
-
-        return this.Super.GetNull(key, default_value);
-    }
-
-    /**
-     * Converts index to a string ('key') and calls the relevant Super method.
-     *
      * @see JSON_Object.GetObject
      */
     public JSON_Object GetObject(int index, JSON_Object default_value = null)
@@ -475,25 +460,6 @@ methodmap JSON_Array < JSON_Object
         }
 
         return this.Super.SetBool(key, value);
-    }
-
-    /*
-     * Converts index to a string ('key') and calls the relevant Super method.
-     *
-     * @see JSON_Object.SetNull
-     */
-    public bool SetNull(int index)
-    {
-        if (! this.CanUseType(JSON_Type_Null)){
-            return false;
-        }
-
-        char key[JSON_INT_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key))) {
-            return false;
-        }
-
-        return this.Super.SetNull(key);
     }
 
     /**
@@ -587,24 +553,6 @@ methodmap JSON_Array < JSON_Object
         int index = this.Length;
         this.Length += 1;
         if (! this.SetBool(index, value)) {
-            this.Length -= 1;
-
-            return -1;
-        }
-
-        return index;
-    }
-
-    /**
-     * Pushes null to the end of the array.
-     *
-     * @returns         The element's index on success, -1 otherwise.
-     */
-    public int PushNull()
-    {
-        int index = this.Length;
-        this.Length += 1;
-        if (! this.SetNull(index)) {
             this.Length -= 1;
 
             return -1;
@@ -754,9 +702,6 @@ methodmap JSON_Array < JSON_Object
                 case JSON_Type_Bool: {
                     this.SetBool(target, this.GetBool(i));
                 }
-                case JSON_Type_Null: {
-                    this.SetNull(target);
-                }
                 case JSON_Type_Object: {
                     this.SetObject(target, this.GetObject(i));
                 }
@@ -851,9 +796,6 @@ methodmap JSON_Array < JSON_Object
                 }
                 case JSON_Type_Bool: {
                     success = success && this.PushBool(values[i]) > -1;
-                }
-                case JSON_Type_Null: {
-                    success = success && this.PushNull() > -1;
                 }
                 case JSON_Type_Object: {
                     success = success && this.PushObject(values[i]) > -1;

@@ -61,7 +61,7 @@ arr.PushString("my string");
 arr.PushInt(1234);
 arr.PushFloat(13.37);
 arr.PushBool(true);
-arr.PushNull();
+arr.PushObject(null);
 arr.PushObject(new JSON_Array());
 arr.PushObject(new JSON_Object());
 
@@ -78,7 +78,7 @@ obj.SetString("strkey", "your string");
 obj.SetInt("intkey", -1234);
 obj.SetFloat("floatkey", -13.37);
 obj.SetBool("boolkey", false);
-obj.SetNull("nullkey");
+obj.SetObject("nullkey", null);
 obj.SetObject("array", new JSON_Array());
 obj.SetObject("object", new JSON_Object());
 
@@ -97,7 +97,7 @@ JSON_Array child_arr = new JSON_Array();
 child_arr.PushInt(1);
 
 JSON_Object child_obj = new JSON_Object();
-child_obj.SetNull("im_indented");
+child_obj.SetObject("im_indented", null);
 child_obj.SetObject("second_depth", child_arr);
 
 JSON_Object parent_obj = new JSON_Object();
@@ -131,7 +131,7 @@ arr.GetString(0, strval, sizeof(strval));
 int intval = arr.GetInt(1);
 float floatval = arr.GetFloat(2);
 bool boolval = arr.GetBool(3);
-Handle nullval = arr.GetNull(4);
+Handle nullval = arr.GetObject(4);
 JSON_Array arrval = view_as<JSON_Array>(arr.GetObject(5));
 JSON_Object objval = arr.GetObject(6);
 
@@ -147,7 +147,7 @@ obj.GetString("strkey", strval, sizeof(strval));
 int intval = obj.GetInt("intkey");
 float floatval = obj.GetFloat("floatkey");
 bool boolval = obj.GetBool("boolkey");
-Handle nullval = obj.GetNull("nullkey");
+Handle nullval = obj.GetObject("nullkey");
 JSON_Array arrval = view_as<JSON_Array>(obj.GetObject("array"));
 JSON_Object objval = obj.GetObject("object");
 
@@ -303,12 +303,12 @@ methodmap Player < JSON_Object
     {
         public get()
         {
-            return this.GetNull("handle");
+            return view_as<Handle>(this.GetObject("handle"));
         }
 
         public set(Handle value)
         {
-            this.SetNull("handle");
+            this.SetObject("handle", value);
         }
     }
 
@@ -437,7 +437,6 @@ In every case where a method denotes that it accepts a `key/index`, it means the
 * `obj/arr.GetInt(key/index)`, which will return the value or -1 if it was not found.
 * `obj/arr.GetFloat(key/index)`, which will return the value or -1.0 if it was not found.
 * `obj/arr.GetBool(key/index)`, which will return the value or false if it was not found.
-* `obj/arr.GetNull(key/index)`, which will return null.
 * `obj/arr.GetObject(key/index)`, which will return the value or null if it was not found. It is recommended that you typecast objects to arrays if you know the contents to be an array: `view_as<JSON_Array>(obj.GetObject("array"))`.
 
 `JSON_Array` and `JSON_Object` contain the following setters. These methods will return true if setting was successful, or false otherwise.
@@ -446,8 +445,7 @@ In every case where a method denotes that it accepts a `key/index`, it means the
 * `obj/arr.SetInt(key/index, value)`
 * `obj/arr.SetFloat(key/index, value)`
 * `obj/arr.SetBool(key/index, value)`
-* `obj/arr.SetNull(key/index)` (does **not** accept a value! implicitly `null`)
-* `obj/arr.SetObject(key/index, value)`
+* `obj/arr.SetObject(key/index, value)`: value can be a `JSON_Array`, a `JSON_Object` or `null`
 
 `JSON_Array` also contains push methods, which will push a value to the end of the array and return its index, or -1 if pushing failed.
 
@@ -455,8 +453,7 @@ In every case where a method denotes that it accepts a `key/index`, it means the
 * `arr.PushInt(value)`
 * `arr.PushFloat(value)`
 * `arr.PushBool(value)`
-* `arr.PushNull()` (does **not** accept a value! implicitly `null`)
-* `arr.PushObject(value)`
+* `arr.PushObject(value)`: value can be a `JSON_Array`, a `JSON_Object` or `null`
 
 ### Metadata
 * `obj/arr.HasKey(key/index)`: returns true if the key exists, false otherwise.
@@ -509,12 +506,12 @@ It is possible to enforce an array to only accept a single type. You can either 
 
 ```c
 JSON_Array ints = new JSON_Array(JSON_Type_Int);
-ints.PushNull(); // fails and returns -1
+ints.PushObject(null); // fails and returns -1
 ints.PushInt(1); // returns 0
 json_cleanup_and_delete(ints);
 
 JSON_Array values = new JSON_Array();
-values.PushNull();
+values.PushObject(null);
 values.PushInt(1);
 values.SetType(JSON_Type_Int); // fails and returns false, array doesn't only contain ints
 values.Remove(0);

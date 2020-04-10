@@ -34,12 +34,8 @@
 #pragma semicolon 1
 #pragma newdecls required
 
-#define HAS_PROFILER SOURCEMOD_V_MAJOR >= 1 && SOURCEMOD_V_MINOR >= 10
-
 #include <sourcemod>
-#if HAS_PROFILER
-#include <profiler>
-#endif
+#include <testsuite>
 #include <json>
 
 public Plugin myinfo = {
@@ -55,8 +51,60 @@ public Plugin myinfo = {
  */
 
 char json_encode_output[1024];
-int passed = 0;
-int failed = 0;
+
+/**
+ * @section Helpers
+ */
+
+void print_json(JSON_Object obj, int options = JSON_NONE)
+{
+    obj.Encode(json_encode_output, sizeof(json_encode_output), options);
+    Test_Output("%s", json_encode_output);
+}
+
+bool check_array_remove(JSON_Array arr, int index)
+{
+    PrintToServer("Removing element at index %d", index);
+
+    // get current value at index
+    JSONCellType type = arr.GetKeyType(index);
+    int str_size = 0;
+    if (type == JSON_Type_String) {
+        str_size = arr.GetKeyLength(index) + 1;
+    }
+
+    any value;
+    char[] str = new char[str_size];
+
+    if (type == JSON_Type_String) {
+        arr.GetString(index, str, str_size);
+    } else {
+        arr.GetValue(index, value);
+    }
+
+    // remove the index from the array
+    arr.Remove(index);
+    print_json(arr);
+
+    // confirm that it is gone
+    int found = -1;
+    if (type == JSON_Type_String) {
+        found = arr.IndexOfString(str);
+    } else {
+        found = arr.IndexOf(value);
+    }
+
+    if (found != -1) {
+        LogError(
+            "json_test: found removed value in array at position %d",
+            found
+        );
+
+        return false;
+    }
+
+    return true;
+}
 
 /**
  * @section Methodmaps
@@ -128,361 +176,137 @@ methodmap Player < JSON_Object
 }
 
 /**
- * @section Helpers
- */
-
-/**
- * Checks if floats are "equal enough", to account for floating point errors.
- * @see https://en.wikipedia.org/wiki/Floating_point_error_mitigation
- *
- * @param float x           First value to compare.
- * @param float y           Second value to compare.
- * @param float tolerance   Maximum allowed tolerance for
- *                          floats to be considered equal.
- * @returns True if the floats are equal within the distance, false otherwise.
- */
-bool equal_enough(float x, float y, float tolerance = 0.0005)
-{
-    float difference = x / y;
-    return difference > (1 - tolerance)
-        && difference < (1 + tolerance);
-}
-
-void print_json(JSON_Object obj, int options = JSON_NONE)
-{
-    obj.Encode(json_encode_output, sizeof(json_encode_output), options);
-    PrintToServer("%s", json_encode_output);
-}
-
-bool check_array_remove(JSON_Array arr, int index)
-{
-    PrintToServer("Removing element at index %d", index);
-
-    // get current value at index
-    JSONCellType type = arr.GetKeyType(index);
-    int str_size = 0;
-    if (type == JSON_Type_String) {
-        str_size = arr.GetKeyLength(index) + 1;
-    }
-
-    any value;
-    char[] str = new char[str_size];
-
-    if (type == JSON_Type_String) {
-        arr.GetString(index, str, str_size);
-    } else {
-        arr.GetValue(index, value);
-    }
-
-    // remove the index from the array
-    arr.Remove(index);
-    print_json(arr);
-
-    // confirm that it is gone
-    int found = -1;
-    if (type == JSON_Type_String) {
-        found = arr.IndexOfString(str);
-    } else {
-        found = arr.IndexOf(value);
-    }
-
-    if (found != -1) {
-        LogError(
-            "json_test: found removed value in array at position %d",
-            found
-        );
-
-        return false;
-    }
-
-    return true;
-}
-
-void check_test(bool result)
-{
-    if (result) {
-        PrintToServer("\tOK");
-        passed += 1;
-    } else {
-        PrintToServer("\tFAILED");
-        failed += 1;
-    }
-
-    PrintToServer("");
-}
-
-/**
  * @section Tests
  **/
 
-bool it_should_encode_empty_objects()
+void it_should_decode(char[] data)
+{
+    JSON_Object obj = json_decode(data);
+    if (Test_AssertNotEqual("obj", obj, view_as<Handle>(null))) {
+        json_cleanup_and_delete(obj);
+    }
+}
+
+void it_should_not_decode(char[] data)
+{
+    JSON_Object obj = json_decode(data);
+    if (! Test_AssertEqual("obj", obj, view_as<Handle>(null))) {
+        obj.Encode(json_encode_output, sizeof(json_encode_output));
+        LogError(
+            "json_test: malformed JSON was parsed as valid: %s",
+            json_encode_output
+        );
+
+        json_cleanup_and_delete(obj);
+    }
+}
+
+void it_should_encode_empty_objects()
 {
     JSON_Object obj = new JSON_Object();
-
     print_json(obj);
     json_cleanup_and_delete(obj);
 
-    return StrEqual(json_encode_output, "{}");
+    Test_AssertStringsEqual("output", json_encode_output, "{}");
 }
 
-bool it_should_encode_empty_arrays()
+void it_should_encode_empty_arrays()
 {
     JSON_Array arr = new JSON_Array();
-
     print_json(arr);
     json_cleanup_and_delete(arr);
 
-    return StrEqual(json_encode_output, "[]");
+    Test_AssertStringsEqual("output", json_encode_output, "[]");
 }
 
-bool it_should_support_objects()
+void it_should_support_objects()
 {
     JSON_Object obj = new JSON_Object();
-    bool success = obj.SetString("str", "leet")
-        && obj.SetString("escaped_str", "\"leet\"")
-        && obj.SetInt("int", 9001)
-        && obj.SetInt("negative_int", -9001)
-        && obj.SetInt("int_zero", 0)
-        && obj.SetInt("negative_int_zero", -0)
-        && obj.SetFloat("float", 13.37)
-        && obj.SetFloat("negative_float", -13.37)
-        && obj.SetFloat("float_zero", 0.0)
-        && obj.SetFloat("negative_float_zero", -0.0)
-        && obj.SetBool("true", true)
-        && obj.SetBool("false", false)
-        && obj.SetObject("handle", null);
+    Test_AssertTrue("set string", obj.SetString("str", "leet"));
+    Test_AssertTrue("set escaped string", obj.SetString("escaped_str", "\"leet\""));
+    Test_AssertTrue("set int", obj.SetInt("int", 9001));
+    Test_AssertTrue("set negative int", obj.SetInt("negative_int", -9001));
+    Test_AssertTrue("set int zero", obj.SetInt("int_zero", 0));
+    Test_AssertTrue("set float", obj.SetFloat("float", 13.37));
+    Test_AssertTrue("set negative float", obj.SetFloat("negative_float", -13.37));
+    Test_AssertTrue("set float zero", obj.SetFloat("float_zero", 0.0));
+    Test_AssertTrue("set true", obj.SetBool("true", true));
+    Test_AssertTrue("set false", obj.SetBool("false", false));
+    Test_AssertTrue("set handle", obj.SetObject("handle", null));
 
     print_json(obj);
     json_cleanup_and_delete(obj);
 
-    if (! success) {
-        LogError("json_test: failed while setting object values");
-
-        return false;
-    }
-
-    JSON_Object decoded_obj = json_decode(json_encode_output);
-    if (decoded_obj == null) {
-        LogError("json_test: unable to decode object");
-
-        return false;
+    JSON_Object decoded = json_decode(json_encode_output);
+    if (! Test_AssertNotEqual("decoded", decoded, view_as<Handle>(null))) {
+        // if this assertion fails, testing cannot continue
+        return;
     }
 
     char string[32];
-    any value;
-    Handle hndl;
+    Test_AssertTrue("get decoded string", decoded.GetString("str", string, sizeof(string)));
+    Test_AssertStringsEqual("decoded string", string, "leet");
+    Test_AssertTrue("get decoded escaped string", decoded.GetString("escaped_str", string, sizeof(string)));
+    Test_AssertStringsEqual("decoded escaped string", string, "\"leet\"");
+    Test_AssertEqual("decoded int", decoded.GetInt("int"), 9001);
+    Test_AssertEqual("decoded negative int", decoded.GetInt("negative_int"), -9001);
+    Test_AssertEqual("decoded int zero", decoded.GetInt("int_zero"), 0);
+    Test_AssertFloatsEqual("decoded float", decoded.GetFloat("float"), 13.37);
+    Test_AssertFloatsEqual("decoded negative float", decoded.GetFloat("negative_float"), -13.37);
+    Test_AssertFloatsEqual("decoded float zero", decoded.GetFloat("float_zero"), 0.0);
+    Test_AssertTrue("decoded true", decoded.GetBool("true"));
+    Test_AssertFalse("decoded false", decoded.GetBool("false"));
+    Test_AssertEqual("decoded handle", decoded.GetObject("handle"), view_as<Handle>(null));
 
-    if (
-        ! decoded_obj.GetString("str", string, sizeof(string))
-        || ! StrEqual(string, "leet")
-    ) {
-        LogError("json_test: unexpected value for key str: %s", string);
-        success = false;
-    }
-
-    if (
-        ! decoded_obj.GetString("escaped_str", string, sizeof(string))
-        || ! StrEqual(string, "\"leet\"")
-    ) {
-        LogError("json_test: unexpected value for key escaped_str: %s", string);
-        success = false;
-    }
-
-    if ((value = decoded_obj.GetInt("int")) != 9001) {
-        LogError("json_test: unexpected value for key int: %d", value);
-        success = false;
-    }
-
-    if ((value = decoded_obj.GetInt("negative_int")) != -9001) {
-        LogError("json_test: unexpected value for key negative_int: %d", value);
-        success = false;
-    }
-
-    if ((value = decoded_obj.GetInt("int_zero")) != 0) {
-        LogError("json_test: unexpected value for key int_zero: %d", value);
-        success = false;
-    }
-
-    if ((value = decoded_obj.GetInt("negative_int_zero")) != -0) {
-        LogError(
-            "json_test: unexpected value for key negative_int_zero: %d",
-            value
-        );
-        success = false;
-    }
-
-    if (! equal_enough((value = decoded_obj.GetFloat("float")), 13.37)) {
-        LogError("json_test: unexpected value for key float: %f", value);
-        success = false;
-    }
-
-    if (
-        ! equal_enough((value = decoded_obj.GetFloat("negative_float")), -13.37)
-    ) {
-        LogError(
-            "json_test: unexpected value for key negative_float: %f",
-            value
-        );
-        success = false;
-    }
-
-    if ((value = decoded_obj.GetFloat("float_zero")) != 0.0) {
-        LogError("json_test: unexpected value for key float_zero: %f", value);
-        success = false;
-    }
-
-    if ((value = decoded_obj.GetFloat("negative_float_zero")) != -0.0) {
-        LogError(
-            "json_test: unexpected value for key negative_float_zero: %f",
-            value
-        );
-        success = false;
-    }
-
-    if ((value = decoded_obj.GetBool("true")) != true) {
-        LogError("json_test: unexpected value for key true: %d", value);
-        success = false;
-    }
-
-    if ((value = decoded_obj.GetBool("false")) != false) {
-        LogError("json_test: unexpected value for key false: %d", value);
-        success = false;
-    }
-
-    if ((hndl = decoded_obj.GetObject("handle")) != null) {
-        LogError(
-            "json_test: unexpected value for key handle: %d",
-            view_as<int>(hndl)
-        );
-        success = false;
-    }
-
-    json_cleanup_and_delete(decoded_obj);
-
-    return success;
+    json_cleanup_and_delete(decoded);
 }
 
-bool it_should_support_arrays()
+void it_should_support_arrays()
 {
     JSON_Array arr = new JSON_Array();
-    bool success = arr.PushString("leet") > -1
-        && arr.PushString("\"leet\"") > -1
-        && arr.PushInt(9001) > -1
-        && arr.PushInt(-9001) > -1
-        && arr.PushInt(0) > -1
-        && arr.PushInt(-0) > -1
-        && arr.PushFloat(13.37) > -1
-        && arr.PushFloat(-13.37) > -1
-        && arr.PushFloat(0.0) > -1
-        && arr.PushFloat(-0.0) > -1
-        && arr.PushBool(true) > -1
-        && arr.PushBool(false) > -1
-        && arr.PushObject(null) > -1;
+    Test_AssertNotEqual("push string", arr.PushString("leet"), -1);
+    Test_AssertNotEqual("push escaped string", arr.PushString("\"leet\""), -1);
+    Test_AssertNotEqual("push int", arr.PushInt(9001), -1);
+    Test_AssertNotEqual("push negative int", arr.PushInt(-9001), -1);
+    Test_AssertNotEqual("push int zero", arr.PushInt(0), -1);
+    Test_AssertNotEqual("push float", arr.PushFloat(13.37), -1);
+    Test_AssertNotEqual("push negative float", arr.PushFloat(-13.37), -1);
+    Test_AssertNotEqual("push float zero", arr.PushFloat(0.0), -1);
+    Test_AssertNotEqual("push true", arr.PushBool(true), -1);
+    Test_AssertNotEqual("push false", arr.PushBool(false), -1);
+    Test_AssertNotEqual("push handle", arr.PushObject(null), -1);
 
     print_json(arr);
     json_cleanup_and_delete(arr);
 
-    if (! success) {
-        LogError("json_test: failed while pushing array values");
-
-        return false;
-    }
-
-    JSON_Array decoded_arr = view_as<JSON_Array>(
+    JSON_Array decoded = view_as<JSON_Array>(
         json_decode(json_encode_output)
     );
-    if (decoded_arr == null) {
-        LogError("json_test: unable to decode array");
-
-        return false;
+    if (! Test_AssertNotEqual("decoded", decoded, view_as<Handle>(null))) {
+        // if this assertion fails, testing cannot continue
+        return;
     }
 
     int index = 0;
     char string[32];
-    any value;
-    Handle hndl;
+    Test_AssertTrue("get decoded string", decoded.GetString(index++, string, sizeof(string)));
+    Test_AssertStringsEqual("decoded string", string, "leet");
+    Test_AssertTrue("get decoded escaped string",decoded.GetString(index++, string, sizeof(string)));
+    Test_AssertStringsEqual("decoded escaped string", string, "\"leet\"");
+    Test_AssertEqual("decoded int", decoded.GetInt(index++), 9001);
+    Test_AssertEqual("decoded negative int", decoded.GetInt(index++), -9001);
+    Test_AssertEqual("decoded int zero", decoded.GetInt(index++), 0);
+    Test_AssertFloatsEqual("decoded float", decoded.GetFloat(index++), 13.37);
+    Test_AssertFloatsEqual("decoded negative float", decoded.GetFloat(index++), -13.37);
+    Test_AssertFloatsEqual("decoded float zero", decoded.GetFloat(index++), 0.0);
+    Test_AssertTrue("decoded true", decoded.GetBool(index++));
+    Test_AssertFalse("decoded false", decoded.GetBool(index++));
+    Test_AssertEqual("decoded handle", decoded.GetObject(index++), view_as<Handle>(null));
 
-    if (
-        ! decoded_arr.GetString(index++, string, sizeof(string))
-        || ! StrEqual(string, "leet")
-    ) {
-        LogError("json_test: unexpected value for index %d: %s", index, string);
-        success = false;
-    }
-
-    if (
-        ! decoded_arr.GetString(index++, string, sizeof(string))
-        || ! StrEqual(string, "\"leet\"")
-    ) {
-        LogError("json_test: unexpected value for index %d: %s", index, string);
-        success = false;
-    }
-
-    if ((value = decoded_arr.GetInt(index++)) != 9001) {
-        LogError("json_test: unexpected value for index %d: %d", index, value);
-        success = false;
-    }
-
-    if ((value = decoded_arr.GetInt(index++)) != -9001) {
-        LogError("json_test: unexpected value for index %d: %d", index, value);
-        success = false;
-    }
-
-    if ((value = decoded_arr.GetInt(index++)) != 0) {
-        LogError("json_test: unexpected value for index %d: %d", index, value);
-        success = false;
-    }
-
-    if ((value = decoded_arr.GetInt(index++)) != -0) {
-        LogError("json_test: unexpected value for index %d: %d", index, value);
-        success = false;
-    }
-
-    if (! equal_enough((value = decoded_arr.GetFloat(index++)), 13.37)) {
-        LogError("json_test: unexpected value for index %d: %f", index, value);
-        success = false;
-    }
-
-    if (! equal_enough((value = decoded_arr.GetFloat(index++)), -13.37)) {
-        LogError("json_test: unexpected value for index %d: %f", index, value);
-        success = false;
-    }
-
-    if ((value = decoded_arr.GetFloat(index++)) != 0.0) {
-        LogError("json_test: unexpected value for index %d: %f", index, value);
-        success = false;
-    }
-
-    if ((value = decoded_arr.GetFloat(index++)) != -0.0) {
-        LogError("json_test: unexpected value for index %d: %f", index, value);
-        success = false;
-    }
-
-    if ((value = decoded_arr.GetBool(index++)) != true) {
-        LogError("json_test: unexpected value for index %d: %d", index, value);
-        success = false;
-    }
-
-    if ((value = decoded_arr.GetBool(index++)) != false) {
-        LogError("json_test: unexpected value for index %d: %d", index, value);
-        success = false;
-    }
-
-    if ((hndl = decoded_arr.GetObject(index++)) != null) {
-        LogError(
-            "json_test: unexpected value for index %d: %d",
-            index,
-            view_as<int>(hndl)
-        );
-        success = false;
-    }
-
-    json_cleanup_and_delete(decoded_arr);
-
-    return success;
+    json_cleanup_and_delete(decoded);
 }
 
-bool it_should_support_objects_nested_in_objects()
+void it_should_support_objects_nested_in_objects()
 {
     JSON_Object nested_obj = new JSON_Object();
     nested_obj.SetBool("nested", true);
@@ -491,15 +315,13 @@ bool it_should_support_objects_nested_in_objects()
     obj.SetBool("nested", false);
     obj.SetObject("object", nested_obj);
 
+    Test_AssertTrue("nested", obj.GetObject("object").GetBool("nested"));
+
     print_json(obj);
-
-    bool success = obj.GetObject("object").GetBool("nested");
     json_cleanup_and_delete(obj);
-
-    return success;
 }
 
-bool it_should_support_objects_nested_in_arrays()
+void it_should_support_objects_nested_in_arrays()
 {
     JSON_Object nested_obj = new JSON_Object();
     nested_obj.SetBool("nested", true);
@@ -507,15 +329,13 @@ bool it_should_support_objects_nested_in_arrays()
     JSON_Array arr = new JSON_Array();
     arr.PushObject(nested_obj);
 
+    Test_AssertTrue("nested", arr.GetObject(0).GetBool("nested"));
+
     print_json(arr);
-
-    bool success = arr.GetObject(0).GetBool("nested");
     json_cleanup_and_delete(arr);
-
-    return success;
 }
 
-bool it_should_support_arrays_nested_in_objects()
+void it_should_support_arrays_nested_in_objects()
 {
     JSON_Array nested_arr = new JSON_Array();
     nested_arr.PushBool(true);
@@ -523,16 +343,14 @@ bool it_should_support_arrays_nested_in_objects()
     JSON_Object obj = new JSON_Object();
     obj.SetObject("array", nested_arr);
 
-    print_json(obj);
-
     JSON_Array obj_array = view_as<JSON_Array>(obj.GetObject("array"));
-    bool success = obj_array.GetBool(0);
-    json_cleanup_and_delete(obj);
+    Test_AssertTrue("nested", obj_array.GetBool(0));
 
-    return success;
+    print_json(obj);
+    json_cleanup_and_delete(obj);
 }
 
-bool it_should_support_arrays_nested_in_arrays()
+void it_should_support_arrays_nested_in_arrays()
 {
     JSON_Array nested_arr = new JSON_Array();
     nested_arr.PushBool(true);
@@ -540,73 +358,48 @@ bool it_should_support_arrays_nested_in_arrays()
     JSON_Array arr = new JSON_Array();
     arr.PushObject(nested_arr);
 
-    print_json(arr);
-
     JSON_Array arr_array = view_as<JSON_Array>(arr.GetObject(0));
-    bool success = arr_array.GetBool(0);
-    json_cleanup_and_delete(arr);
+    Test_AssertTrue("nested", arr_array.GetBool(0));
 
-    return success;
+    print_json(arr);
+    json_cleanup_and_delete(arr);
 }
 
-bool it_should_support_basic_methodmaps()
+void it_should_support_basic_methodmaps()
 {
     Player player = new Player();
     player.id = 1;
 
     print_json(player);
-
     json_cleanup_and_delete(player);
 
-    return true;
+    Player decoded = view_as<Player>(json_decode(json_encode_output));
+    Test_AssertEqual("decoded.id", decoded.id, 1);
+
+    json_cleanup_and_delete(decoded);
 }
 
-bool it_should_support_nested_methodmaps()
+void it_should_support_nested_methodmaps()
 {
     Weapon weapon = new Weapon();
+    weapon.id = 1;
     weapon.SetName("ak47");
+
+    Test_AssertEqual("weapon.id", weapon.id, 1);
 
     Player player = new Player();
     player.id = 1;
     player.weapon = weapon;
-    player.weapon.id = 2;  // demonstrating nested property setters
+
+    Test_AssertEqual("player.weapon.id", weapon.id, 1);
+    player.weapon.id = 2;
+    Test_AssertEqual("player.weapon.id", weapon.id, 2);
 
     print_json(player);
-
-    bool success = player.weapon.id == 2;
     json_cleanup_and_delete(player);
-
-    return success;
 }
 
-bool it_should_decode(char[] data)
-{
-    JSON_Object obj = json_decode(data);
-    if (obj == null) {
-        return false;
-    }
-
-    print_json(obj);
-
-    return true;
-}
-
-bool it_should_not_decode(char[] data)
-{
-    JSON_Object obj = json_decode(data);
-    if (obj != null) {
-        obj.Encode(json_encode_output, sizeof(json_encode_output));
-        LogError(
-            "json_test: malformed JSON was parsed as valid: %s",
-            json_encode_output
-        );
-        return false;
-    }
-
-    return true;
-}
-
-bool it_should_pretty_print()
+void it_should_pretty_print()
 {
     JSON_Array child_arr = new JSON_Array();
     child_arr.PushInt(1);
@@ -623,24 +416,22 @@ bool it_should_pretty_print()
     print_json(parent_obj, JSON_ENCODE_PRETTY);
     json_cleanup_and_delete(parent_obj);
 
-    bool success = StrEqual(json_encode_output, "{\n    \"first_depth\": {\n        \"im_indented\": null,\n        \"second_depth\": [\n            1,\n            []\n        ]\n    },\n    \"pretty_printing\": true\n}");
+    Test_AssertStringsEqual("output", json_encode_output, "{\n    \"first_depth\": {\n        \"im_indented\": null,\n        \"second_depth\": [\n            1,\n            []\n        ]\n    },\n    \"pretty_printing\": true\n}");
 
     JSON_Array empty_arr = new JSON_Array();
     print_json(empty_arr, JSON_ENCODE_PRETTY);
     json_cleanup_and_delete(empty_arr);
 
-    success = success && StrEqual(json_encode_output, "[]");
+    Test_AssertStringsEqual("output", json_encode_output, "[]");
 
     JSON_Object empty_object = new JSON_Object();
     print_json(empty_object, JSON_ENCODE_PRETTY);
     json_cleanup_and_delete(empty_object);
 
-    success = success && StrEqual(json_encode_output, "{}");
-
-    return success;
+    Test_AssertStringsEqual("output", json_encode_output, "{}");
 }
 
-bool it_should_trim_floats()
+void it_should_trim_floats()
 {
     JSON_Array arr = new JSON_Array();
     arr.PushFloat(0.0);
@@ -651,146 +442,93 @@ bool it_should_trim_floats()
     arr.PushFloat(-10.01);
 
     print_json(arr);
+    json_cleanup_and_delete(arr);
 
-    return StrEqual(json_encode_output, "[0.0,1.0,10.01,-0.0,-1.0,-10.01]");
+    Test_AssertStringsEqual("output", json_encode_output, "[0.0,1.0,10.01,-0.0,-1.0,-10.01]");
 }
 
-bool it_should_remove_meta_keys_from_arrays()
+void it_should_remove_meta_keys_from_arrays()
 {
-    bool success = true;
-
     JSON_Array arr = new JSON_Array();
     arr.PushString("hello");
     arr.PushInt(0);
 
-    if (
-        arr.GetKeyType(0) != JSON_Type_String
-        || arr.GetKeyLength(0) != 5
-        || arr.GetKeyType(1) != JSON_Type_Int
-    ) {
-        LogError("json_test: array did not properly set meta-keys");
-
-        success = false;
-    }
+    Test_AssertEqual("0 type", arr.GetKeyType(0), JSON_Type_String);
+    Test_AssertEqual("0 length", arr.GetKeyLength(0), 5);
+    Test_AssertEqual("1 type", arr.GetKeyType(1), JSON_Type_Int);
 
     arr.Remove(0);
 
-    if (
-        arr.GetKeyType(1) != JSON_Type_Invalid
-        || arr.GetKeyLength(0) != -1
-        || arr.GetKeyType(0) != JSON_Type_Int
-    ) {
-        LogError("json_test: array did not properly remove meta-keys");
-
-        success = false;
-    }
+    Test_AssertEqual("0 type", arr.GetKeyType(0), JSON_Type_Int);
+    Test_AssertEqual("0 length", arr.GetKeyLength(0), -1);
+    Test_AssertEqual("1 type", arr.GetKeyType(1), JSON_Type_Invalid);
 
     json_cleanup_and_delete(arr);
-
-    return success;
 }
 
-bool it_should_remove_meta_keys_from_objects()
+void it_should_remove_meta_keys_from_objects()
 {
-    bool success = true;
-
     JSON_Object obj = new JSON_Object();
     obj.SetString("hello", "world");
     obj.SetInt("zero", 0);
 
-    if (
-        obj.GetKeyType("hello") != JSON_Type_String
-        || obj.GetKeyLength("hello") != 5
-        || obj.GetKeyType("zero") != JSON_Type_Int
-    ) {
-        LogError("json_test: object did not properly set meta-keys");
-
-        success = false;
-    }
+    Test_AssertEqual("hello type", obj.GetKeyType("hello"), JSON_Type_String);
+    Test_AssertEqual("hello length", obj.GetKeyLength("hello"), 5);
+    Test_AssertEqual("zero type", obj.GetKeyType("zero"), JSON_Type_Int);
 
     obj.Remove("hello");
 
-    if (
-        obj.GetKeyType("hello") != JSON_Type_Invalid
-        || obj.GetKeyLength("hello") != -1
-    ) {
-        LogError("json_test: object did not properly remove meta-keys");
-
-        success = false;
-    }
-
-    if (obj.GetKeyType("zero") != JSON_Type_Int) {
-        LogError("json_test: object removed incorrect meta-key");
-
-        success = false;
-    }
+    Test_AssertEqual("hello type", obj.GetKeyType("hello"), JSON_Type_Invalid);
+    Test_AssertEqual("hello length", obj.GetKeyLength("hello"), -1);
+    Test_AssertEqual("zero type", obj.GetKeyType("zero"), JSON_Type_Int);
 
     json_cleanup_and_delete(obj);
-
-    return success;
 }
 
-bool it_should_shift_array_down_after_removed_index()
+void it_should_shift_array_down_after_removed_index()
 {
     JSON_Array arr = new JSON_Array();
-    bool success = arr.PushString("leet") > -1
-        && arr.PushString("\"leet\"") > -1
-        && arr.PushInt(9001) > -1
-        && arr.PushFloat(-13.37) > -1
-        && arr.PushBool(true) > -1
-        && arr.PushBool(false) > -1;
+    arr.PushString("leet");
+    arr.PushString("\"leet\"");
+    arr.PushInt(9001);
+    arr.PushFloat(-13.37);
+    arr.PushBool(true);
+    arr.PushBool(false);
 
     print_json(arr);
 
-    if (! success) {
-        LogError("json_test: failed while pushing array values");
-
-        success = false;
-    }
-
-    success = success && check_array_remove(arr, 0);
-    success = success && check_array_remove(arr, arr.Length - 1);
+    Test_AssertTrue("remove first element", check_array_remove(arr, 0));
+    Test_AssertTrue("remove last element", check_array_remove(arr, arr.Length - 1));
     int max = arr.Length - 1;
-    success = success && check_array_remove(arr, GetRandomInt(0, max));
-
-    if (arr.Length != max) {
-        LogError("json_test: array did not properly shift down indexes");
-
-        success = false;
-    }
+    Test_AssertTrue("remove random element", check_array_remove(arr, GetRandomInt(0, max)));
+    Test_AssertEqual("array length", arr.Length, max);
 
     json_cleanup_and_delete(arr);
-
-    return success;
 }
 
-bool it_should_not_merge_array_onto_object()
+void it_should_not_merge_array_onto_object()
 {
     JSON_Object obj = new JSON_Object();
     JSON_Array arr = new JSON_Array();
 
-    bool success = obj.Merge(arr) == false;
+    Test_AssertFalse("merge result", obj.Merge(arr));
 
     json_cleanup_and_delete(obj);
     json_cleanup_and_delete(arr);
-
-    return success;
 }
 
-bool it_should_not_merge_object_onto_array()
+void it_should_not_merge_object_onto_array()
 {
     JSON_Array arr = new JSON_Array();
     JSON_Object obj = new JSON_Object();
 
-    bool success = arr.Merge(obj) == false;
+    Test_AssertFalse("merge result", arr.Merge(obj));
 
     json_cleanup_and_delete(arr);
     json_cleanup_and_delete(obj);
-
-    return success;
 }
 
-bool it_should_merge_arrays()
+void it_should_merge_arrays()
 {
     JSON_Array arr1 = new JSON_Array();
     arr1.PushInt(1);
@@ -802,30 +540,26 @@ bool it_should_merge_arrays()
     arr2.PushBool(false);
     arr2.SetKeyHidden(1, true);
 
-    if (! arr1.Merge(arr2)) {
-        LogError("json_test: failed while merging arrays");
-
-        return false;
+    if (! Test_AssertTrue("merge result", arr1.Merge(arr2))) {
+        // if this assertion fails, testing cannot continue
+        return;
     }
 
     print_json(arr1);
 
-    bool success = arr1.Length == 4
-        && arr1.GetKeyType(2) == JSON_Type_Int
-        && arr1.GetInt(2) == 2
-        && arr1.GetKeyType(3) == JSON_Type_Bool
-        && arr1.GetBool(3) == false
-        && arr1.GetKeyHidden(1) == true
-        && arr1.GetKeyHidden(3) == true
-        && StrEqual(json_encode_output, "[1,2]");
+    Test_AssertEqual("merged length", arr1.Length, 4);
+    Test_AssertEqual("merged 2 type", arr1.GetKeyType(2), JSON_Type_Int);
+    Test_AssertEqual("merged 2", arr1.GetInt(2), 2);
+    Test_AssertEqual("merged 3 type", arr1.GetKeyType(3), JSON_Type_Bool);
+    Test_AssertEqual("merged 3", arr1.GetBool(3), false);
+    Test_AssertTrue("merged 1 hidden", arr1.GetKeyHidden(1));
+    Test_AssertTrue("merged 3 hidden", arr1.GetKeyHidden(3));
 
     json_cleanup_and_delete(arr1);
     json_cleanup_and_delete(arr2);
-
-    return success;
 }
 
-bool it_should_merge_objects_with_replacement()
+void it_should_merge_objects_with_replacement()
 {
     JSON_Object obj1 = new JSON_Object();
     obj1.SetInt("key1", 1);
@@ -837,27 +571,25 @@ bool it_should_merge_objects_with_replacement()
     obj2.SetBool("replaced", true);
     obj2.SetKeyHidden("replaced", true);
 
-    if (! obj1.Merge(obj2)) {
-        LogError("json_test: failed while merging objects");
-
-        return false;
+    if (! Test_AssertTrue("merge result", obj1.Merge(obj2))) {
+        // if this assertion fails, testing cannot continue
+        return;
     }
 
     print_json(obj1);
 
-    bool success = obj1.HasKey("key2")
-        && obj1.GetKeyType("key2") == JSON_Type_Int
-        && obj1.GetInt("key2") == 2
-        && obj1.GetBool("replaced") == true
-        && obj1.GetKeyHidden("replaced") == true;
+    Test_AssertTrue("merged has key2", obj1.HasKey("key2"));
+    Test_AssertEqual("merged key2 type", obj1.GetKeyType("key2"), JSON_Type_Int);
+    Test_AssertEqual("merged key2", obj1.GetInt("key2"), 2);
+    Test_AssertEqual("merged replaced type", obj1.GetKeyType("replaced"), JSON_Type_Bool);
+    Test_AssertTrue("merged replaced", obj1.GetBool("replaced"));
+    Test_AssertTrue("merged replaced hidden", obj1.GetKeyHidden("replaced"));
 
     json_cleanup_and_delete(obj1);
     json_cleanup_and_delete(obj2);
-
-    return success;
 }
 
-bool it_should_merge_objects_without_replacement()
+void it_should_merge_objects_without_replacement()
 {
     JSON_Object obj1 = new JSON_Object();
     obj1.SetInt("key1", 1);
@@ -869,27 +601,25 @@ bool it_should_merge_objects_without_replacement()
     obj2.SetBool("replaced", true);
     obj2.SetKeyHidden("replaced", true);
 
-    if (! obj1.Merge(obj2, JSON_NONE)) {
-        LogError("json_test: failed while merging objects");
-
-        return false;
+    if (! Test_AssertTrue("merge result", obj1.Merge(obj2, JSON_NONE))) {
+        // if this assertion fails, testing cannot continue
+        return;
     }
 
     print_json(obj1);
 
-    bool success = obj1.HasKey("key2")
-        && obj1.GetKeyType("key2") == JSON_Type_Int
-        && obj1.GetInt("key2") == 2
-        && obj1.GetBool("replaced") == false
-        && obj1.GetKeyHidden("replaced") == false;
+    Test_AssertTrue("merged has key2", obj1.HasKey("key2"));
+    Test_AssertEqual("merged key2 type", obj1.GetKeyType("key2"), JSON_Type_Int);
+    Test_AssertEqual("merged key2", obj1.GetInt("key2"), 2);
+    Test_AssertEqual("merged replaced type", obj1.GetKeyType("replaced"), JSON_Type_Bool);
+    Test_AssertFalse("merged replaced", obj1.GetBool("replaced"));
+    Test_AssertFalse("merged replaced hidden", obj1.GetKeyHidden("replaced"));
 
     json_cleanup_and_delete(obj1);
     json_cleanup_and_delete(obj2);
-
-    return success;
 }
 
-bool it_should_copy_flat_arrays()
+void it_should_copy_flat_arrays()
 {
     JSON_Array arr = new JSON_Array();
     arr.PushInt(1);
@@ -897,22 +627,20 @@ bool it_should_copy_flat_arrays()
     arr.PushInt(3);
 
     JSON_Array copy = arr.DeepCopy();
-    bool success = arr.Length == copy.Length
-        && copy.GetInt(0) == 1
-        && copy.GetInt(1) == 2
-        && copy.GetInt(2) == 3;
+    Test_AssertEqual("copy length", copy.Length, arr.Length);
+    Test_AssertEqual("copy 0", copy.GetInt(0), 1);
+    Test_AssertEqual("copy 1", copy.GetInt(1), 2);
+    Test_AssertEqual("copy 2", copy.GetInt(2), 3);
 
     arr.PushInt(4);
 
-    success = success && arr.Length != copy.Length;
+    Test_AssertNotEqual("copy length", copy.Length, arr.Length);
 
     json_cleanup_and_delete(arr);
     json_cleanup_and_delete(copy);
-
-    return success;
 }
 
-bool it_should_copy_flat_objects()
+void it_should_copy_flat_objects()
 {
     JSON_Object obj = new JSON_Object();
     obj.SetInt("key1", 1);
@@ -920,89 +648,80 @@ bool it_should_copy_flat_objects()
     obj.SetInt("key3", 3);
 
     JSON_Object copy = obj.DeepCopy();
-    bool success = obj.Length == copy.Length
-        && copy.GetInt("key1") == 1
-        && copy.GetInt("key2") == 2
-        && copy.GetInt("key3") == 3;
+    Test_AssertEqual("copy length", copy.Length, obj.Length);
+    Test_AssertEqual("copy key1", copy.GetInt("key1"), 1);
+    Test_AssertEqual("copy key2", copy.GetInt("key2"), 2);
+    Test_AssertEqual("copy key3", copy.GetInt("key3"), 3);
 
     obj.SetInt("key4", 4);
 
-    success = success && obj.Length != copy.Length;
+    Test_AssertNotEqual("copy length", copy.Length, obj.Length);
 
     json_cleanup_and_delete(obj);
     json_cleanup_and_delete(copy);
-
-    return success;
 }
 
-bool it_should_shallow_copy_arrays()
+void it_should_shallow_copy_arrays()
 {
     JSON_Array arr = new JSON_Array();
     arr.PushObject(new JSON_Array());
 
     JSON_Array copy = arr.ShallowCopy();
 
-    bool success = arr.Length == copy.Length
-        && arr.GetObject(0) == copy.GetObject(0);
+    Test_AssertEqual("copy length", copy.Length, arr.Length);
+    Test_AssertTrue("copy 0 == arr 0", copy.GetObject(0) == arr.GetObject(0));
 
     json_cleanup_and_delete(arr);
     copy.Remove(0);
     json_cleanup_and_delete(copy);
-
-    return success;
 }
 
-bool it_should_shallow_copy_objects()
+void it_should_shallow_copy_objects()
 {
     JSON_Object obj = new JSON_Object();
     obj.SetObject("nested", new JSON_Object());
 
     JSON_Object copy = obj.ShallowCopy();
 
-    bool success = obj.Length == copy.Length
-        && obj.GetObject("nested") == copy.GetObject("nested");
+    Test_AssertEqual("copy length", copy.Length, obj.Length);
+    Test_AssertTrue("copy nested == obj nested", copy.GetObject("nested") == obj.GetObject("nested"));
 
     json_cleanup_and_delete(obj);
     copy.Remove("nested");
     json_cleanup_and_delete(copy);
-
-    return success;
 }
 
-bool it_should_deep_copy_arrays()
+void it_should_deep_copy_arrays()
 {
     JSON_Array arr = new JSON_Array();
     arr.PushObject(new JSON_Array());
 
     JSON_Array copy = arr.DeepCopy();
 
-    bool success = arr.Length == copy.Length
-        && arr.GetObject(0) != copy.GetObject(0);
+    Test_AssertEqual("copy length", copy.Length, arr.Length);
+    Test_AssertTrue("copy 0 != arr 0", copy.GetObject(0) != arr.GetObject(0));
 
     json_cleanup_and_delete(arr);
     json_cleanup_and_delete(copy);
-
-    return success;
 }
 
-bool it_should_deep_copy_objects()
+void it_should_deep_copy_objects()
 {
     JSON_Object obj = new JSON_Object();
     obj.SetObject("nested", new JSON_Object());
 
     JSON_Object copy = obj.DeepCopy();
 
-    bool success = obj.Length == copy.Length
-        && obj.GetObject("nested") != copy.GetObject("nested");
+    Test_AssertEqual("copy length", copy.Length, obj.Length);
+    Test_AssertTrue("copy nested != obj nested", copy.GetObject("nested") != obj.GetObject("nested"));
 
     json_cleanup_and_delete(obj);
     json_cleanup_and_delete(copy);
-
-    return success;
 }
 
-bool it_should_allow_single_quotes()
+void it_should_allow_single_quotes()
 {
+    // array
     JSON_Array arr = view_as<JSON_Array>(
         json_decode(
             "['single quotes', \"double quotes\", 'single \\'single\\' quotes', 'single \\\"double\\\" quotes', \"double \\'single\\' quotes\", \"double \\\"double\\\" quotes\"]",
@@ -1011,45 +730,48 @@ bool it_should_allow_single_quotes()
     );
     print_json(arr);
 
-    bool success = arr.Length == 6;
+    Test_AssertEqual("array length", arr.Length, 6);
 
+    json_cleanup_and_delete(arr);
+
+    // object
     JSON_Object obj = json_decode(
         "{'key': \"value\"}",
         JSON_DECODE_SINGLE_QUOTES
     );
     print_json(obj);
 
-    success = success && obj.HasKey("key");
+    Test_AssertTrue("object has key", obj.HasKey("key"));
 
     json_cleanup_and_delete(obj);
-    json_cleanup_and_delete(arr);
-
-    return success;
 }
 
-bool it_should_return_default_values_for_missing_elements()
+void it_should_return_default_values_for_missing_elements()
 {
-    JSON_Object obj = new JSON_Object();
+    // array
     JSON_Array arr = new JSON_Array();
 
-    bool success = obj.GetInt("_", 1) == 1
-        && obj.GetFloat("_", 1.0) == 1.0
-        && obj.GetBool("_", true) == true
-        && obj.GetObject("_", null) == null
-        && obj.GetObject("_", obj) == obj
-        && arr.GetInt(0, 1) == 1
-        && arr.GetFloat(0, 1.0) == 1.0
-        && arr.GetBool(0, true) == true
-        && arr.GetObject(0, null) == null
-        && arr.GetObject(0, arr) == arr;
+    Test_AssertEqual("array default int value", arr.GetInt(0, 1), 1);
+    Test_AssertEqual("array default float value", arr.GetFloat(0, 1.0), 1.0);
+    Test_AssertEqual("array default bool value", arr.GetBool(0, true), true);
+    Test_AssertEqual("array default null value", arr.GetObject(0, null), view_as<Handle>(null));
+    Test_AssertEqual("array default arr value", arr.GetObject(0, arr), arr);
 
-    json_cleanup_and_delete(obj);
     json_cleanup_and_delete(arr);
 
-    return success;
+    // object
+    JSON_Object obj = new JSON_Object();
+
+    Test_AssertEqual("object default int value", obj.GetInt("_", 1), 1);
+    Test_AssertEqual("object default float value", obj.GetFloat("_", 1.0), 1.0);
+    Test_AssertEqual("object default bool value", obj.GetBool("_", true), true);
+    Test_AssertEqual("object default null value", obj.GetObject("_", null), view_as<Handle>(null));
+    Test_AssertEqual("object default obj value", obj.GetObject("_", obj), obj);
+
+    json_cleanup_and_delete(obj);
 }
 
-bool it_should_autocleanup_merged_objects()
+void it_should_autocleanup_merged_objects()
 {
     JSON_Object obj1 = new JSON_Object();
     JSON_Object obj2 = new JSON_Object();
@@ -1060,131 +782,106 @@ bool it_should_autocleanup_merged_objects()
     obj1.SetObject("nested", nested1);
     obj2.SetObject("nested", nested2);
     obj1.Merge(obj2, JSON_MERGE_CLEANUP);
-    bool success = IsValidHandle(nested1) && IsValidHandle(nested2);
 
-    if (! success) {
-        LogError(
-            "json_test: nested handle became invalid after no-replace merge"
-        );
-
-        return false;
-    }
+    Test_AssertTrue("nested1 is valid", IsValidHandle(nested1));
+    Test_AssertTrue("nested2 is valid", IsValidHandle(nested2));
 
     // ensure that both handles are valid after replace no-cleanup merge
     obj1.SetObject("nested", nested1);
     obj2.SetObject("nested", nested2);
     obj1.Merge(obj2, JSON_MERGE_REPLACE);
-    success = success && IsValidHandle(nested1) && IsValidHandle(nested2);
 
-    if (! success) {
-        LogError(
-            "json_test: nested handle became invalid after no-cleanup merge"
-        );
-
-        return false;
-    }
+    Test_AssertTrue("nested1 is valid", IsValidHandle(nested1));
+    Test_AssertTrue("nested2 is valid", IsValidHandle(nested2));
 
     // ensure that overriden handle is invalid after replace cleanup merge
     obj1.SetObject("nested", nested1);
     obj2.SetObject("nested", nested2);
     obj1.Merge(obj2, JSON_MERGE_REPLACE | JSON_MERGE_CLEANUP);
-    success = success && ! IsValidHandle(nested1) && IsValidHandle(nested2);
+
+    Test_AssertFalse("nested1 is valid", IsValidHandle(nested1));
+    Test_AssertTrue("nested2 is valid", IsValidHandle(nested2));
 
     json_cleanup_and_delete(obj1);
     obj2.Remove("nested");
     json_cleanup_and_delete(obj2);
-
-    return success;
 }
 
-bool it_should_enforce_types_in_arrays()
+void it_should_enforce_types_in_arrays()
 {
     JSON_Array arr = new JSON_Array(JSON_Type_Int);
-    bool success = arr.PushInt(9001) > -1
-        && arr.PushInt(-9001) > -1
-        && arr.PushString("leet") == -1
-        && arr.PushString("\"leet\"") == -1
-        && arr.PushFloat(13.37) == -1
-        && arr.PushFloat(-13.37) == -1
-        && arr.PushFloat(0.0) == -1
-        && arr.PushFloat(-0.0) == -1
-        && arr.PushBool(true) == -1
-        && arr.PushBool(false) == -1
-        && arr.PushObject(null) == -1;
+
+    Test_AssertNotEqual("push int", arr.PushInt(9001), -1);
+    Test_AssertNotEqual("push negative int", arr.PushInt(-9001), -1);
+    Test_AssertEqual("push string", arr.PushString("leet"), -1);
+    Test_AssertEqual("push float", arr.PushFloat(13.37), -1);
+    Test_AssertEqual("push bool", arr.PushBool(true), -1);
+    Test_AssertEqual("push null", arr.PushObject(null), -1);
 
     print_json(arr);
     json_cleanup_and_delete(arr);
-
-    if (! success) {
-        LogError("json_test: unexpected value pushed successfully");
-
-        return false;
-    }
-
-    return success;
 }
 
-bool it_should_not_set_type_when_array_contains_another_type()
+void it_should_not_set_type_when_array_contains_another_type()
 {
     JSON_Array arr = new JSON_Array();
     arr.PushObject(null);
-    bool success = ! arr.SetType(JSON_Type_Int);
+
+    Test_AssertFalse("result", arr.SetType(JSON_Type_Int));
 
     print_json(arr);
     json_cleanup_and_delete(arr);
-
-    return success;
 }
 
-bool it_should_import_ints()
+void it_should_import_ints()
 {
     int ints[] = {1, 2, 3};
     JSON_Array arr = new JSON_Array();
-    bool success = arr.ImportValues(JSON_Type_Int, ints, sizeof(ints));
+    Test_AssertTrue("import result", arr.ImportValues(JSON_Type_Int, ints, sizeof(ints)));
 
     print_json(arr);
     json_cleanup_and_delete(arr);
 
-    return success && StrEqual(json_encode_output, "[1,2,3]");
+    Test_AssertStringsEqual("output", json_encode_output, "[1,2,3]");
 }
 
-bool it_should_import_floats()
+void it_should_import_floats()
 {
     float floats[] = {1.1, 2.2, 3.3};
     JSON_Array arr = new JSON_Array();
-    bool success = arr.ImportValues(JSON_Type_Float, floats, sizeof(floats));
+    Test_AssertTrue("import result", arr.ImportValues(JSON_Type_Float, floats, sizeof(floats)));
 
     print_json(arr);
     json_cleanup_and_delete(arr);
 
-    return success && StrEqual(json_encode_output, "[1.1,2.2,3.3]");
+    Test_AssertStringsEqual("output", json_encode_output, "[1.1,2.2,3.3]");
 }
 
-bool it_should_import_bools()
+void it_should_import_bools()
 {
     bool bools[] = {true, false};
     JSON_Array arr = new JSON_Array();
-    bool success = arr.ImportValues(JSON_Type_Bool, bools, sizeof(bools));
+    Test_AssertTrue("import result", arr.ImportValues(JSON_Type_Bool, bools, sizeof(bools)));
 
     print_json(arr);
     json_cleanup_and_delete(arr);
 
-    return success && StrEqual(json_encode_output, "[true,false]");
+    Test_AssertStringsEqual("output", json_encode_output, "[true,false]");
 }
 
-bool it_should_import_strings()
+void it_should_import_strings()
 {
     char strings[][] = {"hello", "world"};
     JSON_Array arr = new JSON_Array();
-    bool success = arr.ImportStrings(strings, sizeof(strings));
+    Test_AssertTrue("import result", arr.ImportStrings(strings, sizeof(strings)));
 
     print_json(arr);
     json_cleanup_and_delete(arr);
 
-    return success && StrEqual(json_encode_output, "[\"hello\",\"world\"]");
+    Test_AssertStringsEqual("output", json_encode_output, "[\"hello\",\"world\"]");
 }
 
-bool it_should_export_ints()
+void it_should_export_ints()
 {
     JSON_Array arr = view_as<JSON_Array>(json_decode("[1,2,3]"));
     int size = arr.Length;
@@ -1194,10 +891,12 @@ bool it_should_export_ints()
     print_json(arr);
     json_cleanup_and_delete(arr);
 
-    return values[0] == 1 && values[1] == 2 && values[2] == 3;
+    Test_AssertEqual("values[0]", values[0], 1);
+    Test_AssertEqual("values[1]", values[1], 2);
+    Test_AssertEqual("values[2]", values[2], 3);
 }
 
-bool it_should_export_floats()
+void it_should_export_floats()
 {
     JSON_Array arr = view_as<JSON_Array>(json_decode("[1.1,2.2,3.3]"));
     int size = arr.Length;
@@ -1207,10 +906,12 @@ bool it_should_export_floats()
     print_json(arr);
     json_cleanup_and_delete(arr);
 
-    return values[0] == 1.1 && values[1] == 2.2 && values[2] == 3.3;
+    Test_AssertFloatsEqual("values[0]", values[0], 1.1);
+    Test_AssertFloatsEqual("values[1]", values[1], 2.2);
+    Test_AssertFloatsEqual("values[2]", values[2], 3.3);
 }
 
-bool it_should_export_bools()
+void it_should_export_bools()
 {
     JSON_Array arr = view_as<JSON_Array>(json_decode("[true, false]"));
     int size = arr.Length;
@@ -1220,10 +921,11 @@ bool it_should_export_bools()
     print_json(arr);
     json_cleanup_and_delete(arr);
 
-    return values[0] == true && values[1] == false;
+    Test_AssertTrue("values[0]", values[0]);
+    Test_AssertFalse("values[1]", values[1]);
 }
 
-bool it_should_export_strings()
+void it_should_export_strings()
 {
     JSON_Array arr = view_as<JSON_Array>(json_decode("[\"hello\",\"world\"]"));
     int size = arr.Length;
@@ -1234,48 +936,24 @@ bool it_should_export_strings()
     print_json(arr);
     json_cleanup_and_delete(arr);
 
-    return StrEqual(values[0], "hello") && StrEqual(values[1], "world");
+    Test_AssertStringsEqual("values[0]", values[0], "hello");
+    Test_AssertStringsEqual("values[1]", values[1], "world");
 }
 
 public void OnPluginStart()
 {
-    PrintToServer("Running tests...");
-    PrintToServer("");
+    Test_StartSection("sm-json test suite");
 
-    #if HAS_PROFILER
-    Profiler profiler = new Profiler();
-    profiler.Start();
-    #endif
-
-    PrintToServer("it_should_encode_empty_objects");
-    check_test(it_should_encode_empty_objects());
-
-    PrintToServer("it_should_encode_empty_arrays");
-    check_test(it_should_encode_empty_arrays());
-
-    PrintToServer("it_should_support_objects");
-    check_test(it_should_support_objects());
-
-    PrintToServer("it_should_support_arrays");
-    check_test(it_should_support_arrays());
-
-    PrintToServer("it_should_support_objects_nested_in_objects");
-    check_test(it_should_support_objects_nested_in_objects());
-
-    PrintToServer("it_should_support_objects_nested_in_arrays");
-    check_test(it_should_support_objects_nested_in_arrays());
-
-    PrintToServer("it_should_support_arrays_nested_in_objects");
-    check_test(it_should_support_arrays_nested_in_objects());
-
-    PrintToServer("it_should_support_arrays_nested_in_arrays");
-    check_test(it_should_support_arrays_nested_in_arrays());
-
-    PrintToServer("it_should_support_basic_methodmaps");
-    check_test(it_should_support_basic_methodmaps());
-
-    PrintToServer("it_should_support_nested_methodmaps");
-    check_test(it_should_support_nested_methodmaps());
+    Test_Run("it_should_encode_empty_objects", it_should_encode_empty_objects);
+    Test_Run("it_should_encode_empty_arrays", it_should_encode_empty_arrays);
+    Test_Run("it_should_support_objects", it_should_support_objects);
+    Test_Run("it_should_support_arrays", it_should_support_arrays);
+    Test_Run("it_should_support_objects_nested_in_objects", it_should_support_objects_nested_in_objects);
+    Test_Run("it_should_support_objects_nested_in_arrays", it_should_support_objects_nested_in_arrays);
+    Test_Run("it_should_support_arrays_nested_in_objects", it_should_support_arrays_nested_in_objects);
+    Test_Run("it_should_support_arrays_nested_in_arrays", it_should_support_arrays_nested_in_arrays);
+    Test_Run("it_should_support_basic_methodmaps", it_should_support_basic_methodmaps);
+    Test_Run("it_should_support_nested_methodmaps", it_should_support_nested_methodmaps);
 
     // the following tests were acquired from https://www.json.org/JSON_checker/
     // a few additional tests have been added for completeness
@@ -1286,8 +964,10 @@ public void OnPluginStart()
         "{\n    \"JSON Test Pattern pass3\": {\n        \"The outermost value\": \"must be an object or array.\",\n        \"In this test\": \"It is an object.\"\n    }\n}\n"
     };
     for (int i = 0; i < sizeof(should_decode); i += 1) {
-        PrintToServer("it_should_decode %s", should_decode[i]);
-        check_test(it_should_decode(should_decode[i]));
+        Test_BeforeRun("it_should_decode");
+        Test_Output(should_decode[i]);
+        it_should_decode(should_decode[i]);
+        Test_AfterRun();
     }
 
     char should_not_decode[][] = {
@@ -1333,103 +1013,41 @@ public void OnPluginStart()
         "{\"Extra comma\": true,}"
     };
     for (int i = 0; i < sizeof(should_not_decode); i += 1) {
-        PrintToServer("it_should_not_decode %s", should_not_decode[i]);
-        check_test(it_should_not_decode(should_not_decode[i]));
+        Test_BeforeRun("it_should_not_decode");
+        Test_Output(should_not_decode[i]);
+        it_should_not_decode(should_not_decode[i]);
+        Test_AfterRun();
     }
 
-    PrintToServer("it_should_pretty_print");
-    check_test(it_should_pretty_print());
+    Test_Run("it_should_pretty_print", it_should_pretty_print);
+    Test_Run("it_should_trim_floats", it_should_trim_floats);
+    Test_Run("it_should_remove_meta_keys_from_arrays", it_should_remove_meta_keys_from_arrays);
+    Test_Run("it_should_remove_meta_keys_from_objects", it_should_remove_meta_keys_from_objects);
+    Test_Run("it_should_shift_array_down_after_removed_index", it_should_shift_array_down_after_removed_index);
+    Test_Run("it_should_not_merge_array_onto_object", it_should_not_merge_array_onto_object);
+    Test_Run("it_should_not_merge_object_onto_array", it_should_not_merge_object_onto_array);
+    Test_Run("it_should_merge_arrays", it_should_merge_arrays);
+    Test_Run("it_should_merge_objects_with_replacement", it_should_merge_objects_with_replacement);
+    Test_Run("it_should_merge_objects_without_replacement", it_should_merge_objects_without_replacement);
+    Test_Run("it_should_copy_flat_arrays", it_should_copy_flat_arrays);
+    Test_Run("it_should_copy_flat_objects", it_should_copy_flat_objects);
+    Test_Run("it_should_shallow_copy_arrays", it_should_shallow_copy_arrays);
+    Test_Run("it_should_shallow_copy_objects", it_should_shallow_copy_objects);
+    Test_Run("it_should_deep_copy_arrays", it_should_deep_copy_arrays);
+    Test_Run("it_should_deep_copy_objects", it_should_deep_copy_objects);
+    Test_Run("it_should_allow_single_quotes", it_should_allow_single_quotes);
+    Test_Run("it_should_return_default_values_for_missing_elements", it_should_return_default_values_for_missing_elements);
+    Test_Run("it_should_autocleanup_merged_objects", it_should_autocleanup_merged_objects);
+    Test_Run("it_should_enforce_types_in_arrays", it_should_enforce_types_in_arrays);
+    Test_Run("it_should_not_set_type_when_array_contains_another_type", it_should_not_set_type_when_array_contains_another_type);
+    Test_Run("it_should_import_ints", it_should_import_ints);
+    Test_Run("it_should_import_floats", it_should_import_floats);
+    Test_Run("it_should_import_bools", it_should_import_bools);
+    Test_Run("it_should_import_strings", it_should_import_strings);
+    Test_Run("it_should_export_ints", it_should_export_ints);
+    Test_Run("it_should_export_floats", it_should_export_floats);
+    Test_Run("it_should_export_bools", it_should_export_bools);
+    Test_Run("it_should_export_strings", it_should_export_strings);
 
-    PrintToServer("it_should_trim_floats");
-    check_test(it_should_trim_floats());
-
-    PrintToServer("it_should_remove_meta_keys_from_arrays");
-    check_test(it_should_remove_meta_keys_from_arrays());
-
-    PrintToServer("it_should_remove_meta_keys_from_objects");
-    check_test(it_should_remove_meta_keys_from_objects());
-
-    PrintToServer("it_should_shift_array_down_after_removed_index");
-    check_test(it_should_shift_array_down_after_removed_index());
-
-    PrintToServer("it_should_not_merge_array_onto_object");
-    check_test(it_should_not_merge_array_onto_object());
-
-    PrintToServer("it_should_not_merge_object_onto_array");
-    check_test(it_should_not_merge_object_onto_array());
-
-    PrintToServer("it_should_merge_arrays");
-    check_test(it_should_merge_arrays());
-
-    PrintToServer("it_should_merge_objects_with_replacement");
-    check_test(it_should_merge_objects_with_replacement());
-
-    PrintToServer("it_should_merge_objects_without_replacement");
-    check_test(it_should_merge_objects_without_replacement());
-
-    PrintToServer("it_should_copy_flat_arrays");
-    check_test(it_should_copy_flat_arrays());
-
-    PrintToServer("it_should_copy_flat_objects");
-    check_test(it_should_copy_flat_objects());
-
-    PrintToServer("it_should_shallow_copy_arrays");
-    check_test(it_should_shallow_copy_arrays());
-
-    PrintToServer("it_should_shallow_copy_objects");
-    check_test(it_should_shallow_copy_objects());
-
-    PrintToServer("it_should_deep_copy_arrays");
-    check_test(it_should_deep_copy_arrays());
-
-    PrintToServer("it_should_deep_copy_objects");
-    check_test(it_should_deep_copy_objects());
-
-    PrintToServer("it_should_allow_single_quotes");
-    check_test(it_should_allow_single_quotes());
-
-    PrintToServer("it_should_return_default_values_for_missing_elements");
-    check_test(it_should_return_default_values_for_missing_elements());
-
-    PrintToServer("it_should_autocleanup_merged_objects");
-    check_test(it_should_autocleanup_merged_objects());
-
-    PrintToServer("it_should_enforce_types_in_arrays");
-    check_test(it_should_enforce_types_in_arrays());
-
-    PrintToServer("it_should_not_set_type_when_array_contains_another_type");
-    check_test(it_should_not_set_type_when_array_contains_another_type());
-
-    PrintToServer("it_should_import_ints");
-    check_test(it_should_import_ints());
-
-    PrintToServer("it_should_import_floats");
-    check_test(it_should_import_floats());
-
-    PrintToServer("it_should_import_bools");
-    check_test(it_should_import_bools());
-
-    PrintToServer("it_should_import_strings");
-    check_test(it_should_import_strings());
-
-    PrintToServer("it_should_export_ints");
-    check_test(it_should_export_ints());
-
-    PrintToServer("it_should_export_floats");
-    check_test(it_should_export_floats());
-
-    PrintToServer("it_should_export_bools");
-    check_test(it_should_export_bools());
-
-    PrintToServer("it_should_export_strings");
-    check_test(it_should_export_strings());
-
-    PrintToServer("");
-
-    #if HAS_PROFILER
-    profiler.Stop();
-    PrintToServer("Tests completed in %f seconds", profiler.Time);
-    #endif
-
-    PrintToServer("%d OK, %d FAILED", passed, failed);
+    Test_EndSection();
 }

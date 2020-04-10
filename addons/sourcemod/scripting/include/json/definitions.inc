@@ -147,7 +147,7 @@ stock void json_format_meta_key(char[] output, int max_size, const char[] key, J
  */
 stock bool json_is_meta_key(const char[] key)
 {
-    if (StrEqual(key, JSON_ARRAY_INDEX_KEY)) {
+    if (StrEqual(key, JSON_ARRAY_INDEX_KEY) || StrEqual(key, JSON_ARRAY_TYPE_KEY)) {
         return true;
     }
 

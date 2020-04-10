@@ -99,7 +99,11 @@ methodmap JSON_Object < StringMap
      * @section Metadata Getters
      */
 
-    public any GetMetadata(const char[] key, JSONMetaInfo meta, any default_value)
+    public any GetMetadata(
+        const char[] key,
+        JSONMetaInfo meta,
+        any default_value
+    )
     {
         int max_size = json_meta_key_length(key);
         char[] meta_key = new char[max_size];
@@ -110,7 +114,7 @@ methodmap JSON_Object < StringMap
         }
 
         any value;
-        return (this.GetValue(meta_key, value)) ? value : default_value;
+        return this.GetValue(meta_key, value) ? value : default_value;
     }
 
     /**
@@ -122,7 +126,9 @@ methodmap JSON_Object < StringMap
      */
     public JSONCellType GetKeyType(const char[] key)
     {
-        return view_as<JSONCellType>(this.GetMetadata(key, JSON_Meta_Type, JSON_Type_Invalid));
+        return view_as<JSONCellType>(
+            this.GetMetadata(key, JSON_Meta_Type, JSON_Type_Invalid)
+        );
     }
 
     /**
@@ -230,7 +236,7 @@ methodmap JSON_Object < StringMap
     public int GetInt(const char[] key, int default_value = -1)
     {
         int value;
-        return (this.GetValue(key, value)) ? value : default_value;
+        return this.GetValue(key, value) ? value : default_value;
     }
 
     /**
@@ -243,7 +249,7 @@ methodmap JSON_Object < StringMap
     public float GetFloat(const char[] key, float default_value = -1.0)
     {
         float value;
-        return (this.GetValue(key, value)) ? value : default_value;
+        return this.GetValue(key, value) ? value : default_value;
     }
 
     /**
@@ -256,7 +262,7 @@ methodmap JSON_Object < StringMap
     public bool GetBool(const char[] key, bool default_value = false)
     {
         bool value;
-        return (this.GetValue(key, value)) ? value : default_value;
+        return this.GetValue(key, value) ? value : default_value;
     }
 
     /**
@@ -266,7 +272,10 @@ methodmap JSON_Object < StringMap
      * @param default_value  Value to return if the key does not exist.
      * @returns             Value stored at key.
      */
-    public JSON_Object GetObject(const char[] key, JSON_Object default_value = null)
+    public JSON_Object GetObject(
+        const char[] key,
+        JSON_Object default_value = null
+    )
     {
         JSON_Object value;
         return this.GetValue(key, value) ? value : default_value;
@@ -376,17 +385,24 @@ methodmap JSON_Object < StringMap
     }
 
     /**
-     * Calls the json_encode method, replacing the 'obj' parameter with this instance.
+     * Calls the json_encode method, replacing the 'obj' parameter
+     * with this instance.
      *
      * @see json_encode
      */
-    public void Encode(char[] output, int max_size, int options = JSON_NONE, int depth = 0)
+    public void Encode(
+        char[] output,
+        int max_size,
+        int options = JSON_NONE,
+        int depth = 0
+    )
     {
         json_encode(this, output, max_size, options, depth);
     }
 
     /**
-     * Calls the json_merge method, replacing the 'to' parameter with this instance.
+     * Calls the json_merge method, replacing the 'to' parameter
+     * ith this instance.
      *
      * @see json_merge
      */
@@ -396,7 +412,8 @@ methodmap JSON_Object < StringMap
     }
 
     /**
-     * Calls the json_copy_shallow method, replacing the 'obj' parameter with this instance.
+     * Calls the json_copy_shallow method, replacing the 'obj' parameter
+     * with this instance.
      *
      * @see json_copy_shallow
      */
@@ -406,7 +423,8 @@ methodmap JSON_Object < StringMap
     }
 
     /**
-     * Calls the json_copy_deep method, replacing the 'obj' parameter with this instance.
+     * Calls the json_copy_deep method, replacing the 'obj' parameter
+     * with this instance.
      *
      * @see json_copy_deep
      */
@@ -416,7 +434,8 @@ methodmap JSON_Object < StringMap
     }
 
     /**
-     * Calls the json_cleanup method, replacing the 'obj' parameter with this instance.
+     * Calls the json_cleanup method, replacing the 'obj' parameter
+     * with this instance.
      *
      * @see json_cleanup
      */

@@ -71,7 +71,7 @@
 // The longest representable integer ("-2147483648") + NULL terminator
 #define JSON_INT_BUFFER_SIZE 12
 
-// You may need to change this if you are working with large floating point numbers.
+// You may need to change this if you are working with large floats.
 #define JSON_FLOAT_BUFFER_SIZE 32
 
 // "true"|"false" + NULL terminator
@@ -111,7 +111,9 @@ enum JSONMetaInfo {
 /**
  * An array of all possible meta info values.
  */
-JSONMetaInfo[] JSON_ALL_METADATA = { JSON_Meta_Type, JSON_Meta_Length, JSON_Meta_Hidden };
+JSONMetaInfo[] JSON_ALL_METADATA = {
+    JSON_Meta_Type, JSON_Meta_Length, JSON_Meta_Hidden
+};
 
 /**
  * Calculates the length required to store a meta key
@@ -134,20 +136,28 @@ stock int json_meta_key_length(const char[] key)
  * @param key       Key to generate metakey for.
  * @param meta      Meta information to generate metakey for.
  */
-stock void json_format_meta_key(char[] output, int max_size, const char[] key, JSONMetaInfo meta)
+stock void json_format_meta_key(
+    char[] output,
+    int max_size,
+    const char[] key,
+    JSONMetaInfo meta
+)
 {
     FormatEx(output, max_size, "%s:%d", key, view_as<int>(meta));
 }
 
 /**
- * Checks whether the key provided is a meta-key that should only be used internally.
+ * Checks whether the key provided is a metadata key.
  *
  * @param key   Key to check.
  * @returns     True when it is a meta-key, false otherwise.
  */
 stock bool json_is_meta_key(const char[] key)
 {
-    if (StrEqual(key, JSON_ARRAY_INDEX_KEY) || StrEqual(key, JSON_ARRAY_TYPE_KEY)) {
+    if (
+        StrEqual(key, JSON_ARRAY_INDEX_KEY)
+        || StrEqual(key, JSON_ARRAY_TYPE_KEY)
+    ) {
         return true;
     }
 

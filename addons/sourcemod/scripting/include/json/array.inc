@@ -710,7 +710,12 @@ methodmap JSON_Array < JSON_Object
             this.SetKeyHidden(target, this.GetKeyHidden(i));
 
             char current_key[JSON_INT_BUFFER_SIZE];
-            if (this.GetIndexAsString(i, current_key, sizeof(current_key), false)) {
+            if (this.GetIndexAsString(
+                i,
+                current_key,
+                sizeof(current_key),
+                false
+            )) {
                 this.Super.Remove(current_key);
             }
         }
@@ -846,7 +851,11 @@ methodmap JSON_Array < JSON_Object
      * @param values    Array to export to.
      * @param size      Size of array.
      */
-    public void ExportStrings(char[][] values, int max_size, int max_string_size)
+    public void ExportStrings(
+        char[][] values,
+        int max_size,
+        int max_string_size
+    )
     {
         if (this.Length < max_size) {
             max_size = this.Length;
@@ -881,8 +890,8 @@ methodmap JSON_Array < JSON_Object
     }
 
     /**
-     * Calls the json_copy_shallow method, replacing the 'obj' parameter with this instance
-     * and casting the return value to an array.
+     * Calls the json_copy_shallow method, replacing the 'obj' parameter
+     * with this instance and casting the return value to an array.
      *
      * @see json_copy_shallow
      */
@@ -892,8 +901,8 @@ methodmap JSON_Array < JSON_Object
     }
 
     /**
-     * Calls the json_copy_deep method, replacing the 'obj' parameter with this instance
-     * and casting the return value to an array.
+     * Calls the json_copy_deep method, replacing the 'obj' parameter
+     * with this instance and casting the return value to an array.
      *
      * @see json_copy_deep
      */

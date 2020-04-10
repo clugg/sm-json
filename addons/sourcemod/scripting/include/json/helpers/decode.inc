@@ -64,7 +64,8 @@ stock bool json_is_whitespace(const char[] buffer)
  * of the buffer is the start of a string.
  *
  * @param buffer                String buffer of data.
- * @param allow_single_quotes   Should strings wrapped in single quotes be accepted?
+ * @param allow_single_quotes   Should strings wrapped in
+ *                              single quotes be accepted?
  * @returns                     True if the first character in the buffer
  *                              is the start of a string, false otherwise.
  */
@@ -442,7 +443,7 @@ stock bool json_extract_string(
                 preceding_backslashes += 1;
             }
 
-            // if we have an even number of backslashes, the quote is not escaped
+            // if we have an even number of backslashes, the quote isn't escaped
             if (preceding_backslashes % 2 == 0) {
                 break;
             }

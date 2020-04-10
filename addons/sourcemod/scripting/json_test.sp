@@ -822,7 +822,7 @@ void it_should_enforce_types_in_arrays()
     json_cleanup_and_delete(arr);
 }
 
-void it_should_not_set_type_when_array_contains_another_type()
+void it_should_not_set_type_on_inconsistent_array()
 {
     JSON_Array arr = new JSON_Array();
     arr.PushObject(null);
@@ -1039,7 +1039,7 @@ public void OnPluginStart()
     Test_Run("it_should_return_default_values_for_missing_elements", it_should_return_default_values_for_missing_elements);
     Test_Run("it_should_autocleanup_merged_objects", it_should_autocleanup_merged_objects);
     Test_Run("it_should_enforce_types_in_arrays", it_should_enforce_types_in_arrays);
-    Test_Run("it_should_not_set_type_when_array_contains_another_type", it_should_not_set_type_when_array_contains_another_type);
+    Test_Run("it_should_not_set_type_on_inconsistent_array", it_should_not_set_type_on_inconsistent_array);
     Test_Run("it_should_import_ints", it_should_import_ints);
     Test_Run("it_should_import_floats", it_should_import_floats);
     Test_Run("it_should_import_bools", it_should_import_bools);

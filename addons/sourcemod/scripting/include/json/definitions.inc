@@ -2,7 +2,7 @@
  * vim: set ts=4 :
  * =============================================================================
  * sm-json
- * Provides a pure SourcePawn implementation of JSON encoding and decoding.
+ * A pure SourcePawn JSON encoder/decoder.
  * https://github.com/clugg/sm-json
  *
  * sm-json (C)2020 James Dickens. (clug)

@@ -711,7 +711,7 @@ A number of common tests have been written [here](addons/sourcemod/scripting/jso
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
-Please ensure that all tests pass before making a pull request.
+Please ensure that all tests pass before making a pull request. The test plugin uses the [sm-testsuite](https://github.com/clugg/sm-testsuite) library, which you will need to download separately.
 
 If you are fixing a bug, please add a regression test to ensure that the bug does not sneak back in. If you are adding a feature, please add tests to ensure that it works as expected.
 

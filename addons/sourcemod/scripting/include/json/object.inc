@@ -260,19 +260,6 @@ methodmap JSON_Object < StringMap
     }
 
     /**
-     * Retrieves null stored at a key.
-     *
-     * @param key           Key to retrieve null value for.
-     * @param default_value  Value to return if the key does not exist.
-     * @returns             Value stored at key.
-     */
-    public Handle GetNull(const char[] key, Handle default_value = null)
-    {
-        Handle value;
-        return (this.GetValue(key, value)) ? value : default_value;
-    }
-
-    /**
      * Retrieves the JSON object stored at a key.
      *
      * @param key           Key to retrieve object value for.
@@ -340,18 +327,6 @@ methodmap JSON_Object < StringMap
     {
         return this.SetValue(key, value)
             && this.SetKeyType(key, JSON_Type_Bool);
-    }
-
-    /**
-     * Sets null at a key.
-     *
-     * @param key       Key to set to null.
-     * @returns         True on success, false otherwise.
-     */
-    public bool SetNull(const char[] key)
-    {
-        return this.SetValue(key, view_as<Handle>(null))
-            && this.SetKeyType(key, JSON_Type_Null);
     }
 
     /**

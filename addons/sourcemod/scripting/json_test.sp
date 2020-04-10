@@ -246,7 +246,7 @@ bool it_should_support_objects()
         && obj.SetFloat("negative_float_zero", -0.0)
         && obj.SetBool("true", true)
         && obj.SetBool("false", false)
-        && obj.SetNull("handle");
+        && obj.SetObject("handle", null);
 
     print_json(obj);
     json_cleanup_and_delete(obj);
@@ -328,7 +328,7 @@ bool it_should_support_objects()
         success = false;
     }
 
-    if ((hndl = decoded_obj.GetNull("handle")) != null) {
+    if ((hndl = decoded_obj.GetObject("handle")) != null) {
         LogError("json_test: unexpected value for key handle: %d", view_as<int>(hndl));
         success = false;
     }
@@ -353,7 +353,7 @@ bool it_should_support_arrays()
         && arr.PushFloat(-0.0) > -1
         && arr.PushBool(true) > -1
         && arr.PushBool(false) > -1
-        && arr.PushNull() > -1;
+        && arr.PushObject(null) > -1;
 
     print_json(arr);
     json_cleanup_and_delete(arr);
@@ -436,7 +436,7 @@ bool it_should_support_arrays()
         success = false;
     }
 
-    if ((hndl = decoded_arr.GetNull(index++)) != null) {
+    if ((hndl = decoded_arr.GetObject(index++)) != null) {
         LogError("json_test: unexpected value for index %d: %d", index, view_as<int>(hndl));
         success = false;
     }
@@ -574,7 +574,7 @@ bool it_should_pretty_print()
     child_arr.PushObject(new JSON_Array());
 
     JSON_Object child_obj = new JSON_Object();
-    child_obj.SetNull("im_indented");
+    child_obj.SetObject("im_indented", null);
     child_obj.SetObject("second_depth", child_arr);
 
     JSON_Object parent_obj = new JSON_Object();
@@ -973,12 +973,12 @@ bool it_should_return_default_values_for_missing_elements()
     bool success = obj.GetInt("_", 1) == 1
         && obj.GetFloat("_", 1.0) == 1.0
         && obj.GetBool("_", true) == true
-        && obj.GetNull("_", null) == null
+        && obj.GetObject("_", null) == null
         && obj.GetObject("_", obj) == obj
         && arr.GetInt(0, 1) == 1
         && arr.GetFloat(0, 1.0) == 1.0
         && arr.GetBool(0, true) == true
-        && arr.GetNull(0, null) == null
+        && arr.GetObject(0, null) == null
         && arr.GetObject(0, arr) == arr;
 
     json_cleanup_and_delete(obj);
@@ -1044,7 +1044,7 @@ bool it_should_enforce_types_in_arrays()
         && arr.PushFloat(-0.0) == -1
         && arr.PushBool(true) == -1
         && arr.PushBool(false) == -1
-        && arr.PushNull() == -1;
+        && arr.PushObject(null) == -1;
 
     print_json(arr);
     json_cleanup_and_delete(arr);
@@ -1061,7 +1061,7 @@ bool it_should_enforce_types_in_arrays()
 bool it_should_not_set_type_when_array_contains_another_type()
 {
     JSON_Array arr = new JSON_Array();
-    arr.PushNull();
+    arr.PushObject(null);
     bool success = ! arr.SetType(JSON_Type_Int);
 
     print_json(arr);

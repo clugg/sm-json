@@ -96,7 +96,6 @@ enum JSONCellType {
     JSON_Type_Int,
     JSON_Type_Float,
     JSON_Type_Bool,
-    JSON_Type_Null,
     JSON_Type_Object
 };
 

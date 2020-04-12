@@ -63,19 +63,11 @@ stock void json_encode(
 {
     bool pretty_print = (options & JSON_ENCODE_PRETTY) != 0;
 
-    bool is_empty = true;
     bool is_array = obj.IsArray;
     JSON_Array arr = null;
     if (is_array) {
         arr = view_as<JSON_Array>(obj);
     }
-
-    int builder_size;
-
-    // used in key iterator
-    int str_length = 1;
-    JSON_Object child = null;
-    int cell_length = 0;
 
     StringMapSnapshot snap = null;
     int json_size = 0;
@@ -89,6 +81,13 @@ stock void json_encode(
 
         strcopy(output, max_size, "{");
     }
+
+    // used in key iterator
+    int builder_size = 0;
+    int str_length = 1;
+    JSON_Object child = null;
+    int cell_length = 0;
+    bool is_empty = true;
 
     int key_length = 0;
     for (int i = 0; i < json_size; i += 1) {
@@ -308,11 +307,14 @@ stock JSON_Object json_decode(
             return null;
         }
 
-        // if we are at the end of an object or array
-        // and haven't checked for empty yet, we can stop here (empty structure)
-        if ((! is_array && json_is_object_end(buffer[pos])
-            || is_array && json_is_array_end(buffer[pos]))
-            && ! empty_checked) {
+        // if we haven't checked for empty yet and we are at the end
+        // of an object or array, we can stop here (empty structure)
+        if (
+            ! empty_checked && (
+                ! is_array && json_is_object_end(buffer[pos])
+                || is_array && json_is_array_end(buffer[pos])
+            )
+        ) {
             break;
         }
 
@@ -500,11 +502,7 @@ stock JSON_Object json_decode(
     }
 
     JSON_Object result;
-    if (is_array) {
-        result = view_as<JSON_Object>(arr);
-    } else {
-        result = view_as<JSON_Object>(obj);
-    }
+    result = is_array ? view_as<JSON_Object>(arr) : view_as<JSON_Object>(obj);
 
     return result;
 }

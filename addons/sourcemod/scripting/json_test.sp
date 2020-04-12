@@ -182,7 +182,7 @@ methodmap Player < JSON_Object
 void it_should_decode(char[] data)
 {
     JSON_Object obj = json_decode(data);
-    if (Test_AssertNotEqual("obj", obj, view_as<Handle>(null))) {
+    if (Test_AssertNotNull("obj", obj)) {
         json_cleanup_and_delete(obj);
     }
 }
@@ -190,7 +190,7 @@ void it_should_decode(char[] data)
 void it_should_not_decode(char[] data)
 {
     JSON_Object obj = json_decode(data);
-    if (! Test_AssertEqual("obj", obj, view_as<Handle>(null))) {
+    if (! Test_AssertNull("obj", obj)) {
         obj.Encode(json_encode_output, sizeof(json_encode_output));
         LogError(
             "json_test: malformed JSON was parsed as valid: %s",
@@ -238,7 +238,7 @@ void it_should_support_objects()
     json_cleanup_and_delete(obj);
 
     JSON_Object decoded = json_decode(json_encode_output);
-    if (! Test_AssertNotEqual("decoded", decoded, view_as<Handle>(null))) {
+    if (! Test_AssertNotNull("decoded", decoded)) {
         // if this assertion fails, testing cannot continue
         return;
     }
@@ -256,7 +256,7 @@ void it_should_support_objects()
     Test_AssertFloatsEqual("decoded float zero", decoded.GetFloat("float_zero"), 0.0);
     Test_AssertTrue("decoded true", decoded.GetBool("true"));
     Test_AssertFalse("decoded false", decoded.GetBool("false"));
-    Test_AssertEqual("decoded handle", decoded.GetObject("handle"), view_as<Handle>(null));
+    Test_AssertNull("decoded handle", decoded.GetObject("handle"));
 
     json_cleanup_and_delete(decoded);
 }
@@ -282,7 +282,7 @@ void it_should_support_arrays()
     JSON_Array decoded = view_as<JSON_Array>(
         json_decode(json_encode_output)
     );
-    if (! Test_AssertNotEqual("decoded", decoded, view_as<Handle>(null))) {
+    if (! Test_AssertNotNull("decoded", decoded)) {
         // if this assertion fails, testing cannot continue
         return;
     }
@@ -301,7 +301,7 @@ void it_should_support_arrays()
     Test_AssertFloatsEqual("decoded float zero", decoded.GetFloat(index++), 0.0);
     Test_AssertTrue("decoded true", decoded.GetBool(index++));
     Test_AssertFalse("decoded false", decoded.GetBool(index++));
-    Test_AssertEqual("decoded handle", decoded.GetObject(index++), view_as<Handle>(null));
+    Test_AssertNull("decoded handle", decoded.GetObject(index++));
 
     json_cleanup_and_delete(decoded);
 }
@@ -384,8 +384,6 @@ void it_should_support_nested_methodmaps()
     Weapon weapon = new Weapon();
     weapon.id = 1;
     weapon.SetName("ak47");
-
-    Test_AssertEqual("weapon.id", weapon.id, 1);
 
     Player player = new Player();
     player.id = 1;
@@ -740,22 +738,26 @@ void it_should_allow_single_quotes()
             JSON_DECODE_SINGLE_QUOTES
         )
     );
-    print_json(arr);
 
-    Test_AssertEqual("array length", arr.Length, 6);
+    if (Test_AssertNotNull("array", arr)) {
+        print_json(arr);
+        Test_AssertEqual("array length", arr.Length, 6);
 
-    json_cleanup_and_delete(arr);
+        json_cleanup_and_delete(arr);
+    }
 
     // object
     JSON_Object obj = json_decode(
         "{'key': \"value\"}",
         JSON_DECODE_SINGLE_QUOTES
     );
-    print_json(obj);
 
-    Test_AssertTrue("object has key", obj.HasKey("key"));
+    if (Test_AssertNotNull("object", obj)) {
+        print_json(obj);
+        Test_AssertTrue("object has key", obj.HasKey("key"));
 
-    json_cleanup_and_delete(obj);
+        json_cleanup_and_delete(obj);
+    }
 }
 
 void it_should_return_default_values_for_missing_elements()
@@ -764,9 +766,9 @@ void it_should_return_default_values_for_missing_elements()
     JSON_Array arr = new JSON_Array();
 
     Test_AssertEqual("array default int value", arr.GetInt(0, 1), 1);
-    Test_AssertEqual("array default float value", arr.GetFloat(0, 1.0), 1.0);
-    Test_AssertEqual("array default bool value", arr.GetBool(0, true), true);
-    Test_AssertEqual("array default null value", arr.GetObject(0, null), view_as<Handle>(null));
+    Test_AssertFloatsEqual("array default float value", arr.GetFloat(0, 1.0), 1.0);
+    Test_AssertTrue("array default bool value", arr.GetBool(0, true));
+    Test_AssertNull("array default null value", arr.GetObject(0, null));
     Test_AssertEqual("array default arr value", arr.GetObject(0, arr), arr);
 
     json_cleanup_and_delete(arr);
@@ -775,9 +777,9 @@ void it_should_return_default_values_for_missing_elements()
     JSON_Object obj = new JSON_Object();
 
     Test_AssertEqual("object default int value", obj.GetInt("_", 1), 1);
-    Test_AssertEqual("object default float value", obj.GetFloat("_", 1.0), 1.0);
-    Test_AssertEqual("object default bool value", obj.GetBool("_", true), true);
-    Test_AssertEqual("object default null value", obj.GetObject("_", null), view_as<Handle>(null));
+    Test_AssertFloatsEqual("object default float value", obj.GetFloat("_", 1.0), 1.0);
+    Test_AssertTrue("object default bool value", obj.GetBool("_", true));
+    Test_AssertNull("object default null value", obj.GetObject("_", null));
     Test_AssertEqual("object default obj value", obj.GetObject("_", obj), obj);
 
     json_cleanup_and_delete(obj);
@@ -952,6 +954,7 @@ void it_should_export_strings()
 
 public void OnPluginStart()
 {
+    Test_SetBoxWidth(74);
     Test_StartSection("sm-json test suite");
 
     Test_Run("it_should_encode_empty_objects", it_should_encode_empty_objects);

@@ -24,7 +24,7 @@ jobs:
           version: ${{ matrix.sm_version }}
 
       - name: Download sm-testsuite
-        run: curl https://raw.githubusercontent.com/clugg/sm-testsuite/v1.0.0/addons/sourcemod/scripting/include/testsuite.inc -o $SCRIPTS_PATH/include/testsuite.inc
+        run: curl https://raw.githubusercontent.com/clugg/sm-testsuite/v1.1.0/addons/sourcemod/scripting/include/testsuite.inc -o $SCRIPTS_PATH/include/testsuite.inc
 
       - name: Compile Plugin
         run: spcomp $SCRIPTS_PATH/json_test.sp -i$SCRIPTS_PATH/include -O2 -t4 -v2 -w234

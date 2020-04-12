@@ -64,7 +64,7 @@ void print_json(JSON_Object obj, int options = JSON_NONE)
 
 bool check_array_remove(JSON_Array arr, int index)
 {
-    PrintToServer("Removing element at index %d", index);
+    Test_Output("Removing element at index %d", index);
 
     // get current value at index
     JSONCellType type = arr.GetKeyType(index);
@@ -204,7 +204,7 @@ void it_should_not_decode(char[] data)
 void it_should_encode_empty_objects()
 {
     JSON_Object obj = new JSON_Object();
-    print_json(obj);
+    obj.Encode(json_encode_output, sizeof(json_encode_output));
     json_cleanup_and_delete(obj);
 
     Test_AssertStringsEqual("output", json_encode_output, "{}");
@@ -213,7 +213,7 @@ void it_should_encode_empty_objects()
 void it_should_encode_empty_arrays()
 {
     JSON_Array arr = new JSON_Array();
-    print_json(arr);
+    arr.Encode(json_encode_output, sizeof(json_encode_output));
     json_cleanup_and_delete(arr);
 
     Test_AssertStringsEqual("output", json_encode_output, "[]");
@@ -315,9 +315,9 @@ void it_should_support_objects_nested_in_objects()
     obj.SetBool("nested", false);
     obj.SetObject("object", nested_obj);
 
+    print_json(obj);
     Test_AssertTrue("nested", obj.GetObject("object").GetBool("nested"));
 
-    print_json(obj);
     json_cleanup_and_delete(obj);
 }
 
@@ -329,9 +329,9 @@ void it_should_support_objects_nested_in_arrays()
     JSON_Array arr = new JSON_Array();
     arr.PushObject(nested_obj);
 
+    print_json(arr);
     Test_AssertTrue("nested", arr.GetObject(0).GetBool("nested"));
 
-    print_json(arr);
     json_cleanup_and_delete(arr);
 }
 
@@ -343,10 +343,10 @@ void it_should_support_arrays_nested_in_objects()
     JSON_Object obj = new JSON_Object();
     obj.SetObject("array", nested_arr);
 
+    print_json(obj);
     JSON_Array obj_array = view_as<JSON_Array>(obj.GetObject("array"));
     Test_AssertTrue("nested", obj_array.GetBool(0));
 
-    print_json(obj);
     json_cleanup_and_delete(obj);
 }
 
@@ -358,10 +358,10 @@ void it_should_support_arrays_nested_in_arrays()
     JSON_Array arr = new JSON_Array();
     arr.PushObject(nested_arr);
 
+    print_json(arr);
     JSON_Array arr_array = view_as<JSON_Array>(arr.GetObject(0));
     Test_AssertTrue("nested", arr_array.GetBool(0));
 
-    print_json(arr);
     json_cleanup_and_delete(arr);
 }
 
@@ -391,11 +391,11 @@ void it_should_support_nested_methodmaps()
     player.id = 1;
     player.weapon = weapon;
 
+    print_json(player);
     Test_AssertEqual("player.weapon.id", weapon.id, 1);
     player.weapon.id = 2;
     Test_AssertEqual("player.weapon.id", weapon.id, 2);
 
-    print_json(player);
     json_cleanup_and_delete(player);
 }
 
@@ -413,20 +413,32 @@ void it_should_pretty_print()
     parent_obj.SetBool("pretty_printing", true);
     parent_obj.SetObject("first_depth", child_obj);
 
-    print_json(parent_obj, JSON_ENCODE_PRETTY);
+    parent_obj.Encode(
+        json_encode_output,
+        sizeof(json_encode_output),
+        JSON_ENCODE_PRETTY
+    );
     json_cleanup_and_delete(parent_obj);
 
     Test_AssertStringsEqual("output", json_encode_output, "{\n    \"first_depth\": {\n        \"im_indented\": null,\n        \"second_depth\": [\n            1,\n            []\n        ]\n    },\n    \"pretty_printing\": true\n}");
 
     JSON_Array empty_arr = new JSON_Array();
-    print_json(empty_arr, JSON_ENCODE_PRETTY);
+    empty_arr.Encode(
+        json_encode_output,
+        sizeof(json_encode_output),
+        JSON_ENCODE_PRETTY
+    );
     json_cleanup_and_delete(empty_arr);
 
     Test_AssertStringsEqual("output", json_encode_output, "[]");
 
-    JSON_Object empty_object = new JSON_Object();
-    print_json(empty_object, JSON_ENCODE_PRETTY);
-    json_cleanup_and_delete(empty_object);
+    JSON_Object empty_obj = new JSON_Object();
+    empty_obj.Encode(
+        json_encode_output,
+        sizeof(json_encode_output),
+        JSON_ENCODE_PRETTY
+    );
+    json_cleanup_and_delete(empty_obj);
 
     Test_AssertStringsEqual("output", json_encode_output, "{}");
 }
@@ -441,7 +453,7 @@ void it_should_trim_floats()
     arr.PushFloat(-1.0);
     arr.PushFloat(-10.01);
 
-    print_json(arr);
+    arr.Encode(json_encode_output, sizeof(json_encode_output));
     json_cleanup_and_delete(arr);
 
     Test_AssertStringsEqual("output", json_encode_output, "[0.0,1.0,10.01,-0.0,-1.0,-10.01]");
@@ -778,7 +790,7 @@ void it_should_autocleanup_merged_objects()
     JSON_Object nested1 = new JSON_Object();
     JSON_Object nested2 = new JSON_Object();
 
-    // ensure that both handles are valid after merging without replacement
+    Test_Output("merging without replacement");
     obj1.SetObject("nested", nested1);
     obj2.SetObject("nested", nested2);
     obj1.Merge(obj2, JSON_MERGE_CLEANUP);
@@ -786,7 +798,7 @@ void it_should_autocleanup_merged_objects()
     Test_AssertTrue("nested1 is valid", IsValidHandle(nested1));
     Test_AssertTrue("nested2 is valid", IsValidHandle(nested2));
 
-    // ensure that both handles are valid after replace no-cleanup merge
+    Test_Output("merging with replacement and without cleanup");
     obj1.SetObject("nested", nested1);
     obj2.SetObject("nested", nested2);
     obj1.Merge(obj2, JSON_MERGE_REPLACE);
@@ -794,7 +806,7 @@ void it_should_autocleanup_merged_objects()
     Test_AssertTrue("nested1 is valid", IsValidHandle(nested1));
     Test_AssertTrue("nested2 is valid", IsValidHandle(nested2));
 
-    // ensure that overriden handle is invalid after replace cleanup merge
+    Test_Output("merging with replacement and with cleanup");
     obj1.SetObject("nested", nested1);
     obj2.SetObject("nested", nested2);
     obj1.Merge(obj2, JSON_MERGE_REPLACE | JSON_MERGE_CLEANUP);
@@ -818,7 +830,6 @@ void it_should_enforce_types_in_arrays()
     Test_AssertEqual("push bool", arr.PushBool(true), -1);
     Test_AssertEqual("push null", arr.PushObject(null), -1);
 
-    print_json(arr);
     json_cleanup_and_delete(arr);
 }
 
@@ -829,7 +840,6 @@ void it_should_not_set_type_on_inconsistent_array()
 
     Test_AssertFalse("result", arr.SetType(JSON_Type_Int));
 
-    print_json(arr);
     json_cleanup_and_delete(arr);
 }
 
@@ -839,7 +849,7 @@ void it_should_import_ints()
     JSON_Array arr = new JSON_Array();
     Test_AssertTrue("import result", arr.ImportValues(JSON_Type_Int, ints, sizeof(ints)));
 
-    print_json(arr);
+    arr.Encode(json_encode_output, sizeof(json_encode_output));
     json_cleanup_and_delete(arr);
 
     Test_AssertStringsEqual("output", json_encode_output, "[1,2,3]");
@@ -851,7 +861,7 @@ void it_should_import_floats()
     JSON_Array arr = new JSON_Array();
     Test_AssertTrue("import result", arr.ImportValues(JSON_Type_Float, floats, sizeof(floats)));
 
-    print_json(arr);
+    arr.Encode(json_encode_output, sizeof(json_encode_output));
     json_cleanup_and_delete(arr);
 
     Test_AssertStringsEqual("output", json_encode_output, "[1.1,2.2,3.3]");
@@ -863,7 +873,7 @@ void it_should_import_bools()
     JSON_Array arr = new JSON_Array();
     Test_AssertTrue("import result", arr.ImportValues(JSON_Type_Bool, bools, sizeof(bools)));
 
-    print_json(arr);
+    arr.Encode(json_encode_output, sizeof(json_encode_output));
     json_cleanup_and_delete(arr);
 
     Test_AssertStringsEqual("output", json_encode_output, "[true,false]");
@@ -875,7 +885,7 @@ void it_should_import_strings()
     JSON_Array arr = new JSON_Array();
     Test_AssertTrue("import result", arr.ImportStrings(strings, sizeof(strings)));
 
-    print_json(arr);
+    arr.Encode(json_encode_output, sizeof(json_encode_output));
     json_cleanup_and_delete(arr);
 
     Test_AssertStringsEqual("output", json_encode_output, "[\"hello\",\"world\"]");
@@ -965,7 +975,7 @@ public void OnPluginStart()
     };
     for (int i = 0; i < sizeof(should_decode); i += 1) {
         Test_BeforeRun("it_should_decode");
-        Test_Output(should_decode[i]);
+        Test_Output("index %d", i);
         it_should_decode(should_decode[i]);
         Test_AfterRun();
     }
@@ -1014,7 +1024,7 @@ public void OnPluginStart()
     };
     for (int i = 0; i < sizeof(should_not_decode); i += 1) {
         Test_BeforeRun("it_should_not_decode");
-        Test_Output(should_not_decode[i]);
+        Test_Output("index %d", i);
         it_should_not_decode(should_not_decode[i]);
         Test_AfterRun();
     }

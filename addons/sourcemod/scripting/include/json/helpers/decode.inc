@@ -253,7 +253,7 @@ stock bool json_is_null(const char[] buffer)
  * @returns         True if the first character in the buffer is
  *                  the start of an object, false otherwise.
  */
-stock bool json_is_object(const char[] buffer)
+stock bool json_is_object_start(const char[] buffer)
 {
     return buffer[0] == '{';
 }
@@ -279,7 +279,7 @@ stock bool json_is_object_end(const char[] buffer)
  * @returns         True if the first character in the buffer is
  *                  the start of an array, false otherwise.
  */
-stock bool json_is_array(const char[] buffer)
+stock bool json_is_array_start(const char[] buffer)
 {
     return buffer[0] == '[';
 }

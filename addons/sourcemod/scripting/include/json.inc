@@ -271,10 +271,10 @@ stock JSON_Object json_decode(
     bool is_array = false;
     JSON_Array arr = null;
     JSON_Object obj = null;
-    if (json_is_object(buffer[pos])) {
+    if (json_is_object_start(buffer[pos])) {
         is_array = false;
         obj = new JSON_Object();
-    } else if (json_is_array(buffer[pos])) {
+    } else if (json_is_array_start(buffer[pos])) {
         is_array = true;
         arr = new JSON_Array();
     } else {
@@ -367,7 +367,10 @@ stock JSON_Object json_decode(
             }
         }
 
-        if (json_is_object(buffer[pos]) || json_is_array(buffer[pos])) {
+        if (
+            json_is_object_start(buffer[pos])
+            || json_is_array_start(buffer[pos])
+        ) {
             // if we are dealing with an object or array, decode recursively
             JSON_Object value = json_decode(buffer, options, pos, depth + 1);
 

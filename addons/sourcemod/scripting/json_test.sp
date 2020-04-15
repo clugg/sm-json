@@ -56,12 +56,27 @@ char json_encode_output[1024];
  * @section Helpers
  */
 
-void print_json(JSON_Object obj, int options = JSON_NONE)
+/**
+ * Encodes a JSON_Object to a hardcoded output.
+ */
+void _json_encode(JSON_Object obj, int options = JSON_NONE)
 {
     obj.Encode(json_encode_output, sizeof(json_encode_output), options);
+}
+
+/**
+ * Encodes a JSON_Object and prints it to the test output.
+ */
+void print_json(JSON_Object obj, int options = JSON_NONE)
+{
+    _json_encode(obj, options);
     Test_Output("%s", json_encode_output);
 }
 
+/**
+ * Removes the specified index from the array and confirms
+ * that the removed value no longer exists.
+ */
 bool check_array_remove(JSON_Array arr, int index)
 {
     Test_Output("Removing element at index %d", index);
@@ -191,7 +206,7 @@ void it_should_not_decode(char[] data)
 {
     JSON_Object obj = json_decode(data);
     if (! Test_AssertNull("obj", obj)) {
-        obj.Encode(json_encode_output, sizeof(json_encode_output));
+        _json_encode(obj);
         LogError(
             "json_test: malformed JSON was parsed as valid: %s",
             json_encode_output
@@ -204,7 +219,7 @@ void it_should_not_decode(char[] data)
 void it_should_encode_empty_objects()
 {
     JSON_Object obj = new JSON_Object();
-    obj.Encode(json_encode_output, sizeof(json_encode_output));
+    _json_encode(obj);
     json_cleanup_and_delete(obj);
 
     Test_AssertStringsEqual("output", json_encode_output, "{}");
@@ -213,7 +228,7 @@ void it_should_encode_empty_objects()
 void it_should_encode_empty_arrays()
 {
     JSON_Array arr = new JSON_Array();
-    arr.Encode(json_encode_output, sizeof(json_encode_output));
+    _json_encode(arr);
     json_cleanup_and_delete(arr);
 
     Test_AssertStringsEqual("output", json_encode_output, "[]");
@@ -411,31 +426,19 @@ void it_should_pretty_print()
     parent_obj.SetBool("pretty_printing", true);
     parent_obj.SetObject("first_depth", child_obj);
 
-    parent_obj.Encode(
-        json_encode_output,
-        sizeof(json_encode_output),
-        JSON_ENCODE_PRETTY
-    );
+    _json_encode(parent_obj, JSON_ENCODE_PRETTY);
     json_cleanup_and_delete(parent_obj);
 
     Test_AssertStringsEqual("output", json_encode_output, "{\n    \"first_depth\": {\n        \"im_indented\": null,\n        \"second_depth\": [\n            1,\n            []\n        ]\n    },\n    \"pretty_printing\": true\n}");
 
     JSON_Array empty_arr = new JSON_Array();
-    empty_arr.Encode(
-        json_encode_output,
-        sizeof(json_encode_output),
-        JSON_ENCODE_PRETTY
-    );
+    _json_encode(empty_arr, JSON_ENCODE_PRETTY);
     json_cleanup_and_delete(empty_arr);
 
     Test_AssertStringsEqual("output", json_encode_output, "[]");
 
     JSON_Object empty_obj = new JSON_Object();
-    empty_obj.Encode(
-        json_encode_output,
-        sizeof(json_encode_output),
-        JSON_ENCODE_PRETTY
-    );
+    _json_encode(empty_obj, JSON_ENCODE_PRETTY);
     json_cleanup_and_delete(empty_obj);
 
     Test_AssertStringsEqual("output", json_encode_output, "{}");
@@ -451,7 +454,7 @@ void it_should_trim_floats()
     arr.PushFloat(-1.0);
     arr.PushFloat(-10.01);
 
-    arr.Encode(json_encode_output, sizeof(json_encode_output));
+    _json_encode(arr);
     json_cleanup_and_delete(arr);
 
     Test_AssertStringsEqual("output", json_encode_output, "[0.0,1.0,10.01,-0.0,-1.0,-10.01]");
@@ -851,7 +854,7 @@ void it_should_import_ints()
     JSON_Array arr = new JSON_Array();
     Test_AssertTrue("import result", arr.ImportValues(JSON_Type_Int, ints, sizeof(ints)));
 
-    arr.Encode(json_encode_output, sizeof(json_encode_output));
+    _json_encode(arr);
     json_cleanup_and_delete(arr);
 
     Test_AssertStringsEqual("output", json_encode_output, "[1,2,3]");
@@ -863,7 +866,7 @@ void it_should_import_floats()
     JSON_Array arr = new JSON_Array();
     Test_AssertTrue("import result", arr.ImportValues(JSON_Type_Float, floats, sizeof(floats)));
 
-    arr.Encode(json_encode_output, sizeof(json_encode_output));
+    _json_encode(arr);
     json_cleanup_and_delete(arr);
 
     Test_AssertStringsEqual("output", json_encode_output, "[1.1,2.2,3.3]");
@@ -875,7 +878,7 @@ void it_should_import_bools()
     JSON_Array arr = new JSON_Array();
     Test_AssertTrue("import result", arr.ImportValues(JSON_Type_Bool, bools, sizeof(bools)));
 
-    arr.Encode(json_encode_output, sizeof(json_encode_output));
+    _json_encode(arr);
     json_cleanup_and_delete(arr);
 
     Test_AssertStringsEqual("output", json_encode_output, "[true,false]");
@@ -887,7 +890,7 @@ void it_should_import_strings()
     JSON_Array arr = new JSON_Array();
     Test_AssertTrue("import result", arr.ImportStrings(strings, sizeof(strings)));
 
-    arr.Encode(json_encode_output, sizeof(json_encode_output));
+    _json_encode(arr);
     json_cleanup_and_delete(arr);
 
     Test_AssertStringsEqual("output", json_encode_output, "[\"hello\",\"world\"]");

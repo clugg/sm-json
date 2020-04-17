@@ -1,0 +1,3 @@
+[submodule "dependencies/sm-testsuite"]
+	path = dependencies/sm-testsuite
+	url = https://github.com/clugg/sm-testsuite.git

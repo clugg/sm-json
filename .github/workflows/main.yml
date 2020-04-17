@@ -17,14 +17,15 @@ jobs:
           SOURCEMOD_PATH=$GITHUB_WORKSPACE/addons/sourcemod
           echo ::set-env name=SOURCEMOD_PATH::$SOURCEMOD_PATH
           echo ::set-env name=SCRIPTS_PATH::$SOURCEMOD_PATH/scripting
+          echo ::set-env name=TESTSUITE_SCRIPTS_PATH::$GITHUB_WORKSPACE/dependencies/sm-testsuite/addons/sourcemod/scripting
 
       - name: Setup SourcePawn Compiler
         uses: rumblefrog/setup-sp@master
         with:
           version: ${{ matrix.sm_version }}
 
-      - name: Download sm-testsuite
-        run: curl https://raw.githubusercontent.com/clugg/sm-testsuite/v1.1.0/addons/sourcemod/scripting/include/testsuite.inc -o $SCRIPTS_PATH/include/testsuite.inc
+      - name: Prepare Submodules (sm-testsuite)
+        run: git submodule update --init
 
       - name: Compile Plugin
-        run: spcomp $SCRIPTS_PATH/json_test.sp -i$SCRIPTS_PATH/include -O2 -t4 -v2 -w234
+        run: spcomp $SCRIPTS_PATH/json_test.sp -i$SCRIPTS_PATH/include -i$TESTSUITE_SCRIPTS_PATH/include -O2 -t4 -v2 -w234

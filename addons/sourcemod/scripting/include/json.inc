@@ -293,8 +293,8 @@ stock JSON_Object json_decode(
     char[] cell = new char[length];
 
     // while we haven't reached the end of our structure
-    while (! is_array && ! json_is_object_end(buffer[pos])
-        || is_array && ! json_is_array_end(buffer[pos])) {
+    while ((! is_array && ! json_is_object_end(buffer[pos]))
+        || (is_array && ! json_is_array_end(buffer[pos]))) {
         // pos is either an opening structure or comma, so increment past it
         pos += 1;
 
@@ -311,8 +311,8 @@ stock JSON_Object json_decode(
         // of an object or array, we can stop here (empty structure)
         if (
             ! empty_checked && (
-                ! is_array && json_is_object_end(buffer[pos])
-                || is_array && json_is_array_end(buffer[pos])
+                (! is_array && json_is_object_end(buffer[pos]))
+                || (is_array && json_is_array_end(buffer[pos]))
             )
         ) {
             break;

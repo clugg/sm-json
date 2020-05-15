@@ -309,16 +309,14 @@ stock JSON_Object json_decode(
 
         // if we haven't checked for empty yet and we are at the end
         // of an object or array, we can stop here (empty structure)
-        if (
-            ! empty_checked && (
-                (! is_array && json_is_object_end(buffer[pos]))
-                || (is_array && json_is_array_end(buffer[pos]))
-            )
-        ) {
-            break;
-        }
+        if (! empty_checked) {
+            if ((! is_array && json_is_object_end(buffer[pos]))
+                || (is_array && json_is_array_end(buffer[pos]))) {
+                break;
+            }
 
-        empty_checked = true;
+            empty_checked = true;
+        }
 
         // if dealing with an object, look for the key
         if (! is_array) {

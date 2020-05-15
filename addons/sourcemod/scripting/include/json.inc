@@ -289,7 +289,6 @@ stock JSON_Object json_decode(
     bool allow_single_quotes = (options & JSON_DECODE_SINGLE_QUOTES) > 0;
 
     bool empty_checked = false;
-    char[] cell = new char[length];
 
     // while we haven't reached the end of our structure
     while ((! is_array && ! json_is_object_end(buffer[pos]))
@@ -376,118 +375,151 @@ stock JSON_Object json_decode(
             }
         }
 
+        int cell_length = 1;
+        JSONCellType cell_type = JSON_Type_Invalid;
         if (
             json_is_object_start(buffer[pos])
             || json_is_array_start(buffer[pos])
         ) {
-            // if we are dealing with an object or array, decode recursively
-            JSON_Object value = json_decode(buffer, options, pos, depth + 1);
-
-            // decoding failed, error will be logged in json_decode
-            if (value == null) {
-                json_cleanup_and_delete(obj);
-                json_cleanup_and_delete(arr);
-
-                return null;
-            }
-
-            if (is_array) {
-                arr.PushObject(value);
-            } else {
-                obj.SetObject(key, value);
-            }
+            cell_type = JSON_Type_Object;
         } else if (json_is_string(buffer[pos], allow_single_quotes)) {
-            // if we are dealing with a string, attempt to extract it
-            if (! json_extract_string(
+            cell_type = JSON_Type_String;
+            cell_length = json_extract_string_size(
                 buffer,
                 length,
                 pos,
-                cell,
-                length,
                 is_array
-            )) {
-                LogError(
-                    "json_decode: couldn't extract string at position %d",
-                    pos
-                );
-                json_cleanup_and_delete(obj);
-                json_cleanup_and_delete(arr);
-
-                return null;
-            }
-
-            if (is_array) {
-                arr.PushString(cell);
-            } else {
-                obj.SetString(key, cell);
-            }
+            );
         } else {
-            if (! json_extract_until_end(
+            // in this particular instance, we use JSON_Type_Invalid to
+            // represent any type that isn't an object or string
+            cell_length = json_extract_until_end_size(
                 buffer,
                 length,
                 pos,
-                cell,
-                length,
                 is_array
-            )) {
-                LogError(
-                    "json_decode: couldn't extract until end at position %d",
-                    pos
-                );
-                json_cleanup_and_delete(obj);
-                json_cleanup_and_delete(arr);
+            );
+        }
 
-                return null;
-            }
-
-            if (strlen(cell) == 0) {
-                LogError(
-                    "json_decode: empty cell encountered at position %d",
-                    pos
-                );
-                json_cleanup_and_delete(obj);
-                json_cleanup_and_delete(arr);
-
-                return null;
-            }
-
-            if (json_is_int(cell)) {
-                int value = StringToInt(cell);
-                if (is_array) {
-                    arr.PushInt(value);
-                } else {
-                    obj.SetInt(key, value);
-                }
-            } else if (json_is_float(cell)) {
-                float value = StringToFloat(cell);
-                if (is_array) {
-                    arr.PushFloat(value);
-                } else {
-                    obj.SetFloat(key, value);
-                }
-            } else if (json_is_bool(cell)) {
-                bool value = StrEqual(cell, "true");
-                if (is_array) {
-                    arr.PushBool(value);
-                } else {
-                    obj.SetBool(key, value);
-                }
-            } else if (json_is_null(cell)) {
-                if (is_array) {
-                    arr.PushObject(null);
-                } else {
-                    obj.SetObject(key, null);
-                }
-            } else {
-                LogError(
-                    "json_decode: unknown type encountered at position %d: %s",
+        char[] cell = new char[cell_length];
+        switch (cell_type) {
+            case JSON_Type_Object: {
+                // if we are dealing with an object or array, decode recursively
+                JSON_Object value = json_decode(
+                    buffer,
+                    options,
                     pos,
-                    cell
+                    depth + 1
                 );
-                json_cleanup_and_delete(obj);
-                json_cleanup_and_delete(arr);
 
-                return null;
+                // decoding failed, error will be logged in json_decode
+                if (value == null) {
+                    json_cleanup_and_delete(obj);
+                    json_cleanup_and_delete(arr);
+
+                    return null;
+                }
+
+                if (is_array) {
+                    arr.PushObject(value);
+                } else {
+                    obj.SetObject(key, value);
+                }
+            }
+            case JSON_Type_String: {
+                // if we are dealing with a string, attempt to extract it
+                if (! json_extract_string(
+                    buffer,
+                    length,
+                    pos,
+                    cell,
+                    cell_length,
+                    is_array
+                )) {
+                    LogError(
+                        "json_decode: couldn't extract string at position %d",
+                        pos
+                    );
+                    json_cleanup_and_delete(obj);
+                    json_cleanup_and_delete(arr);
+
+                    return null;
+                }
+
+                if (is_array) {
+                    arr.PushString(cell);
+                } else {
+                    obj.SetString(key, cell);
+                }
+            }
+            case JSON_Type_Invalid: {
+                if (! json_extract_until_end(
+                    buffer,
+                    length,
+                    pos,
+                    cell,
+                    cell_length,
+                    is_array
+                )) {
+                    LogError(
+                        "json_decode: couldn't extract until end at position %d",
+                        pos
+                    );
+                    json_cleanup_and_delete(obj);
+                    json_cleanup_and_delete(arr);
+
+                    return null;
+                }
+
+                if (strlen(cell) == 0) {
+                    LogError(
+                        "json_decode: empty cell encountered at position %d",
+                        pos
+                    );
+                    json_cleanup_and_delete(obj);
+                    json_cleanup_and_delete(arr);
+
+                    return null;
+                }
+
+                if (json_is_int(cell)) {
+                    int value = StringToInt(cell);
+                    if (is_array) {
+                        arr.PushInt(value);
+                    } else {
+                        obj.SetInt(key, value);
+                    }
+                } else if (json_is_float(cell)) {
+                    float value = StringToFloat(cell);
+                    if (is_array) {
+                        arr.PushFloat(value);
+                    } else {
+                        obj.SetFloat(key, value);
+                    }
+                } else if (json_is_bool(cell)) {
+                    bool value = StrEqual(cell, "true");
+                    if (is_array) {
+                        arr.PushBool(value);
+                    } else {
+                        obj.SetBool(key, value);
+                    }
+                } else if (json_is_null(cell)) {
+                    if (is_array) {
+                        arr.PushObject(null);
+                    } else {
+                        obj.SetObject(key, null);
+                    }
+                } else {
+                    LogError(
+                        "json_decode: unknown type encountered at position %d: %s",
+                        pos,
+                        cell
+                    );
+                    json_cleanup_and_delete(obj);
+                    json_cleanup_and_delete(arr);
+
+                    return null;
+                }
             }
         }
 

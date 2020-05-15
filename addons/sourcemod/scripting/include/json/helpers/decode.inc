@@ -339,6 +339,38 @@ stock bool json_skip_whitespace(const char[] buffer, int max_size, int &pos)
 }
 
 /**
+ * Calculates the size of the buffer required to store the next
+ * JSON cell stored in the provided buffer at the provided position.
+ *
+ * @param buffer            String buffer of data.
+ * @param max_size          Maximum size of string buffer.
+ * @param pos               Position to increment.
+ * @param is_array          Whether the decoder is processing an array.
+ * @returns                 The size of the buffer required to store the cell.
+ */
+stock int json_extract_until_end_size(
+    const char[] buffer,
+    int max_size,
+    int pos,
+    bool is_array
+)
+{
+    int length = 1; // for NULL terminator
+
+    // while we haven't hit whitespace, an end point or the end of the buffer
+    while (
+        ! json_is_whitespace(buffer[pos])
+        && ! json_is_at_end(buffer[pos], is_array)
+        && pos < max_size
+    ) {
+        pos += 1;
+        length += 1;
+    }
+
+    return length;
+}
+
+/**
  * Extracts a JSON cell from the buffer until
  * a valid end point is reached.
  *

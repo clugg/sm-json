@@ -391,6 +391,66 @@ stock bool json_extract_until_end(
 }
 
 /**
+ * Calculates the size of the buffer required to store the next
+ * JSON string stored in the provided buffer at the provided position.
+ *
+ * @param buffer            String buffer of data.
+ * @param max_size          Maximum size of string buffer.
+ * @param pos               Position to increment.
+ * @param is_array          Whether the decoder is processing an array.
+ * @returns                 The size of the buffer required to store the string.
+ */
+stock int json_extract_string_size(
+    const char[] buffer,
+    int max_size,
+    int pos,
+    bool is_array
+)
+{
+    int length = 0;
+
+    // store initial quote
+    char quote = buffer[pos];
+
+    // increment past opening quote
+    pos += 1;
+
+    // while we haven't hit the end of the buffer
+    while (pos < max_size) {
+        // check for unescaped control characters
+        if (
+            buffer[pos] == '\b'
+            || buffer[pos] == '\f'
+            || buffer[pos] == '\n'
+            || buffer[pos] == '\r'
+            || buffer[pos] == '\t'
+        ) {
+            return false;
+        }
+
+        if (buffer[pos] == quote) {
+            // count preceding backslashes to check if quote is escaped
+            int search_pos = pos;
+            int preceding_backslashes = 0;
+            while (search_pos > 0 && buffer[--search_pos] == '\\') {
+                preceding_backslashes += 1;
+            }
+
+            // if we have an even number of backslashes, the quote isn't escaped
+            if (preceding_backslashes % 2 == 0) {
+                break;
+            }
+        }
+
+        // pass over the character as it is part of the string
+        pos += 1;
+        length += 1;
+    }
+
+    return json_cell_string_size(length);
+}
+
+/**
  * Extracts a JSON string from the buffer until
  * a valid end point is reached.
  *

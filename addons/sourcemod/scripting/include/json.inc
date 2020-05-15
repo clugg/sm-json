@@ -289,7 +289,6 @@ stock JSON_Object json_decode(
     bool allow_single_quotes = (options & JSON_DECODE_SINGLE_QUOTES) > 0;
 
     bool empty_checked = false;
-    char[] key = new char[length];
     char[] cell = new char[length];
 
     // while we haven't reached the end of our structure
@@ -318,8 +317,9 @@ stock JSON_Object json_decode(
             empty_checked = true;
         }
 
-        // if dealing with an object, look for the key
+        int key_length = 1;
         if (! is_array) {
+            // if dealing with an object, look for the key and determine length
             if (! json_is_string(buffer[pos], allow_single_quotes)) {
                 LogError(
                     "json_decode: expected key string at position %d",
@@ -331,8 +331,19 @@ stock JSON_Object json_decode(
                 return null;
             }
 
+            key_length = json_extract_string_size(
+                buffer,
+                length,
+                pos,
+                is_array
+            );
+        }
+
+        char[] key = new char[key_length];
+
+        if (! is_array) {
             // extract the key from the buffer
-            json_extract_string(buffer, length, pos, key, length, is_array);
+            json_extract_string(buffer, length, pos, key, key_length, is_array);
 
             // skip any whitespace following the key
             if (! json_skip_whitespace(buffer, length, pos)) {

@@ -709,7 +709,7 @@ If you prefer this style you may wish to use it instead.
 A number of common tests have been written [here](addons/sourcemod/scripting/json_test.sp). These tests include library-specific tests (which can be considered examples of how the library can be used) as well as almost every test from the [json.org test suite](https://www.json.org/JSON_checker/). Tests regarding unsupported features such as Unicode handling have been excluded.
 
 The test plugin uses the [sm-testsuite](https://github.com/clugg/sm-testsuite) library, which is included as a submodule to this repository. If you wish to run the tests yourself, follow these steps:
-1. run `git submodule update` on your command line
+1. run `git submodule update --init` on your command line inside the `sm-json` directory
 2. compile the plugin using `spcomp json_test.sp -O2 -t4 -v2 -w234 -i../../../dependencies/sm-testsuite/addons/sourcemod/scripting/include`
 3. place the plugin in your sourcemod installation
 4. run srcds if it's not already running

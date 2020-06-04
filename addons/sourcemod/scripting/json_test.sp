@@ -998,13 +998,9 @@ public void OnPluginStart()
         "{\"Illegal invocation\": alert()}",
         "{\"Numbers cannot have leading zeroes\": 013}",
         "{\"Numbers cannot be hex\": 0x14}",
-        // test case disabled due to lack of escaping support
-        // "[\"Illegal backslash escape: \\x15\"]",
+        "[\"Illegal backslash escape: \\x15\"]",
         "[\\naked]",
-        // test case disabled due to lack of escaping support
-        // "[\"Illegal backslash escape: \\017\"]",
-        // test case disabled due to lack of depth limiting
-        // "[[[[[[[[[[[[[[[[[[[[\"Too deep\"]]]]]]]]]]]]]]]]]]]]",
+        "[\"Illegal backslash escape: \\017\"]",
         "{\"Missing colon\" null}",
         "[\"Unclosed array\"",
         "{\"Double colon\":: null}",
@@ -1027,7 +1023,9 @@ public void OnPluginStart()
         "[   , \"<-- missing value\"]",
         "[\"Comma after the close\"],",
         "[\"Extra close\"]]",
-        "{\"Extra comma\": true,}"
+        "{\"Extra comma\": true,}",
+        "[\"unicode too short \\uABC\"]",
+        "[\"unicode not hex \\uFFFZ\"]"
     };
     for (int i = 0; i < sizeof(should_not_decode); i += 1) {
         Test_BeforeRun("it_should_not_decode");

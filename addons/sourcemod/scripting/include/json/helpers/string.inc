@@ -133,6 +133,21 @@ stock bool json_string_endswith(const char[] haystack, const char[] needle)
 }
 
 /**
+ * Checks whether the provided character is a valid hexadecimal character.
+ *
+ * @param c     Character to check.
+ * @returns     True if c is a hexadecimal character, false otherwise.
+ */
+stock bool json_char_is_hex(int c)
+{
+    return (
+        (c >= '0' && c <= '9')
+        || (c >= 'a' && c <= 'f')
+        || (c >= 'A' && c <= 'F')
+    );
+}
+
+/**
  * Calculates the maximum buffer length required to
  * store the JSON cell representation of a string.
  *

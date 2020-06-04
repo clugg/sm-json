@@ -331,7 +331,7 @@ void it_should_support_objects_nested_in_objects()
     obj.SetObject("object", nested_obj);
 
     print_json(obj);
-    Test_AssertTrue("nested", obj.GetObject("object").GetBool("nested"));
+    Test_AssertTrue("object.nested", obj.GetObject("object").GetBool("nested"));
 
     json_cleanup_and_delete(obj);
 }
@@ -345,7 +345,7 @@ void it_should_support_objects_nested_in_arrays()
     arr.PushObject(nested_obj);
 
     print_json(arr);
-    Test_AssertTrue("nested", arr.GetObject(0).GetBool("nested"));
+    Test_AssertTrue("0.nested", arr.GetObject(0).GetBool("nested"));
 
     json_cleanup_and_delete(arr);
 }
@@ -360,7 +360,7 @@ void it_should_support_arrays_nested_in_objects()
 
     print_json(obj);
     JSON_Array obj_array = view_as<JSON_Array>(obj.GetObject("array"));
-    Test_AssertTrue("nested", obj_array.GetBool(0));
+    Test_AssertTrue("array.0", obj_array.GetBool(0));
 
     json_cleanup_and_delete(obj);
 }
@@ -375,7 +375,7 @@ void it_should_support_arrays_nested_in_arrays()
 
     print_json(arr);
     JSON_Array arr_array = view_as<JSON_Array>(arr.GetObject(0));
-    Test_AssertTrue("nested", arr_array.GetBool(0));
+    Test_AssertTrue("0.0", arr_array.GetBool(0));
 
     json_cleanup_and_delete(arr);
 }
@@ -405,9 +405,10 @@ void it_should_support_nested_methodmaps()
     player.weapon = weapon;
 
     print_json(player);
-    Test_AssertEqual("player.weapon.id", weapon.id, 1);
+    Test_AssertEqual("weapon.id", weapon.id, 1);
+    Test_Output("changing weapon.id via player");
     player.weapon.id = 2;
-    Test_AssertEqual("player.weapon.id", weapon.id, 2);
+    Test_AssertEqual("weapon.id", weapon.id, 2);
 
     json_cleanup_and_delete(player);
 }
@@ -957,7 +958,7 @@ void it_should_export_strings()
 
 public void OnPluginStart()
 {
-    Test_SetBoxWidth(74);
+    Test_SetBoxWidth(56);
     Test_StartSection("sm-json test suite");
 
     Test_Run("it_should_encode_empty_objects", it_should_encode_empty_objects);

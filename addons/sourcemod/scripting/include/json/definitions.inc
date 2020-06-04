@@ -44,14 +44,20 @@
  */
 
 #define JSON_NONE 0
+
+/* json_encode settings */
 #define JSON_ENCODE_PRETTY 1 << 0
+
+/* json_decode settings */
+// During decoding, should strings wrapped in single quotes be accepted?
+#define JSON_DECODE_SINGLE_QUOTES 1 << 0
+
+/* json_merge settings */
 // During merge, should existing keys be replaced if they exist in both objects?
-#define JSON_MERGE_REPLACE 1 << 1
+#define JSON_MERGE_REPLACE 1 << 0
 /* During merge, should existing objects be cleaned up if they exist in
  * both objects? (only applies when JSON_MERGE_REPLACE is also set) */
-#define JSON_MERGE_CLEANUP 1 << 2
-// During decoding, should strings wrapped in single quotes be accepted?
-#define JSON_DECODE_SINGLE_QUOTES 1 << 3
+#define JSON_MERGE_CLEANUP 1 << 1
 
 /**
  * @section Pretty Print Constants

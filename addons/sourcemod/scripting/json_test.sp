@@ -738,7 +738,7 @@ void it_should_allow_single_quotes()
     // array
     JSON_Array arr = view_as<JSON_Array>(
         json_decode(
-            "['single quotes', \"double quotes\", 'single \\'single\\' quotes', 'single \\\"double\\\" quotes', \"double \\'single\\' quotes\", \"double \\\"double\\\" quotes\"]",
+            "['single quotes', \"double quotes\", 'single \\'single\\' quotes', 'single \"double\" quotes', \"double 'single' quotes\", \"double \\\"double\\\" quotes\"]",
             JSON_DECODE_SINGLE_QUOTES
         )
     );

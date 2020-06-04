@@ -590,11 +590,12 @@ stock bool json_extract_string(
 
     // copy only from start with length end - start + NULL terminator
     strcopy(output, end - start + 1, buffer[start]);
-    json_unescape_string(output, max_size);
 
     if (quote == '\'') {
         ReplaceString(output, max_size, "\\'", "'");
     }
+
+    json_unescape_string(output, max_size);
 
     return pos < max_size;
 }

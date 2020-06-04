@@ -449,17 +449,6 @@ stock int json_extract_string_size(
 
     // while we haven't hit the end of the buffer
     while (pos < max_size) {
-        // check for unescaped control characters
-        if (
-            buffer[pos] == '\b'
-            || buffer[pos] == '\f'
-            || buffer[pos] == '\n'
-            || buffer[pos] == '\r'
-            || buffer[pos] == '\t'
-        ) {
-            return false;
-        }
-
         if (buffer[pos] == quote) {
             // count preceding backslashes to check if quote is escaped
             int search_pos = pos;

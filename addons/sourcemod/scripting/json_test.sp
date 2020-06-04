@@ -237,17 +237,17 @@ void it_should_encode_empty_arrays()
 void it_should_support_objects()
 {
     JSON_Object obj = new JSON_Object();
-    Test_AssertTrue("set string", obj.SetString("str", "leet"));
-    Test_AssertTrue("set escaped string", obj.SetString("escaped_str", "\"leet\""));
-    Test_AssertTrue("set int", obj.SetInt("int", 9001));
-    Test_AssertTrue("set negative int", obj.SetInt("negative_int", -9001));
-    Test_AssertTrue("set int zero", obj.SetInt("int_zero", 0));
-    Test_AssertTrue("set float", obj.SetFloat("float", 13.37));
-    Test_AssertTrue("set negative float", obj.SetFloat("negative_float", -13.37));
-    Test_AssertTrue("set float zero", obj.SetFloat("float_zero", 0.0));
-    Test_AssertTrue("set true", obj.SetBool("true", true));
-    Test_AssertTrue("set false", obj.SetBool("false", false));
-    Test_AssertTrue("set handle", obj.SetObject("handle", null));
+    Test_Assert("set string", obj.SetString("str", "leet"));
+    Test_Assert("set escaped string", obj.SetString("escaped_str", "\"leet\""));
+    Test_Assert("set int", obj.SetInt("int", 9001));
+    Test_Assert("set negative int", obj.SetInt("negative_int", -9001));
+    Test_Assert("set int zero", obj.SetInt("int_zero", 0));
+    Test_Assert("set float", obj.SetFloat("float", 13.37));
+    Test_Assert("set negative float", obj.SetFloat("negative_float", -13.37));
+    Test_Assert("set float zero", obj.SetFloat("float_zero", 0.0));
+    Test_Assert("set true", obj.SetBool("true", true));
+    Test_Assert("set false", obj.SetBool("false", false));
+    Test_Assert("set handle", obj.SetObject("handle", null));
 
     print_json(obj);
     json_cleanup_and_delete(obj);
@@ -259,9 +259,9 @@ void it_should_support_objects()
     }
 
     char string[32];
-    Test_AssertTrue("get decoded string", decoded.GetString("str", string, sizeof(string)));
+    Test_Assert("get decoded string", decoded.GetString("str", string, sizeof(string)));
     Test_AssertStringsEqual("decoded string", string, "leet");
-    Test_AssertTrue("get decoded escaped string", decoded.GetString("escaped_str", string, sizeof(string)));
+    Test_Assert("get decoded escaped string", decoded.GetString("escaped_str", string, sizeof(string)));
     Test_AssertStringsEqual("decoded escaped string", string, "\"leet\"");
     Test_AssertEqual("decoded int", decoded.GetInt("int"), 9001);
     Test_AssertEqual("decoded negative int", decoded.GetInt("negative_int"), -9001);
@@ -304,9 +304,9 @@ void it_should_support_arrays()
 
     int index = 0;
     char string[32];
-    Test_AssertTrue("get decoded string", decoded.GetString(index++, string, sizeof(string)));
+    Test_Assert("get decoded string", decoded.GetString(index++, string, sizeof(string)));
     Test_AssertStringsEqual("decoded string", string, "leet");
-    Test_AssertTrue("get decoded escaped string",decoded.GetString(index++, string, sizeof(string)));
+    Test_Assert("get decoded escaped string",decoded.GetString(index++, string, sizeof(string)));
     Test_AssertStringsEqual("decoded escaped string", string, "\"leet\"");
     Test_AssertEqual("decoded int", decoded.GetInt(index++), 9001);
     Test_AssertEqual("decoded negative int", decoded.GetInt(index++), -9001);
@@ -511,10 +511,10 @@ void it_should_shift_array_down_after_removed_index()
 
     print_json(arr);
 
-    Test_AssertTrue("remove first element", check_array_remove(arr, 0));
-    Test_AssertTrue("remove last element", check_array_remove(arr, arr.Length - 1));
+    Test_Assert("remove first element", check_array_remove(arr, 0));
+    Test_Assert("remove last element", check_array_remove(arr, arr.Length - 1));
     int max = arr.Length - 1;
-    Test_AssertTrue("remove random element", check_array_remove(arr, GetRandomInt(0, max)));
+    Test_Assert("remove random element", check_array_remove(arr, GetRandomInt(0, max)));
     Test_AssertEqual("array length", arr.Length, max);
 
     json_cleanup_and_delete(arr);
@@ -525,7 +525,7 @@ void it_should_not_merge_array_onto_object()
     JSON_Object obj = new JSON_Object();
     JSON_Array arr = new JSON_Array();
 
-    Test_AssertFalse("merge result", obj.Merge(arr));
+    Test_Assert("merge failed", obj.Merge(arr) == false);
 
     json_cleanup_and_delete(obj);
     json_cleanup_and_delete(arr);
@@ -536,7 +536,7 @@ void it_should_not_merge_object_onto_array()
     JSON_Array arr = new JSON_Array();
     JSON_Object obj = new JSON_Object();
 
-    Test_AssertFalse("merge result", arr.Merge(obj));
+    Test_Assert("merge failed", arr.Merge(obj) == false);
 
     json_cleanup_and_delete(arr);
     json_cleanup_and_delete(obj);
@@ -554,7 +554,7 @@ void it_should_merge_arrays()
     arr2.PushBool(false);
     arr2.SetKeyHidden(1, true);
 
-    if (! Test_AssertTrue("merge result", arr1.Merge(arr2))) {
+    if (! Test_Assert("merged successfully", arr1.Merge(arr2))) {
         // if this assertion fails, testing cannot continue
         return;
     }
@@ -585,14 +585,14 @@ void it_should_merge_objects_with_replacement()
     obj2.SetBool("replaced", true);
     obj2.SetKeyHidden("replaced", true);
 
-    if (! Test_AssertTrue("merge result", obj1.Merge(obj2))) {
+    if (! Test_Assert("merged successfully", obj1.Merge(obj2))) {
         // if this assertion fails, testing cannot continue
         return;
     }
 
     print_json(obj1);
 
-    Test_AssertTrue("merged has key2", obj1.HasKey("key2"));
+    Test_Assert("merged has key2", obj1.HasKey("key2"));
     Test_AssertEqual("merged key2 type", obj1.GetKeyType("key2"), JSON_Type_Int);
     Test_AssertEqual("merged key2", obj1.GetInt("key2"), 2);
     Test_AssertEqual("merged replaced type", obj1.GetKeyType("replaced"), JSON_Type_Bool);
@@ -615,14 +615,14 @@ void it_should_merge_objects_without_replacement()
     obj2.SetBool("replaced", true);
     obj2.SetKeyHidden("replaced", true);
 
-    if (! Test_AssertTrue("merge result", obj1.Merge(obj2, JSON_NONE))) {
+    if (! Test_Assert("merged successfully", obj1.Merge(obj2, JSON_NONE))) {
         // if this assertion fails, testing cannot continue
         return;
     }
 
     print_json(obj1);
 
-    Test_AssertTrue("merged has key2", obj1.HasKey("key2"));
+    Test_Assert("merged has key2", obj1.HasKey("key2"));
     Test_AssertEqual("merged key2 type", obj1.GetKeyType("key2"), JSON_Type_Int);
     Test_AssertEqual("merged key2", obj1.GetInt("key2"), 2);
     Test_AssertEqual("merged replaced type", obj1.GetKeyType("replaced"), JSON_Type_Bool);
@@ -683,7 +683,7 @@ void it_should_shallow_copy_arrays()
     JSON_Array copy = arr.ShallowCopy();
 
     Test_AssertEqual("copy length", copy.Length, arr.Length);
-    Test_AssertTrue("copy 0 == arr 0", copy.GetObject(0) == arr.GetObject(0));
+    Test_Assert("copy 0 == arr 0", copy.GetObject(0) == arr.GetObject(0));
 
     json_cleanup_and_delete(arr);
     copy.Remove(0);
@@ -698,7 +698,7 @@ void it_should_shallow_copy_objects()
     JSON_Object copy = obj.ShallowCopy();
 
     Test_AssertEqual("copy length", copy.Length, obj.Length);
-    Test_AssertTrue("copy nested == obj nested", copy.GetObject("nested") == obj.GetObject("nested"));
+    Test_Assert("copy nested == obj nested", copy.GetObject("nested") == obj.GetObject("nested"));
 
     json_cleanup_and_delete(obj);
     copy.Remove("nested");
@@ -713,7 +713,7 @@ void it_should_deep_copy_arrays()
     JSON_Array copy = arr.DeepCopy();
 
     Test_AssertEqual("copy length", copy.Length, arr.Length);
-    Test_AssertTrue("copy 0 != arr 0", copy.GetObject(0) != arr.GetObject(0));
+    Test_Assert("copy 0 != arr 0", copy.GetObject(0) != arr.GetObject(0));
 
     json_cleanup_and_delete(arr);
     json_cleanup_and_delete(copy);
@@ -727,7 +727,7 @@ void it_should_deep_copy_objects()
     JSON_Object copy = obj.DeepCopy();
 
     Test_AssertEqual("copy length", copy.Length, obj.Length);
-    Test_AssertTrue("copy nested != obj nested", copy.GetObject("nested") != obj.GetObject("nested"));
+    Test_Assert("copy nested != obj nested", copy.GetObject("nested") != obj.GetObject("nested"));
 
     json_cleanup_and_delete(obj);
     json_cleanup_and_delete(copy);
@@ -758,7 +758,7 @@ void it_should_allow_single_quotes()
 
     if (Test_AssertNotNull("object", obj)) {
         print_json(obj);
-        Test_AssertTrue("object has key", obj.HasKey("key"));
+        Test_Assert("object has key", obj.HasKey("key"));
 
         json_cleanup_and_delete(obj);
     }
@@ -801,24 +801,24 @@ void it_should_autocleanup_merged_objects()
     obj2.SetObject("nested", nested2);
     obj1.Merge(obj2, JSON_MERGE_CLEANUP);
 
-    Test_AssertTrue("nested1 is valid", IsValidHandle(nested1));
-    Test_AssertTrue("nested2 is valid", IsValidHandle(nested2));
+    Test_Assert("nested1 is valid", IsValidHandle(nested1));
+    Test_Assert("nested2 is valid", IsValidHandle(nested2));
 
     Test_Output("merging with replacement and without cleanup");
     obj1.SetObject("nested", nested1);
     obj2.SetObject("nested", nested2);
     obj1.Merge(obj2, JSON_MERGE_REPLACE);
 
-    Test_AssertTrue("nested1 is valid", IsValidHandle(nested1));
-    Test_AssertTrue("nested2 is valid", IsValidHandle(nested2));
+    Test_Assert("nested1 is valid", IsValidHandle(nested1));
+    Test_Assert("nested2 is valid", IsValidHandle(nested2));
 
     Test_Output("merging with replacement and with cleanup");
     obj1.SetObject("nested", nested1);
     obj2.SetObject("nested", nested2);
     obj1.Merge(obj2, JSON_MERGE_REPLACE | JSON_MERGE_CLEANUP);
 
-    Test_AssertFalse("nested1 is valid", IsValidHandle(nested1));
-    Test_AssertTrue("nested2 is valid", IsValidHandle(nested2));
+    Test_Assert("nested1 is invalid", ! IsValidHandle(nested1));
+    Test_Assert("nested2 is valid", IsValidHandle(nested2));
 
     json_cleanup_and_delete(obj1);
     obj2.Remove("nested");
@@ -844,7 +844,7 @@ void it_should_not_set_type_on_inconsistent_array()
     JSON_Array arr = new JSON_Array();
     arr.PushObject(null);
 
-    Test_AssertFalse("result", arr.SetType(JSON_Type_Int));
+    Test_Assert("SetType failed", ! arr.SetType(JSON_Type_Int));
 
     json_cleanup_and_delete(arr);
 }
@@ -853,7 +853,7 @@ void it_should_import_ints()
 {
     int ints[] = {1, 2, 3};
     JSON_Array arr = new JSON_Array();
-    Test_AssertTrue("import result", arr.ImportValues(JSON_Type_Int, ints, sizeof(ints)));
+    Test_Assert("imported successfully", arr.ImportValues(JSON_Type_Int, ints, sizeof(ints)));
 
     _json_encode(arr);
     json_cleanup_and_delete(arr);
@@ -865,7 +865,7 @@ void it_should_import_floats()
 {
     float floats[] = {1.1, 2.2, 3.3};
     JSON_Array arr = new JSON_Array();
-    Test_AssertTrue("import result", arr.ImportValues(JSON_Type_Float, floats, sizeof(floats)));
+    Test_Assert("imported successfully", arr.ImportValues(JSON_Type_Float, floats, sizeof(floats)));
 
     _json_encode(arr);
     json_cleanup_and_delete(arr);
@@ -877,7 +877,7 @@ void it_should_import_bools()
 {
     bool bools[] = {true, false};
     JSON_Array arr = new JSON_Array();
-    Test_AssertTrue("import result", arr.ImportValues(JSON_Type_Bool, bools, sizeof(bools)));
+    Test_Assert("imported successfully", arr.ImportValues(JSON_Type_Bool, bools, sizeof(bools)));
 
     _json_encode(arr);
     json_cleanup_and_delete(arr);
@@ -889,7 +889,7 @@ void it_should_import_strings()
 {
     char strings[][] = {"hello", "world"};
     JSON_Array arr = new JSON_Array();
-    Test_AssertTrue("import result", arr.ImportStrings(strings, sizeof(strings)));
+    Test_Assert("imported successfully", arr.ImportStrings(strings, sizeof(strings)));
 
     _json_encode(arr);
     json_cleanup_and_delete(arr);

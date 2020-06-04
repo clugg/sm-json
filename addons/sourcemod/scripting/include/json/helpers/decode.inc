@@ -341,6 +341,8 @@ stock bool json_skip_whitespace(const char[] buffer, int max_size, int &pos)
 /**
  * Calculates the size of the buffer required to store the next
  * JSON cell stored in the provided buffer at the provided position.
+ * This function is quite forgiving of malformed input and shouldn't be
+ * relied upon as proof that the input is valid.
  *
  * @param buffer            String buffer of data.
  * @param max_size          Maximum size of string buffer.
@@ -425,6 +427,8 @@ stock bool json_extract_until_end(
 /**
  * Calculates the size of the buffer required to store the next
  * JSON string stored in the provided buffer at the provided position.
+ * This function is quite forgiving of malformed input and shouldn't be
+ * relied upon as proof that the input is valid.
  *
  * @param buffer            String buffer of data.
  * @param max_size          Maximum size of string buffer.

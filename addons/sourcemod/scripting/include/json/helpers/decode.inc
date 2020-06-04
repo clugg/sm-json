@@ -452,19 +452,20 @@ stock int json_extract_string_size(
     pos += 1;
 
     // while we haven't hit the end of the buffer
+    int continuous_backslashes = 0;
     while (pos < max_size) {
         if (buffer[pos] == quote) {
-            // count preceding backslashes to check if quote is escaped
-            int search_pos = pos;
-            int preceding_backslashes = 0;
-            while (search_pos > 0 && buffer[--search_pos] == '\\') {
-                preceding_backslashes += 1;
-            }
-
-            // if we have an even number of backslashes, the quote isn't escaped
-            if (preceding_backslashes % 2 == 0) {
+            // if we have an even number of preceding backslashes,
+            // the quote isn't escaped so this is the end of the string
+            if (continuous_backslashes % 2 == 0) {
                 break;
             }
+        }
+
+        if (buffer[pos] == '\\') {
+            continuous_backslashes += 1;
+        } else {
+            continuous_backslashes = 0;
         }
 
         // pass over the character as it is part of the string
@@ -508,6 +509,7 @@ stock bool json_extract_string(
     int start = pos;
 
     // while we haven't hit the end of the buffer
+    int continuous_backslashes = 0;
     while (pos < max_size) {
         // check for unescaped control characters
         if (
@@ -521,17 +523,17 @@ stock bool json_extract_string(
         }
 
         if (buffer[pos] == quote) {
-            // count preceding backslashes to check if quote is escaped
-            int search_pos = pos;
-            int preceding_backslashes = 0;
-            while (search_pos > 0 && buffer[--search_pos] == '\\') {
-                preceding_backslashes += 1;
-            }
-
-            // if we have an even number of backslashes, the quote isn't escaped
-            if (preceding_backslashes % 2 == 0) {
+            // if we have an even number of preceding backslashes,
+            // the quote isn't escaped so this is the end of the string
+            if (continuous_backslashes % 2 == 0) {
                 break;
             }
+        }
+
+        if (buffer[pos] == '\\') {
+            continuous_backslashes += 1;
+        } else {
+            continuous_backslashes = 0;
         }
 
         // pass over the character as it is part of the string

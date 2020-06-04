@@ -137,7 +137,7 @@ stock int json_meta_key_length(const char[] key)
 /**
  * Formats the key/metainfo combination into a buffer.
  *
- * @param buffer    String buffer to store output.
+ * @param output    String buffer to store output.
  * @param max_size  Maximum size of string buffer.
  * @param key       Key to generate metakey for.
  * @param meta      Meta information to generate metakey for.

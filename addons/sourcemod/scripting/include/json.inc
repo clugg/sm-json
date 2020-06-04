@@ -134,9 +134,7 @@ stock void json_encode(
             }
             case JSON_Type_Object: {
                 child = obj.GetObject(key);
-                cell_length = (child != null) ?
-                    max_size
-                    : JSON_NULL_BUFFER_SIZE;
+                cell_length = child != null ? max_size : JSON_NULL_BUFFER_SIZE;
             }
         }
 
@@ -291,8 +289,10 @@ stock JSON_Object json_decode(
     bool empty_checked = false;
 
     // while we haven't reached the end of our structure
-    while ((! is_array && ! json_is_object_end(buffer[pos]))
-        || (is_array && ! json_is_array_end(buffer[pos]))) {
+    while (
+        (! is_array && ! json_is_object_end(buffer[pos]))
+        || (is_array && ! json_is_array_end(buffer[pos]))
+    ) {
         // pos is either an opening structure or comma, so increment past it
         pos += 1;
 
@@ -308,8 +308,10 @@ stock JSON_Object json_decode(
         // if we haven't checked for empty yet and we are at the end
         // of an object or array, we can stop here (empty structure)
         if (! empty_checked) {
-            if ((! is_array && json_is_object_end(buffer[pos]))
-                || (is_array && json_is_array_end(buffer[pos]))) {
+            if (
+                (! is_array && json_is_object_end(buffer[pos]))
+                || (is_array && json_is_array_end(buffer[pos]))
+            ) {
                 break;
             }
 

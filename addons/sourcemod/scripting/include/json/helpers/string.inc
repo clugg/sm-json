@@ -36,6 +36,8 @@
 #endif
 #define _json_helpers_string_included
 
+#include <json/helpers/unicode>
+
 /**
  * Mapping characters to their escaped form.
  */
@@ -62,6 +64,43 @@ stock void json_escape_string(char[] buffer, int max_size)
             JSON_STRING_ESCAPED[i]
         );
     }
+
+    int length = strlen(buffer) + 1;
+    for (int pos = 0; pos < length && pos < max_size; pos += 1) {
+        if (buffer[pos] < 0x80) {
+            // skip standard ascii values
+            continue;
+        }
+
+        // consume the ascii bytes of the next utf8 character
+        int ascii_size;
+        int utf8 = json_ascii_to_utf8(buffer[pos], length - pos, ascii_size);
+        if (ascii_size <= 0) {
+            continue;
+        }
+
+        // convert the utf8 value to escaped format
+        char escaped[7];
+        FormatEx(escaped, sizeof(escaped), "\\u%04x", utf8);
+
+        // duplicate the consumed byte array
+        ascii_size += 1;
+        char[] ascii = new char[ascii_size];
+        for (int i = 0; i < ascii_size; i += 1) {
+            ascii[i] = buffer[pos + i];
+        }
+        ascii[ascii_size - 1] = '\0';
+
+        // replace bytes with the escaped value
+        int replacements = ReplaceString(buffer, max_size, ascii, escaped);
+
+        // calculate new string length based on replacements made
+        length -= replacements * ascii_size - 1;
+        length += replacements * sizeof(escaped) - 1;
+
+        // skip to the last of the bytes we just replaced
+        pos += sizeof(escaped) - 2;
+    }
 }
 
 /**
@@ -72,6 +111,50 @@ stock void json_escape_string(char[] buffer, int max_size)
  */
 stock void json_unescape_string(char[] buffer, int max_size)
 {
+    int length = strlen(buffer) + 1;
+    int continuous_backslashes = 0;
+    for (int pos = 0; pos < length && pos < max_size; pos += 1) {
+        if (buffer[pos] == '\\') {
+            continuous_backslashes += 1;
+        } else {
+            if (continuous_backslashes % 2 != 0 && buffer[pos] == 'u') {
+                // consume the entire escape starting at backslash
+                pos -= 1;
+                char escaped[7];
+                for (int i = 0; i < 6; i += 1) {
+                    escaped[i] = buffer[pos + i];
+                }
+                escaped[sizeof(escaped) - 1] = '\0';
+
+                // convert the hex to decimal
+                int utf8 = StringToInt(escaped[2], 16);
+
+                // convert the utf8 to ascii
+                int ascii_size = json_utf8_to_ascii_size(utf8) + 1;
+                char[] ascii = new char[ascii_size];
+                int written = json_utf8_to_ascii(utf8, ascii, ascii_size);
+
+                // replace the escaped value with ascii bytes
+                int replacements = ReplaceString(
+                    buffer,
+                    max_size,
+                    escaped,
+                    ascii,
+                    false
+                );
+
+                // calculate new string length based on replacements made
+                length -= replacements * sizeof(escaped) - 1;
+                length += replacements * written;
+
+                // skip to the last of the bytes we just replaced
+                pos += written - 1;
+            }
+
+            continuous_backslashes = 0;
+        }
+    }
+
     for (int i = 0; i < sizeof(JSON_STRING_NORMAL); i += 1) {
         ReplaceString(
             buffer,

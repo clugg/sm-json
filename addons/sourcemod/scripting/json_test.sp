@@ -956,6 +956,31 @@ void it_should_export_strings()
     Test_AssertStringsEqual("values[1]", values[1], "world");
 }
 
+void it_should_support_unicode()
+{
+    JSON_Array arr = view_as<JSON_Array>(json_decode("[\"test \\u2717 hello \\u2713\",\"\\u2717 world \\u2713 test\",\"\\u62b5\"]"));
+
+    int s0_length = arr.GetKeyLength(0) + 1;
+    char[] s0 = new char[s0_length];
+    arr.GetString(0, s0, s0_length);
+    Test_AssertStringsEqual("arr[0]", s0, "test ✗ hello ✓");
+
+    int s1_length = arr.GetKeyLength(1) + 1;
+    char[] s1 = new char[s1_length];
+    arr.GetString(1, s1, s1_length);
+    Test_AssertStringsEqual("arr[1]", s1, "✗ world ✓ test");
+
+    int s2_length = arr.GetKeyLength(2) + 1;
+    char[] s2 = new char[s2_length];
+    arr.GetString(2, s2, s2_length);
+    Test_AssertStringsEqual("arr[2]", s2, "抵");
+
+    _json_encode(arr);
+    json_cleanup_and_delete(arr);
+
+    Test_AssertStringsEqual("encoded", json_encode_output, "[\"test \\u2717 hello \\u2713\",\"\\u2717 world \\u2713 test\",\"\\u62b5\"]");
+}
+
 public void OnPluginStart()
 {
     Test_SetBoxWidth(56);
@@ -1063,6 +1088,7 @@ public void OnPluginStart()
     Test_Run("it_should_export_floats", it_should_export_floats);
     Test_Run("it_should_export_bools", it_should_export_bools);
     Test_Run("it_should_export_strings", it_should_export_strings);
+    Test_Run("it_should_support_unicode", it_should_support_unicode);
 
     Test_EndSection();
 }

@@ -5,9 +5,8 @@
 
 A pure SourcePawn JSON encoder/decoder. Also offers a nice way of implementing pseudo-classes with properties and methods.
 
-Follows the JSON specification ([RFC7159](https://tools.ietf.org/html/rfc7159)) almost perfectly. The following are not supported and likely never will be:
+Follows the JSON specification ([RFC7159](https://tools.ietf.org/html/rfc7159)) almost perfectly. The following is not supported and likely never will be:
 * Any singular value not contained with a structure (e.g. `"string"`, `1`, `0.1`, `true`, `false`, `null`, etc.)
-* Escaping/unescaping unicode values in strings (\uXXXX)
 
 Table of Contents
 =================

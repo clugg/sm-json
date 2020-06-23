@@ -461,19 +461,30 @@ stock bool json_extract_string(
         } else {
             if (continuous_backslashes % 2 != 0) {
                 if (buffer[pos] == 'u') {
-                    int endpos = pos + 4;
-                    if (endpos >= max_size) {
+                    if (pos + 4 >= max_size) {
                         // less than 4 characters left in the buffer
                         return false;
                     }
 
-                    // ensure next 4 chars are hex
-                    for (pos += 1; pos <= endpos; pos += 1) {
+                    // ensure next 4 chars are hex and not a high surrogate
+                    for (int i = 0; i < 4; i += 1) {
+                        pos += 1;
+
                         if (! json_char_is_hex(buffer[pos])) {
                             return false;
                         }
+
+                        if (
+                            i == 1
+                            && buffer[pos - 1] == 'D'
+                            && buffer[pos] >= '8'
+                        ) {
+                            // detected a high surrogate value
+                            return false;
+                        }
                     }
-                    // backtrack to the last hex char so it is safe to continue
+
+                    // jump back to the last hex char so it is safe to continue
                     pos -= 1;
                 } else if (
                     buffer[pos] != '"'

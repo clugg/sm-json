@@ -498,14 +498,14 @@ stock JSON_Object json_decode(
                     } else {
                         obj.SetFloat(key, value);
                     }
-                } else if (json_is_bool(cell)) {
+                } else if (StrEqual(cell, "true") || StrEqual(cell, "false")) {
                     bool value = StrEqual(cell, "true");
                     if (is_array) {
                         arr.PushBool(value);
                     } else {
                         obj.SetBool(key, value);
                     }
-                } else if (json_is_null(cell)) {
+                } else if (StrEqual(cell, "null")) {
                     if (is_array) {
                         arr.PushObject(null);
                     } else {

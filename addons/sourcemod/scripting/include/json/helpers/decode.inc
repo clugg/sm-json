@@ -224,28 +224,6 @@ stock bool json_is_float(const char[] buffer)
 }
 
 /**
- * Checks whether the buffer provided contains a bool.
- *
- * @param buffer    String buffer of data.
- * @returns         True if buffer contains a bool, false otherwise.
- */
-stock bool json_is_bool(const char[] buffer)
-{
-    return StrEqual(buffer, "true") || StrEqual(buffer, "false");
-}
-
-/**
- * Checks whether the buffer provided contains null.
- *
- * @param buffer    String buffer of data.
- * @returns         True if buffer contains null, false otherwise.
- */
-stock bool json_is_null(const char[] buffer)
-{
-    return StrEqual(buffer, "null");
-}
-
-/**
  * Checks whether the character at the beginning
  * of the buffer is the start of an object.
  *

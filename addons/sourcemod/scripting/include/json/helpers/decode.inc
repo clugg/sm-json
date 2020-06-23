@@ -224,58 +224,6 @@ stock bool json_is_float(const char[] buffer)
 }
 
 /**
- * Checks whether the character at the beginning
- * of the buffer is the start of an object.
- *
- * @param buffer    String buffer of data.
- * @returns         True if the first character in the buffer is
- *                  the start of an object, false otherwise.
- */
-stock bool json_is_object_start(const char[] buffer)
-{
-    return buffer[0] == '{';
-}
-
-/**
- * Checks whether the character at the beginning
- * of the buffer is the end of an object.
- *
- * @param buffer    String buffer of data.
- * @returns         True if the first character in the buffer is
- *                  the end of an object, false otherwise.
- */
-stock bool json_is_object_end(const char[] buffer)
-{
-    return buffer[0] == '}';
-}
-
-/**
- * Checks whether the character at the beginning
- * of the buffer is the start of an array.
- *
- * @param buffer    String buffer of data.
- * @returns         True if the first character in the buffer is
- *                  the start of an array, false otherwise.
- */
-stock bool json_is_array_start(const char[] buffer)
-{
-    return buffer[0] == '[';
-}
-
-/**
- * Checks whether the character at the beginning
- * of the buffer is the end of an array.
- *
- * @param buffer    String buffer of data.
- * @returns         True if the first character in the buffer is
- *                  the end of an array, false otherwise.
- */
-stock bool json_is_array_end(const char[] buffer)
-{
-    return buffer[0] == ']';
-}
-
-/**
  * Checks whether the character at the beginning of the buffer
  * is considered a valid 'end point' for some data, such as a
  * colon (indicating a key), a comma (indicating a new element),
@@ -289,8 +237,8 @@ stock bool json_is_at_end(const char[] buffer, bool is_array)
 {
     return buffer[0] == ','
         || (! is_array && buffer[0] == ':')
-        || json_is_object_end(buffer[0])
-        || json_is_array_end(buffer[0]);
+        || buffer[0] == '}'
+        || buffer[0] == ']';
 }
 
 /**

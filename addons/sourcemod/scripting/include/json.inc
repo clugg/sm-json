@@ -269,10 +269,10 @@ stock JSON_Object json_decode(
     bool is_array = false;
     JSON_Array arr = null;
     JSON_Object obj = null;
-    if (json_is_object_start(buffer[pos])) {
+    if (buffer[pos] == '{') {
         is_array = false;
         obj = new JSON_Object();
-    } else if (json_is_array_start(buffer[pos])) {
+    } else if (buffer[pos] == '[') {
         is_array = true;
         arr = new JSON_Array();
     } else {
@@ -290,8 +290,8 @@ stock JSON_Object json_decode(
 
     // while we haven't reached the end of our structure
     while (
-        (! is_array && ! json_is_object_end(buffer[pos]))
-        || (is_array && ! json_is_array_end(buffer[pos]))
+        (! is_array && buffer[pos] != '}')
+        || (is_array && buffer[pos] != ']')
     ) {
         // pos is either an opening structure or comma, so increment past it
         pos += 1;
@@ -309,8 +309,8 @@ stock JSON_Object json_decode(
         // of an object or array, we can stop here (empty structure)
         if (! empty_checked) {
             if (
-                (! is_array && json_is_object_end(buffer[pos]))
-                || (is_array && json_is_array_end(buffer[pos]))
+                (! is_array && buffer[pos] == '}')
+                || (is_array && buffer[pos] == ']')
             ) {
                 break;
             }
@@ -379,10 +379,7 @@ stock JSON_Object json_decode(
 
         int cell_length = 1;
         JSONCellType cell_type = JSON_Type_Invalid;
-        if (
-            json_is_object_start(buffer[pos])
-            || json_is_array_start(buffer[pos])
-        ) {
+        if (buffer[pos] == '{' || buffer[pos] == '[') {
             cell_type = JSON_Type_Object;
         } else if (json_is_string(buffer[pos], allow_single_quotes)) {
             cell_type = JSON_Type_String;

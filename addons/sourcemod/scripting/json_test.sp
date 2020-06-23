@@ -958,27 +958,32 @@ void it_should_export_strings()
 
 void it_should_support_unicode()
 {
-    JSON_Array arr = view_as<JSON_Array>(json_decode("[\"test \\u2717 hello \\u2713\",\"\\u2717 world \\u2713 test\",\"\\u62b5\"]"));
+    JSON_Array arr = view_as<JSON_Array>(json_decode("[\"\\u0073tarts with\",\"ends wit\\u0068\",\"\\u0021\",\"\\u00a1\",\"\\u2122\",\"\\u2b50\"]"));
 
-    int s0_length = arr.GetKeyLength(0) + 1;
-    char[] s0 = new char[s0_length];
-    arr.GetString(0, s0, s0_length);
-    Test_AssertStringsEqual("arr[0]", s0, "test ✗ hello ✓");
+    char expected_values[][] = {
+        "starts with",
+        "ends with",
+        "!", // 1 byte
+        "¡", // 2 bytes
+        "™", // 3 bytes
+        "⭐" // 4 bytes
+    };
 
-    int s1_length = arr.GetKeyLength(1) + 1;
-    char[] s1 = new char[s1_length];
-    arr.GetString(1, s1, s1_length);
-    Test_AssertStringsEqual("arr[1]", s1, "✗ world ✓ test");
+    int length = arr.Length;
+    char element_name[8];
+    for (int i = 0; i < length; i += 1) {
+        FormatEx(element_name, sizeof(element_name), "arr[%d]", i);
 
-    int s2_length = arr.GetKeyLength(2) + 1;
-    char[] s2 = new char[s2_length];
-    arr.GetString(2, s2, s2_length);
-    Test_AssertStringsEqual("arr[2]", s2, "抵");
+        int element_length = arr.GetKeyLength(i) + 1;
+        char[] element = new char[element_length];
+        arr.GetString(i, element, element_length);
+        Test_AssertStringsEqual(element_name, element, expected_values[i]);
+    }
 
     _json_encode(arr);
     json_cleanup_and_delete(arr);
 
-    Test_AssertStringsEqual("encoded", json_encode_output, "[\"test \\u2717 hello \\u2713\",\"\\u2717 world \\u2713 test\",\"\\u62b5\"]");
+    Test_AssertStringsEqual("encoded", json_encode_output, "[\"starts with\",\"ends with\",\"!\",\"\\u00a1\",\"\\u2122\",\"\\u2b50\"]");
 }
 
 public void OnPluginStart()

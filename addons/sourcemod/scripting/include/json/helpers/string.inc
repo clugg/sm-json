@@ -252,16 +252,13 @@ stock int json_cell_string_size(int length)
  */
 stock void json_cell_string(const char[] input, char[] output, int max_size)
 {
-    // add dummy char that won't be escaped to replace with a quote later
-    strcopy(output, max_size, "?");
+    // add input string to output offset by 1 char
+    strcopy(output[1], max_size - 1, input);
 
-    // add input string to output
-    StrCat(output, max_size, input);
+    // escape the output
+    json_escape_string(output[1], max_size - 1);
 
-    // escape the output string
-    json_escape_string(output, max_size);
-
-    // surround string with quotations
+    // surround output with quotations
     output[0] = '"';
     StrCat(output, max_size, "\"");
 }

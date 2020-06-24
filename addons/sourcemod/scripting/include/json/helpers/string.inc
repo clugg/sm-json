@@ -240,7 +240,7 @@ stock bool json_char_is_hex(int c)
 stock int json_cell_string_size(int length)
 {
     // double for potential escaping, + 2 for outside quotes + NULL terminator
-    return (length * 2) + 3;
+    return (length * 3) + 3;
 }
 
 /**

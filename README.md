@@ -5,8 +5,7 @@
 
 A pure SourcePawn JSON encoder/decoder. Also offers a nice way of implementing pseudo-classes with properties and methods.
 
-Follows the JSON specification ([RFC7159](https://tools.ietf.org/html/rfc7159)) almost perfectly. The following is not supported and likely never will be:
-* Any singular value not contained with a structure (e.g. `"string"`, `1`, `0.1`, `true`, `false`, `null`, etc.)
+Follows the JSON specification ([RFC7159](https://tools.ietf.org/html/rfc7159)) almost perfectly. Singular values not contained within a structure (e.g. `"string"`, `1`, `0.1`, `true`, `false`, `null`, etc.) are not supported.
 
 Table of Contents
 =================
@@ -89,7 +88,7 @@ delete obj;
 
 #### Options
 Options which modify how the encoder works can be passed as the third parameter (or fourth in `json_encode`).
-* `JSON_ENCODE_PRETTY`: enables pretty printing. You can customise pretty printing by manually updating the `JSON_PP_*` constants in [`addons/sourcemod/scripting/include/json/definitions.inc`](addons/sourcemod/scripting/include/json/definitions.inc#L56-L65). **Example:**
+* `JSON_ENCODE_PRETTY`: enables pretty printing. You can customise pretty printing by manually updating the `JSON_PP_*` constants in [`addons/sourcemod/scripting/include/json/definitions.inc`](addons/sourcemod/scripting/include/json/definitions.inc#L62-L71). **Example:**
 
 ```c
 JSON_Array child_arr = new JSON_Array();
@@ -705,7 +704,7 @@ json_cleanup(obj/arr);
 If you prefer this style you may wish to use it instead.
 
 ## Testing
-A number of common tests have been written [here](addons/sourcemod/scripting/json_test.sp). These tests include library-specific tests (which can be considered examples of how the library can be used) as well as almost every test from the [json.org test suite](https://www.json.org/JSON_checker/). Tests regarding unsupported features such as Unicode handling have been excluded.
+A number of common tests have been written [here](addons/sourcemod/scripting/json_test.sp). These tests include library-specific tests (which can be considered examples of how the library can be used) as well as every relevant test from the [json.org test suite](https://www.json.org/JSON_checker/).
 
 The test plugin uses the [sm-testsuite](https://github.com/clugg/sm-testsuite) library, which is included as a submodule to this repository. If you wish to run the tests yourself, follow these steps:
 1. run `git submodule update --init` on your command line inside the `sm-json` directory

@@ -15,9 +15,9 @@ jobs:
       - name: Setup Environment
         run: |
           SOURCEMOD_PATH=$GITHUB_WORKSPACE/addons/sourcemod
-          echo ::set-env name=SOURCEMOD_PATH::$SOURCEMOD_PATH
-          echo ::set-env name=SCRIPTS_PATH::$SOURCEMOD_PATH/scripting
-          echo ::set-env name=TESTSUITE_SCRIPTS_PATH::$GITHUB_WORKSPACE/dependencies/sm-testsuite/addons/sourcemod/scripting
+          echo "SOURCEMOD_PATH=$SOURCEMOD_PATH" >> $GITHUB_ENV
+          echo "SCRIPTS_PATH=$SOURCEMOD_PATH/scripting" >> $GITHUB_ENV
+          echo "TESTSUITE_SCRIPTS_PATH=$GITHUB_WORKSPACE/dependencies/sm-testsuite/addons/sourcemod/scripting" >> $GITHUB_ENV
 
       - name: Setup SourcePawn Compiler
         uses: rumblefrog/setup-sp@master

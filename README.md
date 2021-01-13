@@ -456,13 +456,13 @@ In every case where a method denotes that it accepts a `key/index`, it means the
 
 ### Metadata
 * `obj/arr.HasKey(key/index)`: returns true if the key exists, false otherwise.
-* `obj/arr.GetKeyType(key/index)`: returns the [JSONCellType](addons/sourcemod/scripting/include/json/definitions.inc#L90-L101) stored at the key.
+* `obj/arr.GetKeyType(key/index)`: returns the [JSONCellType](addons/sourcemod/scripting/include/json/definitions.inc#LL96-L106) stored at the key.
 * `obj/arr.GetKeyLength(key/index)`: if the key contains a string, returns the exact length of the string (not including NULL terminator). **Example:**
 
 ```c
-int len = arr.GetKeyLength(0);
+int len = arr.GetKeyLength(0) + 1;
 char[] val = new char[len];
-arr.GetString(0, val, len + 1);
+arr.GetString(0, val, len);
 ```
 
 It is possible to mark a key as 'hidden' so that it does not appear in encoder output. **WARNING:** When calling `Clear()` or `Remove()`, the hidden flag will be removed.

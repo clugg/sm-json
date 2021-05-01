@@ -29,3 +29,9 @@ jobs:
 
       - name: Compile Plugin
         run: spcomp $SCRIPTS_PATH/json_test.sp -i$SCRIPTS_PATH/include -i$TESTSUITE_SCRIPTS_PATH/include -O2 -t4 -v2 -w234
+
+      - name: Upload Compiled Plugin
+        uses: actions/upload-artifact@v2
+        with:
+          name: json_test_sm${{ matrix.sm_version }}
+          path: json_test.smx

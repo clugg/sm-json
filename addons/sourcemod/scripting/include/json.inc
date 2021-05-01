@@ -586,14 +586,12 @@ stock bool json_merge(
 
     bool is_array = to.IsArray;
     JSON_Array to_arr = null;
-    if (is_array) {
-        to_arr = view_as<JSON_Array>(to);
-    }
-
+    JSON_Array from_arr = null;
     StringMapSnapshot snap = null;
     int json_size = 0;
     if (is_array) {
-        JSON_Array from_arr = view_as<JSON_Array>(from);
+        to_arr = view_as<JSON_Array>(to);
+        from_arr = view_as<JSON_Array>(from);
         json_size = from_arr.Length;
     } else {
         snap = from.Snapshot();
@@ -607,7 +605,7 @@ stock bool json_merge(
 
         bool key_already_exists = false;
         if (is_array) {
-            IntToString(i, key, key_length);
+            to_arr.GetIndexAsString(i, key, key_length, false);
         } else {
             snap.GetKey(i, key, key_length);
 
@@ -677,9 +675,8 @@ stock bool json_merge(
                 } else {
                     if (autocleanup && key_already_exists) {
                         JSON_Object existing = to.GetObject(key);
-                        if (existing != null && existing != value) {
-                            existing.Cleanup();
-                            delete existing;
+                        if (existing != value) {
+                            json_cleanup_and_delete(existing);
                         }
                     }
 

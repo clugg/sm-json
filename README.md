@@ -88,7 +88,7 @@ delete obj;
 
 #### Options
 Options which modify how the encoder works can be passed as the third parameter (or fourth in `json_encode`).
-* `JSON_ENCODE_PRETTY`: enables pretty printing. You can customise pretty printing by manually updating the `JSON_PP_*` constants in [`addons/sourcemod/scripting/include/json/definitions.inc`](addons/sourcemod/scripting/include/json/definitions.inc#L62-L71). **Example:**
+* `JSON_ENCODE_PRETTY`: enables pretty printing. You can customise pretty printing by overriding (i.e. strcopy) the `JSON_PP_*` strings which are declared in [`addons/sourcemod/scripting/include/json/definitions.inc`](addons/sourcemod/scripting/include/json/definitions.inc#L62-L71). Please do note that these are `char[32]`s. **Example:**
 
 ```c
 JSON_Array child_arr = new JSON_Array();
@@ -118,6 +118,20 @@ delete parent_obj;
     },
     "pretty_printing": true
 }
+```
+
+Using the same parent object as last time (pretending we didn't just clean it up!):
+```c
+strcopy(JSON_PP_AFTER_COLON, sizeof(JSON_PP_AFTER_COLON), " ");
+strcopy(JSON_PP_INDENT, sizeof(JSON_PP_AFTER_COLON), "");
+strcopy(JSON_PP_NEWLINE, sizeof(JSON_PP_NEWLINE), " ");
+
+parent_obj.Encode(output, sizeof(output), JSON_ENCODE_PRETTY);
+```
+
+`output` will contain the following:
+```json
+{ "first_depth": { "im_indented": null, "second_depth": [ 1, [] ] }, "pretty_printing": true }
 ```
 
 ### Decoding

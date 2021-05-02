@@ -415,6 +415,18 @@ void it_should_support_nested_methodmaps()
 
 void it_should_pretty_print()
 {
+    JSON_Array empty_arr = new JSON_Array();
+    _json_encode(empty_arr, JSON_ENCODE_PRETTY);
+    json_cleanup_and_delete(empty_arr);
+
+    Test_AssertStringsEqual("output", json_encode_output, "[]");
+
+    JSON_Object empty_obj = new JSON_Object();
+    _json_encode(empty_obj, JSON_ENCODE_PRETTY);
+    json_cleanup_and_delete(empty_obj);
+
+    Test_AssertStringsEqual("output", json_encode_output, "{}");
+
     JSON_Array child_arr = new JSON_Array();
     child_arr.PushInt(1);
     child_arr.PushObject(new JSON_Array());
@@ -428,21 +440,17 @@ void it_should_pretty_print()
     parent_obj.SetObject("first_depth", child_obj);
 
     _json_encode(parent_obj, JSON_ENCODE_PRETTY);
-    json_cleanup_and_delete(parent_obj);
 
     Test_AssertStringsEqual("output", json_encode_output, "{\n    \"first_depth\": {\n        \"im_indented\": null,\n        \"second_depth\": [\n            1,\n            []\n        ]\n    },\n    \"pretty_printing\": true\n}");
 
-    JSON_Array empty_arr = new JSON_Array();
-    _json_encode(empty_arr, JSON_ENCODE_PRETTY);
-    json_cleanup_and_delete(empty_arr);
+    strcopy(JSON_PP_AFTER_COLON, sizeof(JSON_PP_AFTER_COLON), " ");
+    strcopy(JSON_PP_INDENT, sizeof(JSON_PP_INDENT), "");
+    strcopy(JSON_PP_NEWLINE, sizeof(JSON_PP_NEWLINE), " ");
 
-    Test_AssertStringsEqual("output", json_encode_output, "[]");
+    _json_encode(parent_obj, JSON_ENCODE_PRETTY);
+    json_cleanup_and_delete(parent_obj);
 
-    JSON_Object empty_obj = new JSON_Object();
-    _json_encode(empty_obj, JSON_ENCODE_PRETTY);
-    json_cleanup_and_delete(empty_obj);
-
-    Test_AssertStringsEqual("output", json_encode_output, "{}");
+    Test_AssertStringsEqual("output", json_encode_output, "{ \"first_depth\": { \"im_indented\": null, \"second_depth\": [ 1, [] ] }, \"pretty_printing\": true }");
 }
 
 void it_should_trim_floats()

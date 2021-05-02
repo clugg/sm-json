@@ -66,9 +66,9 @@
  * You can modify these if you prefer your JSON formatted differently.
  */
 
-#define JSON_PP_AFTER_COLON " "
-#define JSON_PP_INDENT "    "
-#define JSON_PP_NEWLINE "\n"
+char JSON_PP_AFTER_COLON[32] = " ";
+char JSON_PP_INDENT[32] = "    ";
+char JSON_PP_NEWLINE[32] = "\n";
 
 /**
  * @section Buffer Size Constants

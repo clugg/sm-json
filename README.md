@@ -174,7 +174,8 @@ Options which modify how the parser works can be passed as the second parameter 
 ### Iteration
 #### Arrays
 ```c
-for (int i = 0; i < arr.Length; i += 1) {
+int length = arr.Length;
+for (int i = 0; i < length; i += 1) {
     JSONCellType type = arr.GetKeyType(i);
     // do whatever you want with the index and type information
 }
@@ -182,9 +183,10 @@ for (int i = 0; i < arr.Length; i += 1) {
 
 #### Objects
 ```c
+int length = obj.Length;
 int key_length = 0;
 StringMapSnapshot snap = obj.Snapshot();
-for (int i = 0; i < obj.Length; i += 1) {
+for (int i = 0; i < length; i += 1) {
     key_length = snap.KeyBufferSize(i);
     char[] key = new char[key_length];
 

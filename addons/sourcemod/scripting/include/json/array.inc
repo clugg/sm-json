@@ -593,7 +593,8 @@ methodmap JSON_Array < JSON_Object
     public int IndexOf(any value)
     {
         any current;
-        for (int i = 0; i < this.Length; i += 1) {
+        int length = this.Length;
+        for (int i = 0; i < length; i += 1) {
             if (this.GetValue(i, current) && value == current) {
                 return i;
             }
@@ -610,7 +611,8 @@ methodmap JSON_Array < JSON_Object
      */
     public int IndexOfString(const char[] value)
     {
-        for (int i = 0; i < this.Length; i += 1) {
+        int length = this.Length;
+        for (int i = 0; i < length; i += 1) {
             if (this.GetKeyType(i) != JSON_Type_String) {
                 continue;
             }
@@ -681,7 +683,8 @@ methodmap JSON_Array < JSON_Object
         }
 
         // shift all following elements down
-        for (int i = index + 1; i < this.Length; i += 1) {
+        int length = this.Length;
+        for (int i = index + 1; i < length; i += 1) {
             int target = i - 1;
             JSONCellType type = this.GetKeyType(i);
 
@@ -738,7 +741,8 @@ methodmap JSON_Array < JSON_Object
         {
             int max = -1;
             int current = -1;
-            for (int i = 0; i < this.Length; i += 1) {
+            int length = this.Length;
+            for (int i = 0; i < length; i += 1) {
                 if (this.GetKeyType(i) != JSON_Type_String) {
                     continue;
                 }
@@ -769,7 +773,8 @@ methodmap JSON_Array < JSON_Object
             return true;
         }
 
-        for (int i = 0; i < this.Length; i += 1) {
+        int length = this.Length;
+        for (int i = 0; i < length; i += 1) {
             if (this.GetKeyType(i) != type) {
                 return false;
             }
@@ -836,8 +841,9 @@ methodmap JSON_Array < JSON_Object
      */
     public void ExportValues(any[] values, int max_size)
     {
-        if (this.Length < max_size) {
-            max_size = this.Length;
+        int length = this.Length;
+        if (length < max_size) {
+            max_size = length;
         }
 
         for (int i = 0; i < max_size; i += 1) {
@@ -857,8 +863,9 @@ methodmap JSON_Array < JSON_Object
         int max_string_size
     )
     {
-        if (this.Length < max_size) {
-            max_size = this.Length;
+        int length = this.Length;
+        if (length < max_size) {
+            max_size = length;
         }
 
         for (int i = 0; i < max_size; i += 1) {

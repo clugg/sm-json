@@ -809,3 +809,46 @@ stock void json_cleanup_and_delete(JSON_Object &obj)
 
     obj = null;
 }
+
+/**
+ * Rename the key values of an object.
+ *
+ * @param obj       Object to work with 
+ * @param key       The default key value to search in object (to be renamed)         
+ * @param toKey     Renamed key value name after the process
+ *
+ * @returns         True on success, false otherwise
+ */
+stock bool json_rename(JSON_Object &obj, char[] key, char[] toKey) 
+{
+    JSONCellType type = obj.GetKeyType(key);
+    if(type != JSON_Type_Invalid) {
+        if(type == JSON_Type_String) {
+            char temp[256];
+            obj.GetString(key, temp, sizeof(temp));
+            obj.Remove(key);
+            obj.SetString(toKey, temp);
+        } else if(type == JSON_Type_Int) {
+            int temp = obj.GetInt(key);
+            obj.Remove(key);
+            obj.SetInt(toKey, temp);
+        } else if(type == JSON_Type_Float) {
+            float temp = obj.GetFloat(key);
+            obj.Remove(key);
+            obj.SetFloat(toKey, temp);
+        } else if(type == JSON_Type_Bool) {
+            bool temp = obj.GetBool(key);
+            obj.Remove(key);
+            obj.SetBool(toKey, temp);
+        } else if(type == JSON_Type_Object) {
+            JSON_Object hObject = obj.GetObject(key);
+            if(obj != null) {
+                obj.SetObject(toKey, hObject);
+                obj.Remove(key);
+            }
+        }
+        return true;
+    }
+
+    return false;
+}

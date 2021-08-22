@@ -819,36 +819,32 @@ stock void json_cleanup_and_delete(JSON_Object &obj)
  *
  * @returns         True on success, false otherwise
  */
-stock bool json_rename(JSON_Object &obj, char[] key, char[] toKey) 
+stock bool json_rename(
+    JSON_Object obj, 
+    const char[] key, 
+    const char[] toKey
+)
 {
-    JSONCellType type = obj.GetKeyType(key);
-    if(type != JSON_Type_Invalid) {
-        if(type == JSON_Type_String) {
-            char temp[256];
-            obj.GetString(key, temp, sizeof(temp));
-            obj.Remove(key);
-            obj.SetString(toKey, temp);
-        } else if(type == JSON_Type_Int) {
-            int temp = obj.GetInt(key);
-            obj.Remove(key);
-            obj.SetInt(toKey, temp);
-        } else if(type == JSON_Type_Float) {
-            float temp = obj.GetFloat(key);
-            obj.Remove(key);
-            obj.SetFloat(toKey, temp);
-        } else if(type == JSON_Type_Bool) {
-            bool temp = obj.GetBool(key);
-            obj.Remove(key);
-            obj.SetBool(toKey, temp);
-        } else if(type == JSON_Type_Object) {
-            JSON_Object hObject = obj.GetObject(key);
-            if(obj != null) {
-                obj.SetObject(toKey, hObject);
-                obj.Remove(key);
-            }
-        }
-        return true;
-    }
+	JSONCellType type = obj.GetKeyType(key);
 
-    return false;
+	if (type == JSON_Type_Invalid) 
+        return false;
+	if (StrEqual(key, toKey, true))
+        return false;
+
+	switch (type) {
+		case JSON_Type_String: {
+			int length = obj.GetKeyLength(key) + 1;
+			char[] value = new char[length];
+			obj.GetString(key, value, length);
+			obj.SetString(toKey, value);
+		}
+		case JSON_Type_Int:    obj.SetInt(toKey, obj.GetInt(key));
+		case JSON_Type_Float:  obj.SetFloat(toKey, obj.GetFloat(key));
+		case JSON_Type_Bool:   obj.SetBool(toKey, obj.GetBool(key));
+		case JSON_Type_Object: obj.SetObject(toKey, obj.GetObject(key));
+	}
+
+	obj.Remove(key);
+	return true;
 }

@@ -450,8 +450,8 @@ methodmap JSON_Object < StringMap
     *
     * @see     json_rename
     */
-    public void Rename(char[] key, char[] toKey)
+    public bool Rename(const char[] key, const char[] toKey)
     {
-        json_rename(this, key, toKey);
+        return json_rename(this, key, toKey);
     }
 };

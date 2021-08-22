@@ -827,12 +827,11 @@ stock bool json_rename(
 {
 	JSONCellType type = obj.GetKeyType(key);
 
-	if (type == JSON_Type_Invalid) 
-        return false;
 	if (StrEqual(key, toKey, true))
         return false;
 
 	switch (type) {
+        case JSON_Type_Invalid: return false;
 		case JSON_Type_String: {
 			int length = obj.GetKeyLength(key) + 1;
 			char[] value = new char[length];

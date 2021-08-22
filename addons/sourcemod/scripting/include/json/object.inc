@@ -443,4 +443,15 @@ methodmap JSON_Object < StringMap
     {
         json_cleanup(this);
     }
+
+    /**
+    * Calls the json_rename method, replacing the 'obj' parameter
+    * with the instance.
+    *
+    * @see     json_rename
+    */
+    public void Rename(char[] key, char[] toKey)
+    {
+        json_rename(this, key, toKey);
+    }
 };

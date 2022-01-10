@@ -694,6 +694,10 @@ stock bool json_merge(
         }
     }
 
+    if (snap != null) {
+        delete snap;
+    }
+
     return true;
 }
 
@@ -747,6 +751,8 @@ stock JSON_Object json_copy_deep(JSON_Object obj)
         JSON_Object value = obj.GetObject(key);
         result.SetObject(key, value.DeepCopy());
     }
+
+    delete snap;
 
     return result;
 }

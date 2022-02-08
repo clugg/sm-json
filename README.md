@@ -21,6 +21,7 @@ Table of Contents
 * [API](#api)
   * [Getters & Setters](#getters--setters)
   * [Metadata](#metadata)
+  * [Renaming Elements](#Renaming-elements)
   * [Removing Elements](#removing-elements)
   * [Array Helpers](#array-helpers)
   * [Array Type Enforcement](#array-type-enforcement)

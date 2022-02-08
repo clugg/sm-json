@@ -145,7 +145,7 @@ methodmap Weapon < JSON_Object
         }
     }
 
-    public bool GetString(char[] buffer, int max_size)
+    public bool GetName(char[] buffer, int max_size)
     {
         return this.GetString("name", buffer, max_size);
     }

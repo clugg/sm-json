@@ -994,6 +994,40 @@ void it_should_support_unicode()
     Test_AssertStringsEqual("encoded", json_encode_output, "[\"starts with\",\"ends with\",\"!\",\"\\u00a1\",\"\\u2122\",\"\\u2b50\"]");
 }
 
+void it_should_rename_object_keys()
+{
+    JSON_Object obj = new JSON_Object();
+    obj.SetInt("key1", 1);
+    obj.SetInt("key2", 2);
+    obj.SetInt("key3", 3);
+
+    Test_AssertFalse("rename existing key with no replace fails", obj.RenameKey("key1", "key2", false));
+    Test_AssertEqual("key1", obj.GetInt("key1"), 1);
+    Test_AssertEqual("key2", obj.GetInt("key2"), 2);
+
+    Test_AssertTrue("rename existing key with replace succeeds", obj.RenameKey("key1", "key2"));
+    Test_AssertFalse("key1 doesn't exist", obj.HasKey("key1"));
+    Test_AssertEqual("key2", obj.GetInt("key2"), 1);
+
+    Test_AssertTrue("rename new key succeeds", obj.RenameKey("key3", "key4"));
+    Test_AssertFalse("key3 doesn't exist", obj.HasKey("key3"));
+    Test_AssertEqual("key4", obj.GetInt("key4"), 3);
+
+    json_cleanup_and_delete(obj);
+}
+
+void it_should_maintain_hidden_on_renamed_object_keys()
+{
+    JSON_Object obj = new JSON_Object();
+    obj.SetInt("key1", 1);
+    obj.SetKeyHidden("key1", true);
+
+    obj.RenameKey("key1", "key2");
+    Test_AssertTrue("key2 hidden", obj.GetKeyHidden("key2"));
+
+    json_cleanup_and_delete(obj);
+}
+
 public void OnPluginStart()
 {
     Test_SetBoxWidth(56);
@@ -1105,6 +1139,8 @@ public void OnPluginStart()
     Test_Run("it_should_export_bools", it_should_export_bools);
     Test_Run("it_should_export_strings", it_should_export_strings);
     Test_Run("it_should_support_unicode", it_should_support_unicode);
+    Test_Run("it_should_rename_object_keys", it_should_rename_object_keys);
+    Test_Run("it_should_maintain_hidden_on_renamed_object_keys", it_should_maintain_hidden_on_renamed_object_keys);
 
     Test_EndSection();
 }

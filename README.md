@@ -501,6 +501,13 @@ obj.Remove("secret_key");
 obj.GetKeyHidden("secret_key"); // returns false
 ```
 
+### Renaming Elements
+`obj.Rename("fromKey", "toKey")`: returns true if the rename is successful, false otherwise.
+
+Renames an existing key in an object. Takes an optional third paramater `replace` (default `true`) which, when `false`, will prevent the rename if the to key already exists.
+
+This method maintains the element's metadata (e.g. whether or not it is hidden).
+
 ### Removing Elements
 `obj/arr.Remove(key/index)`
 

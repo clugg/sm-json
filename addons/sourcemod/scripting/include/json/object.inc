@@ -434,6 +434,17 @@ methodmap JSON_Object < StringMap
     }
 
     /**
+     * Calls the json_rename_key method, replacing the 'obj' parameter
+     * with this instance.
+     *
+     * @see json_rename_key
+     */
+    public bool RenameKey(const char[] from, const char[] to, bool replace = true)
+    {
+        return json_rename_key(this, from, to, replace);
+    }
+
+    /**
      * Calls the json_cleanup method, replacing the 'obj' parameter
      * with this instance.
      *

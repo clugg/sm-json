@@ -758,6 +758,68 @@ stock JSON_Object json_copy_deep(JSON_Object obj)
 }
 
 /**
+ * Renames the key of an existing item in the object.
+ *
+ * @param obj       Object to rename key on.
+ * @param from      Existing key to rename.
+ * @param to        New key.
+ * @param replace   Whether the 'to' key should be replaced if it already exists.
+ * @returns         True if the key was renamed successfully, false otherwise.
+ */
+stock bool json_rename_key(
+    JSON_Object obj,
+    const char[] from,
+    const char[] to,
+    bool replace = true
+)
+{
+    JSONCellType type = obj.GetKeyType(from);
+    if (type == JSON_Type_Invalid) {
+        return false;
+    }
+
+    if (StrEqual(from, to, true)) {
+        return true;
+    }
+
+    bool fromExists = obj.HasKey(to);
+    if (fromExists) {
+        if (! replace) {
+            return false;
+        }
+
+        obj.Remove(to);
+    }
+
+    switch (type) {
+        case JSON_Type_String: {
+            int length = obj.GetKeyLength(from) + 1;
+            char[] value = new char[length];
+            obj.GetString(from, value, length);
+            obj.SetString(to, value);
+        }
+        case JSON_Type_Int: {
+            obj.SetInt(to, obj.GetInt(from));
+        }
+        case JSON_Type_Float: {
+            obj.SetFloat(to, obj.GetFloat(from));
+        }
+        case JSON_Type_Bool: {
+            obj.SetBool(to, obj.GetBool(from));
+        }
+        case JSON_Type_Object: {
+            obj.SetObject(to, obj.GetObject(from));
+        }
+    }
+
+    obj.SetKeyHidden(to, obj.GetKeyHidden(from));
+
+    obj.Remove(from);
+
+    return true;
+}
+
+/**
  * Recursively cleans up a JSON instance and any JSON instances stored within.
  *
  * @param obj   JSON instance to clean up.

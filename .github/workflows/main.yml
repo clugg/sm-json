@@ -28,7 +28,7 @@ jobs:
         run: git submodule update --init
 
       - name: Compile Plugin
-        run: spcomp $SCRIPTS_PATH/json_test.sp -i$SCRIPTS_PATH/include -i$TESTSUITE_SCRIPTS_PATH/include -O2 -t4 -v2 -w234
+        run: spcomp $SCRIPTS_PATH/json_test.sp -i$includePath -i$SCRIPTS_PATH/include -i$TESTSUITE_SCRIPTS_PATH/include -O2 -t4 -v2 -w234
 
       - name: Upload Compiled Plugin
         uses: actions/upload-artifact@v2

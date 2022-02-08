@@ -117,7 +117,7 @@ enum JSONMetaInfo {
 /**
  * An array of all possible meta info values.
  */
-JSONMetaInfo[] JSON_ALL_METADATA = {
+JSONMetaInfo JSON_ALL_METADATA[3] = {
     JSON_Meta_Type, JSON_Meta_Length, JSON_Meta_Hidden
 };
 

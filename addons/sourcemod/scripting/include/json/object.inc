@@ -210,7 +210,7 @@ methodmap JSON_Object < StringMap
      * Sets whether the key should be hidden from encoding.
      *
      * @param key       Key to set hidden state for.
-     * @param hidden    Wheter or not the key should be hidden.
+     * @param hidden    Whether or not the key should be hidden.
      * @return          True on success, false otherwise.
      */
     public bool SetKeyHidden(const char[] key, bool hidden)

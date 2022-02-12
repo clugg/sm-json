@@ -393,7 +393,7 @@ methodmap JSON_Array < JSON_Object
      */
     public bool SetString(int index, const char[] value)
     {
-        if (! this.CanUseType(JSON_Type_String)){
+        if (! this.CanUseType(JSON_Type_String)) {
             return false;
         }
 
@@ -412,7 +412,7 @@ methodmap JSON_Array < JSON_Object
      */
     public bool SetInt(int index, int value)
     {
-        if (! this.CanUseType(JSON_Type_Int)){
+        if (! this.CanUseType(JSON_Type_Int)) {
             return false;
         }
 
@@ -431,7 +431,7 @@ methodmap JSON_Array < JSON_Object
      */
     public bool SetFloat(int index, float value)
     {
-        if (! this.CanUseType(JSON_Type_Float)){
+        if (! this.CanUseType(JSON_Type_Float)) {
             return false;
         }
 
@@ -450,7 +450,7 @@ methodmap JSON_Array < JSON_Object
      */
     public bool SetBool(int index, bool value)
     {
-        if (! this.CanUseType(JSON_Type_Bool)){
+        if (! this.CanUseType(JSON_Type_Bool)) {
             return false;
         }
 
@@ -469,7 +469,7 @@ methodmap JSON_Array < JSON_Object
      */
     public bool SetObject(int index, JSON_Object value)
     {
-        if (! this.CanUseType(JSON_Type_Object)){
+        if (! this.CanUseType(JSON_Type_Object)) {
             return false;
         }
 

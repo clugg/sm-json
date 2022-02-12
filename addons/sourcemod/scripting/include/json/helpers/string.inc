@@ -171,7 +171,7 @@ stock void json_unescape_string(char[] buffer, int max_size)
  * @param haystack  String to check that starts with needle.
  * @param max_size  Maximum size of string buffer.
  * @param needle    String to check that haystack starts with.
- * @returns         True if haystack begins with needle, false otherwise.
+ * @return          True if haystack begins with needle, false otherwise.
  */
 stock bool json_string_startswith(const char[] haystack, const char[] needle)
 {
@@ -196,7 +196,7 @@ stock bool json_string_startswith(const char[] haystack, const char[] needle)
  * @param haystack  String to check that ends with needle.
  * @param max_size  Maximum size of string buffer.
  * @param needle    String to check that haystack ends with.
- * @returns         True if haystack ends with needle, false otherwise.
+ * @return          True if haystack ends with needle, false otherwise.
  */
 stock bool json_string_endswith(const char[] haystack, const char[] needle)
 {
@@ -219,7 +219,7 @@ stock bool json_string_endswith(const char[] haystack, const char[] needle)
  * Checks whether the provided character is a valid hexadecimal character.
  *
  * @param c     Character to check.
- * @returns     True if c is a hexadecimal character, false otherwise.
+ * @return      True if c is a hexadecimal character, false otherwise.
  */
 stock bool json_char_is_hex(int c)
 {
@@ -235,7 +235,7 @@ stock bool json_char_is_hex(int c)
  * store the JSON cell representation of a string.
  *
  * @param length    The length of the string.
- * @returns         Maximum buffer length.
+ * @return          Maximum buffer length.
  */
 stock int json_cell_string_size(int length)
 {

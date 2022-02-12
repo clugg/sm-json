@@ -103,7 +103,7 @@ methodmap JSON_Array < JSON_Object
      * Checks whether the array accepts the type provided.
      *
      * @param type  Type to check for enforcement.
-     * @returns     True if the type can be used, false otherwise.
+     * @return      True if the type can be used, false otherwise.
      */
     public bool CanUseType(JSONCellType type)
     {
@@ -114,7 +114,7 @@ methodmap JSON_Array < JSON_Object
      * Checks whether the object has an index.
      *
      * @param index     Index to check existence of.
-     * @returns         True if the index exists, false otherwise.
+     * @return          True if the index exists, false otherwise.
      */
     public bool HasKey(int index)
     {
@@ -129,7 +129,7 @@ methodmap JSON_Array < JSON_Object
      * @param max_size  Maximum size of string buffer.
      * @param validate  Should we check that the index is valid before
      *                  converting it to a string? [default: true]
-     * @returns         True if the index is valid, false otherwise.
+     * @return          True if the index is valid, false otherwise.
      */
     public bool GetIndexAsString(
         int index,
@@ -489,7 +489,7 @@ methodmap JSON_Array < JSON_Object
      * Pushes a string to the end of the array.
      *
      * @param value     Value to push.
-     * @returns         The element's index on success, -1 otherwise.
+     * @return          The element's index on success, -1 otherwise.
      */
     public int PushString(const char[] value)
     {
@@ -508,7 +508,7 @@ methodmap JSON_Array < JSON_Object
      * Pushes an int to the end of the array.
      *
      * @param value     Value to push.
-     * @returns         The element's index on success, -1 otherwise.
+     * @return          The element's index on success, -1 otherwise.
      */
     public int PushInt(int value)
     {
@@ -527,7 +527,7 @@ methodmap JSON_Array < JSON_Object
      * Pushes a float to the end of the array.
      *
      * @param value     Value to push.
-     * @returns         The element's index on success, -1 otherwise.
+     * @return          The element's index on success, -1 otherwise.
      */
     public int PushFloat(float value)
     {
@@ -546,7 +546,7 @@ methodmap JSON_Array < JSON_Object
      * Pushes a bool to the end of the array.
      *
      * @param value     Value to push.
-     * @returns         The element's index on success, -1 otherwise.
+     * @return          The element's index on success, -1 otherwise.
      */
     public int PushBool(bool value)
     {
@@ -565,7 +565,7 @@ methodmap JSON_Array < JSON_Object
      * Pushes a JSON object to the end of the array.
      *
      * @param value     Value to push.
-     * @returns         The element's index on success, -1 otherwise.
+     * @return          The element's index on success, -1 otherwise.
      */
     public int PushObject(JSON_Object value)
     {
@@ -588,7 +588,7 @@ methodmap JSON_Array < JSON_Object
      * Finds the index of a value in the array.
      *
      * @param value     Value to search for.
-     * @returns         The index of the value if it is found, -1 otherwise.
+     * @return          The index of the value if it is found, -1 otherwise.
      */
     public int IndexOf(any value)
     {
@@ -607,7 +607,7 @@ methodmap JSON_Array < JSON_Object
      * Finds the index of a string in the array.
      *
      * @param value     String to search for.
-     * @returns         The index of the string if it is found, -1 otherwise.
+     * @return          The index of the string if it is found, -1 otherwise.
      */
     public int IndexOfString(const char[] value)
     {
@@ -632,7 +632,7 @@ methodmap JSON_Array < JSON_Object
      * Determines whether the array contains a value.
      *
      * @param value     Value to search for.
-     * @returns         True if the value is found, false otherwise.
+     * @return          True if the value is found, false otherwise.
      */
     public bool Contains(any value)
     {
@@ -643,7 +643,7 @@ methodmap JSON_Array < JSON_Object
      * Determines whether the array contains a string.
      *
      * @param value     String to search for.
-     * @returns         True if the string is found, false otherwise.
+     * @return          True if the string is found, false otherwise.
      */
     public bool ContainsString(const char[] value)
     {
@@ -668,7 +668,7 @@ methodmap JSON_Array < JSON_Object
      * and shifts down all following element indices.
      *
      * @param key   Key to remove.
-     * @returns     True on success, false if the value was never set.
+     * @return      True on success, false if the value was never set.
      */
     public bool Remove(int index)
     {
@@ -763,7 +763,7 @@ methodmap JSON_Array < JSON_Object
      * in the array which are not of the same type.
      *
      * @param type  Type to enforce.
-     * @returns     True if the type was enforced successfully, false otherwise.
+     * @return      True if the type was enforced successfully, false otherwise.
      */
     public bool SetType(JSONCellType type)
     {
@@ -791,7 +791,7 @@ methodmap JSON_Array < JSON_Object
      * @param type      Type of native values.
      * @param values    Array of values.
      * @param size      Size of array.
-     * @returns         True on success, false otherwise.
+     * @return          True on success, false otherwise.
      */
     public bool ImportValues(JSONCellType type, any[] values, int size)
     {
@@ -821,7 +821,7 @@ methodmap JSON_Array < JSON_Object
      *
      * @param strings   Array of strings.
      * @param size      Size of array.
-     * @returns         True on success, false otherwise.
+     * @return          True on success, false otherwise.
      */
     public bool ImportStrings(const char[][] strings, int size)
     {
@@ -882,7 +882,7 @@ methodmap JSON_Array < JSON_Object
      *
      * @param type  The type to enforce for this array, or
      *              JSON_Type_Invalid for no enforced type.
-     * @returns     A new JSON_Array.
+     * @return      A new JSON_Array.
      */
     public JSON_Array(JSONCellType type = JSON_Type_Invalid)
     {

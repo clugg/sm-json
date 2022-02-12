@@ -126,7 +126,7 @@ JSONMetaInfo JSON_ALL_METADATA[3] = {
  * for a specified key/metainfo combination.
  *
  * @param   key
- * @returns The length required to store the meta key.
+ * @return  The length required to store the meta key.
  */
 stock int json_meta_key_length(const char[] key)
 {
@@ -156,7 +156,7 @@ stock void json_format_meta_key(
  * Checks whether the key provided is a metadata key.
  *
  * @param key   Key to check.
- * @returns     True when it is a meta-key, false otherwise.
+ * @return      True when it is a meta-key, false otherwise.
  */
 stock bool json_is_meta_key(const char[] key)
 {

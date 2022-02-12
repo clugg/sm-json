@@ -43,7 +43,7 @@
  * representation of a UTF-8 character.
  *
  * @param c     The UTF-8 character.
- * @returns     The number of bytes required, or -1 if c is invalid.
+ * @return      The number of bytes required, or -1 if c is invalid.
  */
 stock int json_utf8_to_ascii_size(int c)
 {
@@ -73,7 +73,7 @@ stock int json_utf8_to_ascii_size(int c)
  * @param c         The UTF-8 character.
  * @param output    String buffer to store output.
  * @param max_size  Maximum size of string buffer.
- * @returns         The number of bytes written, or -1 if c is invalid.
+ * @return          The number of bytes written, or -1 if c is invalid.
  */
 stock int json_utf8_to_ascii(int c, char[] output, int max_size)
 {

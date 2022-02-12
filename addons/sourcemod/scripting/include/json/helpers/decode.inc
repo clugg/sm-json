@@ -48,7 +48,7 @@
  * of the buffer is whitespace.
  *
  * @param buffer    String buffer of data.
- * @returns         True if the first character in the buffer
+ * @return          True if the first character in the buffer
  *                  is whitespace, false otherwise.
  */
 stock bool json_is_whitespace(const char[] buffer)
@@ -66,7 +66,7 @@ stock bool json_is_whitespace(const char[] buffer)
  * @param buffer                String buffer of data.
  * @param allow_single_quotes   Should strings wrapped in
  *                              single quotes be accepted?
- * @returns                     True if the first character in the buffer
+ * @return                      True if the first character in the buffer
  *                              is the start of a string, false otherwise.
  */
 stock bool json_is_string(const char[] buffer, bool allow_single_quotes = false)
@@ -78,7 +78,7 @@ stock bool json_is_string(const char[] buffer, bool allow_single_quotes = false)
  * Checks whether the buffer provided contains an int.
  *
  * @param buffer    String buffer of data.
- * @returns         True if buffer contains an int, false otherwise.
+ * @return          True if buffer contains an int, false otherwise.
  */
 stock bool json_is_int(const char[] buffer)
 {
@@ -122,7 +122,7 @@ stock bool json_is_int(const char[] buffer)
  * Checks whether the buffer provided contains a float.
  *
  * @param buffer    String buffer of data.
- * @returns         True if buffer contains a float, false otherwise.
+ * @return          True if buffer contains a float, false otherwise.
  */
 stock bool json_is_float(const char[] buffer)
 {
@@ -230,7 +230,7 @@ stock bool json_is_float(const char[] buffer)
  * or the end of an object or array.
  *
  * @param buffer    String buffer of data.
- * @returns         True if the first character in the buffer
+ * @return          True if the first character in the buffer
  *                  is a valid data end point, false otherwise.
  */
 stock bool json_is_at_end(const char[] buffer, bool is_array)
@@ -252,7 +252,7 @@ stock bool json_is_at_end(const char[] buffer, bool is_array)
  * @param buffer    String buffer of data.
  * @param max_size  Maximum size of string buffer.
  * @param pos       Position to increment.
- * @returns         True if pos has not reached the end
+ * @return          True if pos has not reached the end
  *                  of the buffer, false otherwise.
  */
 stock bool json_skip_whitespace(const char[] buffer, int max_size, int &pos)
@@ -274,7 +274,7 @@ stock bool json_skip_whitespace(const char[] buffer, int max_size, int &pos)
  * @param max_size          Maximum size of string buffer.
  * @param pos               Position to increment.
  * @param is_array          Whether the decoder is processing an array.
- * @returns                 The size of the buffer required to store the cell.
+ * @return                  The size of the buffer required to store the cell.
  */
 stock int json_extract_until_end_size(
     const char[] buffer,
@@ -308,7 +308,7 @@ stock int json_extract_until_end_size(
  * @param output            String buffer to store output.
  * @param output_max_size   Maximum size of output string buffer.
  * @param is_array          Whether the decoder is processing an array.
- * @returns                 True if pos has not reached the end
+ * @return                  True if pos has not reached the end
  *                          of the buffer, false otherwise.
  */
 stock bool json_extract_until_end(
@@ -360,7 +360,7 @@ stock bool json_extract_until_end(
  * @param max_size          Maximum size of string buffer.
  * @param pos               Position to increment.
  * @param is_array          Whether the decoder is processing an array.
- * @returns                 The size of the buffer required to store the string.
+ * @return                  The size of the buffer required to store the string.
  */
 stock int json_extract_string_size(
     const char[] buffer,
@@ -412,7 +412,7 @@ stock int json_extract_string_size(
  * @param output            String buffer to store output.
  * @param output_max_size   Maximum size of output string buffer.
  * @param is_array          Whether the decoder is processing an array.
- * @returns                 True if pos has not reached the end
+ * @return                  True if pos has not reached the end
  *                          of the buffer, false otherwise.
  */
 stock bool json_extract_string(

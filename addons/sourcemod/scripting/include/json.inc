@@ -246,7 +246,7 @@ stock void json_encode(
  * @param pos       Current position of the decoder as bytes
  *                  offset into the buffer.
  * @param depth     Current nested depth of the decoder.
- * @returns         JSON instance or null if decoding failed becase
+ * @return          JSON instance or null if decoding failed becase
  *                  the buffer didn't contain valid JSON.
  * @error           If the buffer does not contain valid JSON,
  *                  an error will be thrown.
@@ -558,7 +558,7 @@ stock JSON_Object json_decode(
  * @param from      Object to merge entries from.
  * @param options   Bitwise combination of JSON_MERGE_* options.
  *                  [default: JSON_MERGE_REPLACE]
- * @returns         True on success, false otherwise.
+ * @return          True on success, false otherwise.
  * @error           If the objects are not the same structure type
  *                  as one another, an error will be thrown.
  *                  For example, an object cannot be reliably merged over an
@@ -705,7 +705,7 @@ stock bool json_merge(
  * Creates a shallow copy of the specified object.
  *
  * @param obj   Object to copy.
- * @returns     A shallow copy of the specified object.
+ * @return      A shallow copy of the specified object.
  */
 stock JSON_Object json_copy_shallow(JSON_Object obj)
 {
@@ -721,7 +721,7 @@ stock JSON_Object json_copy_shallow(JSON_Object obj)
  * Creates a deep copy of the specified object.
  *
  * @param obj   Object to copy.
- * @returns     A deep copy of the specified object.
+ * @return      A deep copy of the specified object.
  */
 stock JSON_Object json_copy_deep(JSON_Object obj)
 {
@@ -764,7 +764,7 @@ stock JSON_Object json_copy_deep(JSON_Object obj)
  * @param from      Existing key to rename.
  * @param to        New key.
  * @param replace   Whether the 'to' key should be replaced if it already exists.
- * @returns         True if the key was renamed successfully, false otherwise.
+ * @return          True if the key was renamed successfully, false otherwise.
  */
 stock bool json_rename_key(
     JSON_Object obj,

@@ -60,7 +60,7 @@ methodmap JSON_Object < StringMap
      * Checks whether the object has a key.
      *
      * @param key   Key to check existence of.
-     * @returns     True if the key exists, false otherwise.
+     * @return      True if the key exists, false otherwise.
      */
     public bool HasKey(const char[] key)
     {
@@ -121,7 +121,7 @@ methodmap JSON_Object < StringMap
      * Gets the cell type stored at a key.
      *
      * @param key   Key to get value type for.
-     * @returns     Value type for key provided,
+     * @return      Value type for key provided,
      *              or JSON_Type_Invalid if it does not exist.
      */
     public JSONCellType GetKeyType(const char[] key)
@@ -135,7 +135,7 @@ methodmap JSON_Object < StringMap
      * Gets the length of the string stored at a key.
      *
      * @param key   Key to get string length for.
-     * @returns     Length of string at key provided,
+     * @return      Length of string at key provided,
      *              or -1 if it is not a string/does not exist.
      */
     public int GetKeyLength(const char[] key)
@@ -147,7 +147,7 @@ methodmap JSON_Object < StringMap
      * Gets whether the key should be hidden from encoding.
      *
      * @param key   Key to get hidden state for.
-     * @returns     Whether or not the key should be hidden.
+     * @return      Whether or not the key should be hidden.
      */
     public bool GetKeyHidden(const char[] key)
     {
@@ -187,7 +187,7 @@ methodmap JSON_Object < StringMap
      *
      * @param key   Key to set value type for.
      * @param type  Type to set key to.
-     * @returns     True on success, false otherwise.
+     * @return      True on success, false otherwise.
      */
     public bool SetKeyType(const char[] key, JSONCellType type)
     {
@@ -199,7 +199,7 @@ methodmap JSON_Object < StringMap
      *
      * @param key       Key to set string length for.
      * @param length    Length to set string to.
-     * @returns         True on success, false otherwise.
+     * @return          True on success, false otherwise.
      */
     public bool SetKeyLength(const char[] key, int length)
     {
@@ -211,7 +211,7 @@ methodmap JSON_Object < StringMap
      *
      * @param key       Key to set hidden state for.
      * @param hidden    Wheter or not the key should be hidden.
-     * @returns         True on success, false otherwise.
+     * @return          True on success, false otherwise.
      */
     public bool SetKeyHidden(const char[] key, bool hidden)
     {
@@ -231,7 +231,7 @@ methodmap JSON_Object < StringMap
      *
      * @param key           Key to retrieve int value for.
      * @param default_value  Value to return if the key does not exist.
-     * @returns             Value stored at key.
+     * @return              Value stored at key.
      */
     public int GetInt(const char[] key, int default_value = -1)
     {
@@ -244,7 +244,7 @@ methodmap JSON_Object < StringMap
      *
      * @param key           Key to retrieve float value for.
      * @param default_value  Value to return if the key does not exist.
-     * @returns             Value stored at key.
+     * @return              Value stored at key.
      */
     public float GetFloat(const char[] key, float default_value = -1.0)
     {
@@ -257,7 +257,7 @@ methodmap JSON_Object < StringMap
      *
      * @param key           Key to retrieve bool value for.
      * @param default_value  Value to return if the key does not exist.
-     * @returns             Value stored at key.
+     * @return              Value stored at key.
      */
     public bool GetBool(const char[] key, bool default_value = false)
     {
@@ -270,7 +270,7 @@ methodmap JSON_Object < StringMap
      *
      * @param key           Key to retrieve object value for.
      * @param default_value  Value to return if the key does not exist.
-     * @returns             Value stored at key.
+     * @return              Value stored at key.
      */
     public JSON_Object GetObject(
         const char[] key,
@@ -290,7 +290,7 @@ methodmap JSON_Object < StringMap
      *
      * @param key       Key to set to string value.
      * @param value     Value to set.
-     * @returns         True on success, false otherwise.
+     * @return          True on success, false otherwise.
      */
     public bool SetString(const char[] key, const char[] value)
     {
@@ -304,7 +304,7 @@ methodmap JSON_Object < StringMap
      *
      * @param key       Key to set to int value.
      * @param value     Value to set.
-     * @returns         True on success, false otherwise.
+     * @return          True on success, false otherwise.
      */
     public bool SetInt(const char[] key, int value)
     {
@@ -317,7 +317,7 @@ methodmap JSON_Object < StringMap
      *
      * @param key       Key to set to float value.
      * @param value     Value to set.
-     * @returns         True on success, false otherwise.
+     * @return          True on success, false otherwise.
      */
     public bool SetFloat(const char[] key, float value)
     {
@@ -330,7 +330,7 @@ methodmap JSON_Object < StringMap
      *
      * @param key       Key to set to bool value.
      * @param value     Value to set.
-     * @returns         True on success, false otherwise.
+     * @return          True on success, false otherwise.
      */
     public bool SetBool(const char[] key, bool value)
     {
@@ -343,7 +343,7 @@ methodmap JSON_Object < StringMap
      *
      * @param key       Key to set to object value.
      * @param value     Value to set.
-     * @returns         True on success, false otherwise.
+     * @return          True on success, false otherwise.
      */
     public bool SetObject(const char[] key, JSON_Object value)
     {
@@ -359,7 +359,7 @@ methodmap JSON_Object < StringMap
      * Removes an item from the object by key.
      *
      * @param key       Key of object to remove.
-     * @returns         True on success, false if the value was never set.
+     * @return          True on success, false if the value was never set.
      */
     public bool Remove(const char[] key)
     {
@@ -377,7 +377,7 @@ methodmap JSON_Object < StringMap
     /**
      * Creates a new JSON_Object.
      *
-     * @returns     A new JSON_Object.
+     * @return      A new JSON_Object.
      */
     public JSON_Object()
     {

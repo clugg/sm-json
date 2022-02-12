@@ -64,11 +64,15 @@ methodmap JSON_Object < StringMap
      */
     public bool HasKey(const char[] key)
     {
+#if SOURCEMOD_V_MAJOR >= 1 && SOURCEMOD_V_MINOR >= 11 && SOURCEMOD_V_REV >= 6646
+        return this.ContainsKey(key);
+#else
         int dummy_int;
         char dummy_str[1];
 
         return this.GetValue(key, dummy_int)
             || this.GetString(key, dummy_str, sizeof(dummy_str));
+#endif
     }
 
     /**

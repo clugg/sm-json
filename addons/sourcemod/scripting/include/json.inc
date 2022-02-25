@@ -248,6 +248,10 @@ stock JSON_Object json_decode(
     if (buffer[pos] == '{') {
         is_array = false;
         obj = new JSON_Object();
+
+        if ((options & JSON_DECODE_ORDERED_KEYS) > 0) {
+            obj.EnableOrderedKeys();
+        }
     } else if (buffer[pos] == '[') {
         is_array = true;
         arr = new JSON_Array();

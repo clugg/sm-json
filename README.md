@@ -85,6 +85,8 @@ obj.Encode(output, sizeof(output));
 json_cleanup_and_delete(obj);
 ```
 
+**Note:** By default, JSON is unordered. This means that your encoded output may not necessarily display keys in the same order that they were inserted. If you would prefer your keys be 'ordered', you may use `obj.EnableOrderedKeys()` after creating an object but before setting any data.
+
 #### Options
 Options which modify how the encoder works can be passed as the third parameter (or fourth in `json_encode`).
 * `JSON_ENCODE_PRETTY`: enables pretty printing. You can customise pretty printing by overriding (i.e. strcopy) the `JSON_PP_*` strings which are declared in [`addons/sourcemod/scripting/include/json/definitions.inc`](addons/sourcemod/scripting/include/json/definitions.inc#L62-L71). Please do note that these are `char[32]`s. **Example:**
@@ -166,6 +168,7 @@ json_cleanup_and_delete(obj);
 #### Options
 Options which modify how the parser works can be passed as the second parameter (e.g. `json_decode("[]", JSON_DECODE_SINGLE_QUOTES)`).
 * `JSON_DECODE_SINGLE_QUOTES`: accepts `'single quote strings'` as valid. A mixture of single and double quoted strings can be used in a structure (e.g. `['single', "double"]`) as long as quotes are matched correctly. *Note: encoded output will still use double quotes, and unescaping of single quotes in double quoted strings does not occur.*
+* `JSON_DECODE_ORDERED_KEYS`: effectively the same as `EnableOrderedKeys`, this will ensure that key insertion order tracking is enabled before decoding begins.
 
 ### Iteration
 #### Arrays

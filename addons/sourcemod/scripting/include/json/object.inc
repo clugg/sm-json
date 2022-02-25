@@ -68,6 +68,16 @@ methodmap JSON_Object < MetaStringMap
     }
 
     /**
+     * Whether the current object has ordered key tracking.
+     */
+    property bool OrderedKeys {
+        public get()
+        {
+            return this.Meta.GetBool(JSON_ORDERED_KEYS_KEY);
+        }
+    }
+
+    /**
      * The latest snapshot stored for this object.
      */
     property StringMapSnapshot Snap {
@@ -95,12 +105,14 @@ methodmap JSON_Object < MetaStringMap
      */
     public int Iterate()
     {
-        if (this.Snap != null) {
-            delete this.Snap;
-            this.Snap = null;
-        }
+        if (! this.OrderedKeys) {
+            if (this.Snap != null) {
+                delete this.Snap;
+                this.Snap = null;
+            }
 
-        this.Snap = this.Snapshot();
+            this.Snap = this.Snapshot();
+        }
 
         return this.Length;
     }
@@ -113,7 +125,15 @@ methodmap JSON_Object < MetaStringMap
      */
     public int GetKeySize(int index)
     {
-        return this.Snap.KeyBufferSize(index);
+        if (! this.OrderedKeys) {
+            return this.Snap.KeyBufferSize(index);
+        }
+
+        int max_size = JSON_INT_BUFFER_SIZE + 4;
+        char[] meta_key = new char[max_size];
+        FormatEx(meta_key, max_size, "%d:len", index);
+
+        return this.Meta.GetInt(meta_key);
     }
 
     /**
@@ -126,9 +146,30 @@ methodmap JSON_Object < MetaStringMap
      */
     public bool GetKey(int index, char[] value, int max_size)
     {
-        this.Snap.GetKey(index, value, max_size);
+        if (! this.OrderedKeys) {
+            this.Snap.GetKey(index, value, max_size);
 
-        return true;
+            return true;
+        }
+
+        char[] meta_key = new char[JSON_INT_BUFFER_SIZE];
+        IntToString(index, meta_key, JSON_INT_BUFFER_SIZE);
+
+        return this.Meta.GetString(meta_key, value, max_size);
+    }
+
+    /**
+     * Enable tracking order of key insertion.
+     *
+     * @return  True on success, false if the object already has unordered keys.
+     */
+    public bool EnableOrderedKeys()
+    {
+        if (this.Length > 0) {
+            return false;
+        }
+
+        return this.Meta.SetBool(JSON_ORDERED_KEYS_KEY, true);
     }
 
     /**
@@ -191,6 +232,18 @@ methodmap JSON_Object < MetaStringMap
     public bool GetHidden(const char[] key)
     {
         return view_as<bool>(this.GetMeta(key, JSON_Meta_Hidden, false));
+    }
+
+    /**
+     * Gets the index of a key (if ordered keys are enabled).
+     *
+     * @param key   Key to get index of.
+     * @return      Index of the key provided,
+     *              or -1 if it does not exist or ordered keys are disabled.
+     */
+    public int GetIndex(const char[] key)
+    {
+        return view_as<int>(this.GetMeta(key, JSON_Meta_Index, -1));
     }
 
     /**
@@ -270,6 +323,68 @@ methodmap JSON_Object < MetaStringMap
         return this.SetMeta(key, JSON_Meta_Hidden, hidden);
     }
 
+    public bool TrackKeyOrder(const char[] key, int index = -1)
+    {
+        if (! this.OrderedKeys) {
+            return true;
+        }
+
+        if (index == -1) {
+            index = this.Length - 1;
+        }
+
+        char[] meta_key = new char[JSON_INT_BUFFER_SIZE];
+        IntToString(index, meta_key, JSON_INT_BUFFER_SIZE);
+
+        int max_size = JSON_INT_BUFFER_SIZE + 8;
+        char[] meta_length_key = new char[max_size];
+        FormatEx(meta_length_key, max_size, "%d:len", index);
+
+        return this.Meta.SetString(meta_key, key)
+            && this.Meta.SetInt(meta_length_key, strlen(key) + 1)
+            && this.SetMeta(key, JSON_Meta_Index, index);
+    }
+
+    public bool RemoveKeyFromOrder(const char[] key)
+    {
+        int index = this.GetIndex(key);
+        if (index == -1) {
+            return false;
+        }
+
+        char[] meta_key = new char[JSON_INT_BUFFER_SIZE];
+        IntToString(index, meta_key, JSON_INT_BUFFER_SIZE);
+
+        int max_size = JSON_INT_BUFFER_SIZE + 8;
+        char[] meta_length_key = new char[max_size];
+        FormatEx(meta_length_key, max_size, "%d:len", index);
+
+        if (! this.Meta.Remove(meta_key)
+            || ! this.Meta.Remove(meta_length_key)) {
+            return false;
+        }
+
+        int length = this.Iterate();
+        if (index < length - 1) {
+            for (int i = index + 1; i < length; i += 1) {
+                int new_key_size = this.GetKeySize(i);
+                char[] new_key = new char[new_key_size];
+                this.GetKey(i, new_key, new_key_size);
+
+                this.TrackKeyOrder(new_key, i - 1);
+            }
+
+            int last_index = length - 1;
+            FormatEx(meta_length_key, max_size, "%d:len", last_index);
+            IntToString(last_index, meta_key, JSON_INT_BUFFER_SIZE);
+
+            this.Meta.Remove(meta_key);
+            this.Meta.Remove(meta_length_key);
+        }
+
+        return true;
+    }
+
     /**
      * @section Getters
      */
@@ -304,7 +419,8 @@ methodmap JSON_Object < MetaStringMap
     {
         return this.Super.SetString(key, value)
             && this.SetType(key, JSON_Type_String)
-            && this.SetSize(key, strlen(value) + 1);
+            && this.SetSize(key, strlen(value) + 1)
+            && this.TrackKeyOrder(key);
     }
 
     /**
@@ -317,7 +433,8 @@ methodmap JSON_Object < MetaStringMap
     public bool SetInt(const char[] key, int value)
     {
         return this.Super.SetInt(key, value)
-            && this.SetType(key, JSON_Type_Int);
+            && this.SetType(key, JSON_Type_Int)
+            && this.TrackKeyOrder(key);
     }
 
     /**
@@ -330,7 +447,8 @@ methodmap JSON_Object < MetaStringMap
     public bool SetFloat(const char[] key, float value)
     {
         return this.Super.SetFloat(key, value)
-            && this.SetType(key, JSON_Type_Float);
+            && this.SetType(key, JSON_Type_Float)
+            && this.TrackKeyOrder(key);
     }
 
     /**
@@ -343,7 +461,8 @@ methodmap JSON_Object < MetaStringMap
     public bool SetBool(const char[] key, bool value)
     {
         return this.Super.SetBool(key, value)
-            && this.SetType(key, JSON_Type_Bool);
+            && this.SetType(key, JSON_Type_Bool)
+            && this.TrackKeyOrder(key);
     }
 
     /**
@@ -356,7 +475,8 @@ methodmap JSON_Object < MetaStringMap
     public bool SetObject(const char[] key, JSON_Object value)
     {
         return this.Super.SetHandle(key, value)
-            && this.SetType(key, JSON_Type_Object);
+            && this.SetType(key, JSON_Type_Object)
+            && this.TrackKeyOrder(key);
     }
 
     /**
@@ -371,6 +491,10 @@ methodmap JSON_Object < MetaStringMap
      */
     public bool Remove(const char[] key)
     {
+        if (this.OrderedKeys) {
+            this.RemoveKeyFromOrder(key);
+        }
+
         for (int i = 0; i < sizeof(JSON_ALL_METADATA); i += 1) {
             this.RemoveMeta(key, JSON_ALL_METADATA[i]);
         }

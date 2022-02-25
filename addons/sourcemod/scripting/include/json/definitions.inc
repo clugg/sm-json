@@ -51,6 +51,8 @@
 /* json_decode settings */
 // During decoding, should strings wrapped in single quotes be accepted?
 #define JSON_DECODE_SINGLE_QUOTES 1 << 0
+// During decoding, should objects track order of key insertion?
+#define JSON_DECODE_ORDERED_KEYS 1 << 1
 
 /* json_merge settings */
 // During merge, should existing keys be replaced if they exist in both objects?
@@ -92,6 +94,7 @@ char JSON_PP_NEWLINE[32] = "\n";
 
 #define JSON_ARRAY_KEY "is_array"
 #define JSON_ENFORCE_TYPE_KEY "enforce_type"
+#define JSON_ORDERED_KEYS_KEY "ordered_keys"
 #define JSON_SNAP_KEY "snap"
 
 /**
@@ -112,14 +115,15 @@ enum JSONCellType {
 enum JSONMetaInfo {
     JSON_Meta_Type = 0,
     JSON_Meta_Size,
-    JSON_Meta_Hidden
+    JSON_Meta_Hidden,
+    JSON_Meta_Index
 }
 
 /**
  * An array of all possible meta info values.
  */
-JSONMetaInfo JSON_ALL_METADATA[3] = {
-    JSON_Meta_Type, JSON_Meta_Size, JSON_Meta_Hidden
+JSONMetaInfo JSON_ALL_METADATA[4] = {
+    JSON_Meta_Type, JSON_Meta_Size, JSON_Meta_Hidden, JSON_Meta_Index
 };
 
 /**

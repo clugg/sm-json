@@ -276,6 +276,53 @@ void it_should_support_objects()
     json_cleanup_and_delete(decoded);
 }
 
+void it_should_support_objects_with_ordered_keys()
+{
+    JSON_Object obj = new JSON_Object();
+    obj.EnableOrderedKeys();
+    obj.SetInt("first", 1);
+    Test_AssertEqual("first index", obj.GetMeta("first", JSON_Meta_Index, -1), 0);
+    obj.SetInt("second", 2);
+    Test_AssertEqual("second index", obj.GetMeta("second", JSON_Meta_Index, -1), 1);
+    obj.SetInt("third", 3);
+    Test_AssertEqual("third index", obj.GetMeta("third", JSON_Meta_Index, -1), 2);
+
+    _json_encode(obj);
+    Test_AssertStringsEqual("output upon insert", json_encode_output, "{\"first\":1,\"second\":2,\"third\":3}");
+
+    obj.Remove("second");
+    Test_AssertEqual("first index", obj.GetMeta("first", JSON_Meta_Index, -1), 0);
+    Test_AssertEqual("third index", obj.GetMeta("third", JSON_Meta_Index, -1), 1);
+    obj.SetBool("last", true);
+    Test_AssertEqual("last index", obj.GetMeta("last", JSON_Meta_Index, -1), 2);
+
+    _json_encode(obj);
+    Test_AssertStringsEqual("output after removing second and adding", json_encode_output, "{\"first\":1,\"third\":3,\"last\":true}");
+
+    obj.Remove("first");
+    Test_AssertEqual("third index", obj.GetMeta("third", JSON_Meta_Index, -1), 0);
+    Test_AssertEqual("last index", obj.GetMeta("last", JSON_Meta_Index, -1), 1);
+
+    _json_encode(obj);
+    Test_AssertStringsEqual("output after removing first", json_encode_output, "{\"third\":3,\"last\":true}");
+
+    obj.Remove("last");
+    _json_encode(obj);
+    Test_AssertStringsEqual("output after removing last", json_encode_output, "{\"third\":3}");
+
+    json_cleanup_and_delete(obj);
+}
+
+void it_should_support_decoding_objects_with_ordered_keys()
+{
+    JSON_Object obj = json_decode("{\"first\":1,\"second\":2,\"third\":3}", JSON_DECODE_ORDERED_KEYS);
+    _json_encode(obj);
+
+    Test_AssertStringsEqual("decode -> encode output", json_encode_output, "{\"first\":1,\"second\":2,\"third\":3}");
+
+    json_cleanup_and_delete(obj);
+}
+
 void it_should_support_arrays()
 {
     JSON_Array arr = new JSON_Array();
@@ -1039,6 +1086,8 @@ public void OnPluginStart()
     Test_Run("it_should_encode_empty_objects", it_should_encode_empty_objects);
     Test_Run("it_should_encode_empty_arrays", it_should_encode_empty_arrays);
     Test_Run("it_should_support_objects", it_should_support_objects);
+    Test_Run("it_should_support_objects_with_ordered_keys", it_should_support_objects_with_ordered_keys);
+    Test_Run("it_should_support_decoding_objects_with_ordered_keys", it_should_support_decoding_objects_with_ordered_keys);
     Test_Run("it_should_support_arrays", it_should_support_arrays);
     Test_Run("it_should_support_objects_nested_in_objects", it_should_support_objects_nested_in_objects);
     Test_Run("it_should_support_objects_nested_in_arrays", it_should_support_objects_nested_in_arrays);

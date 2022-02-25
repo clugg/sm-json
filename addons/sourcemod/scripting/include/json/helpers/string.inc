@@ -166,56 +166,6 @@ stock void json_unescape_string(char[] buffer, int max_size)
 }
 
 /**
- * Checks if a string starts with another string.
- *
- * @param haystack  String to check that starts with needle.
- * @param max_size  Maximum size of string buffer.
- * @param needle    String to check that haystack starts with.
- * @return          True if haystack begins with needle, false otherwise.
- */
-stock bool json_string_startswith(const char[] haystack, const char[] needle)
-{
-    int haystack_length = strlen(haystack);
-    int needle_length = strlen(needle);
-    if (needle_length > haystack_length) {
-        return false;
-    }
-
-    for (int i = 0; i < needle_length; i += 1) {
-        if (haystack[i] != needle[i]) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-/**
- * Checks if a string ends with another string.
- *
- * @param haystack  String to check that ends with needle.
- * @param max_size  Maximum size of string buffer.
- * @param needle    String to check that haystack ends with.
- * @return          True if haystack ends with needle, false otherwise.
- */
-stock bool json_string_endswith(const char[] haystack, const char[] needle)
-{
-    int haystack_length = strlen(haystack);
-    int needle_length = strlen(needle);
-    if (needle_length > haystack_length) {
-        return false;
-    }
-
-    for (int i = 0; i < needle_length; i += 1) {
-        if (haystack[haystack_length - needle_length + i] != needle[i]) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-/**
  * Checks whether the provided character is a valid hexadecimal character.
  *
  * @param c     Character to check.

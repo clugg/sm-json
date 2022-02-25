@@ -64,25 +64,10 @@ stock void json_encode(
     bool pretty_print = (options & JSON_ENCODE_PRETTY) != 0;
 
     bool is_array = obj.IsArray;
-    JSON_Array arr = null;
-    if (is_array) {
-        arr = view_as<JSON_Array>(obj);
-    }
-
-    StringMapSnapshot snap = null;
-    int json_size = 0;
-    if (is_array) {
-        json_size = arr.Length;
-
-        strcopy(output, max_size, "[");
-    } else {
-        snap = obj.Snapshot();
-        json_size = snap.Length;
-
-        strcopy(output, max_size, "{");
-    }
+    strcopy(output, max_size, is_array ? "[" : "{");
 
     // used in key iterator
+    int json_size = obj.Iterate();
     int builder_size = 0;
     int str_length = 1;
     JSON_Object child = null;
@@ -91,26 +76,21 @@ stock void json_encode(
 
     int key_length = 0;
     for (int i = 0; i < json_size; i += 1) {
-        key_length = is_array ? JSON_INT_BUFFER_SIZE : snap.KeyBufferSize(i);
+        key_length = is_array ? JSON_INT_BUFFER_SIZE : obj.GetKeySize(i);
         char[] key = new char[key_length];
 
         if (is_array) {
             IntToString(i, key, key_length);
         } else {
-            snap.GetKey(i, key, key_length);
-
-            // skip meta-keys
-            if (json_is_meta_key(key)) {
-                continue;
-            }
+            obj.GetKey(i, key, key_length);
         }
 
         // skip keys that are marked as hidden
-        if (obj.GetKeyHidden(key)) {
+        if (obj.GetHidden(key)) {
             continue;
         }
 
-        JSONCellType type = obj.GetKeyType(key);
+        JSONCellType type = obj.GetType(key);
         // skip keys of unknown type
         if (type == JSON_Type_Invalid) {
             continue;
@@ -120,7 +100,7 @@ stock void json_encode(
         cell_length = 0;
         switch (type) {
             case JSON_Type_String: {
-                str_length = obj.GetKeyLength(key);
+                str_length = obj.GetSize(key);
                 cell_length = json_cell_string_size(str_length);
             }
             case JSON_Type_Int: {
@@ -142,8 +122,8 @@ stock void json_encode(
         char[] cell = new char[cell_length];
         switch (type) {
             case JSON_Type_String: {
-                char[] value = new char[str_length + 1];
-                obj.GetString(key, value, str_length + 1);
+                char[] value = new char[str_length];
+                obj.GetString(key, value, str_length);
                 json_cell_string(value, cell, cell_length);
             }
             case JSON_Type_Int: {
@@ -214,10 +194,6 @@ stock void json_encode(
         StrCat(output, max_size, builder);
 
         is_empty = false;
-    }
-
-    if (snap != null) {
-        delete snap;
     }
 
     if (! is_empty) {
@@ -544,161 +520,7 @@ stock JSON_Object json_decode(
         return null;
     }
 
-    JSON_Object result;
-    result = is_array ? view_as<JSON_Object>(arr) : view_as<JSON_Object>(obj);
-
-    return result;
-}
-
-/**
- * Merges the entries from the second object to the first,
- * optionally replacing existing entries with the same key.
- *
- * @param to        Object to merge on to.
- * @param from      Object to merge entries from.
- * @param options   Bitwise combination of JSON_MERGE_* options.
- *                  [default: JSON_MERGE_REPLACE]
- * @return          True on success, false otherwise.
- * @error           If the objects are not the same structure type
- *                  as one another, an error will be thrown.
- *                  For example, an object cannot be reliably merged over an
- *                  array and vice versa. Only array over array and
- *                  object over object merging is supported.
- */
-stock bool json_merge(
-    JSON_Object to,
-    JSON_Object from,
-    int options = JSON_MERGE_REPLACE
-)
-{
-    if (to.IsArray && ! from.IsArray) {
-        LogError("json_merge: attempting to merge an object onto an array");
-
-        return false;
-    } else if (! to.IsArray && from.IsArray) {
-        LogError("json_merge: attempting to merge an array onto an object");
-
-        return false;
-    }
-
-    bool replace = (options & JSON_MERGE_REPLACE) > 0;
-    bool autocleanup = (options & JSON_MERGE_CLEANUP) > 0;
-
-    bool is_array = to.IsArray;
-    JSON_Array to_arr = null;
-    JSON_Array from_arr = null;
-    StringMapSnapshot snap = null;
-    int json_size = 0;
-    if (is_array) {
-        to_arr = view_as<JSON_Array>(to);
-        from_arr = view_as<JSON_Array>(from);
-        json_size = from_arr.Length;
-    } else {
-        snap = from.Snapshot();
-        json_size = snap.Length;
-    }
-
-    int key_length = 0;
-    for (int i = 0; i < json_size; i += 1) {
-        key_length = is_array ? JSON_INT_BUFFER_SIZE : snap.KeyBufferSize(i);
-        char[] key = new char[key_length];
-
-        bool key_already_exists = false;
-        if (is_array) {
-            to_arr.GetIndexAsString(i, key, key_length, false);
-        } else {
-            snap.GetKey(i, key, key_length);
-
-            // skip meta-keys
-            if (json_is_meta_key(key)) {
-                continue;
-            }
-
-            // skip already existing keys if we aren't in replace mode
-            key_already_exists = to.HasKey(key);
-            if (! replace && key_already_exists) {
-                continue;
-            }
-        }
-
-        JSONCellType type = from.GetKeyType(key);
-        // skip keys of unknown type
-        if (type == JSON_Type_Invalid) {
-            continue;
-        }
-
-        // merge value onto structure
-        switch (type) {
-            case JSON_Type_String: {
-                int length = from.GetKeyLength(key);
-                char[] value = new char[length + 1];
-                from.GetString(key, value, length + 1);
-
-                if (is_array) {
-                    to_arr.PushString(value);
-                } else {
-                    to.SetString(key, value);
-                }
-            }
-            case JSON_Type_Int: {
-                int value = from.GetInt(key);
-
-                if (is_array) {
-                    to_arr.PushInt(value);
-                } else {
-                    to.SetInt(key, value);
-                }
-            }
-            case JSON_Type_Float: {
-                float value = from.GetFloat(key);
-
-                if (is_array) {
-                    to_arr.PushFloat(value);
-                } else {
-                    to.SetFloat(key, value);
-                }
-            }
-            case JSON_Type_Bool: {
-                bool value = from.GetBool(key);
-
-                if (is_array) {
-                    to_arr.PushBool(value);
-                } else {
-                    to.SetBool(key, value);
-                }
-            }
-            case JSON_Type_Object: {
-                JSON_Object value = from.GetObject(key);
-
-                if (is_array) {
-                    to_arr.PushObject(value);
-                } else {
-                    if (autocleanup && key_already_exists) {
-                        JSON_Object existing = to.GetObject(key);
-                        if (existing != value) {
-                            json_cleanup_and_delete(existing);
-                        }
-                    }
-
-                    to.SetObject(key, value);
-                }
-            }
-        }
-
-        // set hidden attribute
-        bool hidden = from.GetKeyHidden(key);
-        if (is_array) {
-            to_arr.SetKeyHidden(to_arr.Length - 1, hidden);
-        } else {
-            to.SetKeyHidden(key, hidden);
-        }
-    }
-
-    if (snap != null) {
-        delete snap;
-    }
-
-    return true;
+    return is_array ? view_as<JSON_Object>(arr) : obj;
 }
 
 /**
@@ -709,10 +531,16 @@ stock bool json_merge(
  */
 stock JSON_Object json_copy_shallow(JSON_Object obj)
 {
-    JSON_Object result = obj.IsArray ?
-        view_as<JSON_Object>(new JSON_Array())
+    bool isArray = obj.IsArray;
+    JSON_Object result = isArray
+        ? view_as<JSON_Object>(new JSON_Array())
         : new JSON_Object();
-    result.Merge(obj);
+
+    if (isArray) {
+        view_as<JSON_Array>(result).Concat(view_as<JSON_Array>(obj));
+    } else {
+        result.Merge(obj);
+    }
 
     return result;
 }
@@ -725,121 +553,48 @@ stock JSON_Object json_copy_shallow(JSON_Object obj)
  */
 stock JSON_Object json_copy_deep(JSON_Object obj)
 {
-    JSON_Object result = obj.IsArray ?
-        view_as<JSON_Object>(new JSON_Array())
-        : new JSON_Object();
-    result.Merge(obj);
+    JSON_Object result = json_copy_shallow(obj);
 
+    int length = obj.Iterate();
     int key_length = 0;
-    StringMapSnapshot snap = result.Snapshot();
-    for (int i = 0; i < snap.Length; i += 1) {
-        key_length = snap.KeyBufferSize(i);
+    for (int i = 0; i < length; i += 1) {
+        key_length = obj.GetKeySize(i);
         char[] key = new char[key_length];
-
-        // ignore meta keys
-        snap.GetKey(i, key, key_length);
-        if (json_is_meta_key(key)) {
-            continue;
-        }
+        obj.GetKey(i, key, key_length);
 
         // only deep copy objects
-        JSONCellType type = obj.GetKeyType(key);
+        JSONCellType type = obj.GetType(key);
         if (type != JSON_Type_Object) {
             continue;
         }
 
         JSON_Object value = obj.GetObject(key);
-        result.SetObject(key, value.DeepCopy());
+        result.SetObject(key, json_copy_deep(value));
     }
-
-    delete snap;
 
     return result;
 }
 
 /**
- * Renames the key of an existing item in the object.
+ * Recursively cleans up the instance and any instances stored within.
  *
- * @param obj       Object to rename key on.
- * @param from      Existing key to rename.
- * @param to        New key.
- * @param replace   Whether the 'to' key should be replaced if it already exists.
- * @return          True if the key was renamed successfully, false otherwise.
- */
-stock bool json_rename_key(
-    JSON_Object obj,
-    const char[] from,
-    const char[] to,
-    bool replace = true
-)
-{
-    JSONCellType type = obj.GetKeyType(from);
-    if (type == JSON_Type_Invalid) {
-        return false;
-    }
-
-    if (StrEqual(from, to, true)) {
-        return true;
-    }
-
-    bool fromExists = obj.HasKey(to);
-    if (fromExists) {
-        if (! replace) {
-            return false;
-        }
-
-        obj.Remove(to);
-    }
-
-    switch (type) {
-        case JSON_Type_String: {
-            int length = obj.GetKeyLength(from) + 1;
-            char[] value = new char[length];
-            obj.GetString(from, value, length);
-            obj.SetString(to, value);
-        }
-        case JSON_Type_Int: {
-            obj.SetInt(to, obj.GetInt(from));
-        }
-        case JSON_Type_Float: {
-            obj.SetFloat(to, obj.GetFloat(from));
-        }
-        case JSON_Type_Bool: {
-            obj.SetBool(to, obj.GetBool(from));
-        }
-        case JSON_Type_Object: {
-            obj.SetObject(to, obj.GetObject(from));
-        }
-    }
-
-    obj.SetKeyHidden(to, obj.GetKeyHidden(from));
-
-    obj.Remove(from);
-
-    return true;
-}
-
-/**
- * Recursively cleans up a JSON instance and any JSON instances stored within.
- *
- * @param obj   JSON instance to clean up.
+ * @param obj   Object to clean up.
  */
 stock void json_cleanup(JSON_Object obj)
 {
-    int key_length = 0;
-    StringMapSnapshot snap = obj.Snapshot();
-    for (int i = 0; i < snap.Length; i += 1) {
-        key_length = snap.KeyBufferSize(i);
-        char[] key = new char[key_length];
+    if (obj == null) {
+        return;
+    }
 
-        // ignore meta keys
-        snap.GetKey(i, key, key_length);
-        if (json_is_meta_key(key)) {
-            continue;
-        }
+    int length = obj.Iterate();
+    int key_length = 0;
+    for (int i = 0; i < length; i += 1) {
+        key_length = obj.GetKeySize(i);
+        char[] key = new char[key_length];
+        obj.GetKey(i, key, key_length);
 
         // only clean up objects
-        JSONCellType type = obj.GetKeyType(key);
+        JSONCellType type = obj.GetType(key);
         if (type != JSON_Type_Object) {
             continue;
         }
@@ -847,33 +602,20 @@ stock void json_cleanup(JSON_Object obj)
         JSON_Object value = obj.GetObject(key);
         if (value != null) {
             json_cleanup(value);
-            delete value;
         }
     }
-    delete snap;
 
-    if (obj.IsArray) {
-        JSON_Array obj_arr = view_as<JSON_Array>(obj);
-        obj_arr.Clear();
-    } else {
-        obj.Clear();
-    }
+    delete obj.Snap;
+    obj.Super.Cleanup();
 }
 
 /**
- * Cleans up and deletes an object, ensuring all resources are freed.
- * Also sets the passed variable to null.
+ * Cleans up an object and sets the passed variable to null.
  *
  * @param obj   Object to clean up.
  */
 stock void json_cleanup_and_delete(JSON_Object &obj)
 {
-    if (obj == null) {
-        return;
-    }
-
-    obj.Cleanup();
-    delete obj;
-
+    json_cleanup(obj);
     obj = null;
 }

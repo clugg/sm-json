@@ -87,11 +87,12 @@ char JSON_PP_NEWLINE[32] = "\n";
 #define JSON_NULL_BUFFER_SIZE 5
 
 /**
- * @section Array Constants
+ * @section Array/Object Constants
  */
 
-#define JSON_ARRAY_INDEX_KEY "__array_index"
-#define JSON_ARRAY_TYPE_KEY "__array_type"
+#define JSON_ARRAY_KEY "is_array"
+#define JSON_ENFORCE_TYPE_KEY "enforce_type"
+#define JSON_SNAP_KEY "snap"
 
 /**
  * Types of cells within a JSON object
@@ -110,7 +111,7 @@ enum JSONCellType {
  */
 enum JSONMetaInfo {
     JSON_Meta_Type = 0,
-    JSON_Meta_Length,
+    JSON_Meta_Size,
     JSON_Meta_Hidden
 }
 
@@ -118,7 +119,7 @@ enum JSONMetaInfo {
  * An array of all possible meta info values.
  */
 JSONMetaInfo JSON_ALL_METADATA[3] = {
-    JSON_Meta_Type, JSON_Meta_Length, JSON_Meta_Hidden
+    JSON_Meta_Type, JSON_Meta_Size, JSON_Meta_Hidden
 };
 
 /**
@@ -150,32 +151,4 @@ stock void json_format_meta_key(
 )
 {
     FormatEx(output, max_size, "%s:%d", key, view_as<int>(meta));
-}
-
-/**
- * Checks whether the key provided is a metadata key.
- *
- * @param key   Key to check.
- * @return      True when it is a meta-key, false otherwise.
- */
-stock bool json_is_meta_key(const char[] key)
-{
-    if (
-        StrEqual(key, JSON_ARRAY_INDEX_KEY)
-        || StrEqual(key, JSON_ARRAY_TYPE_KEY)
-    ) {
-        return true;
-    }
-
-    int max_size = json_meta_key_length("");
-    char[] meta_key = new char[max_size];
-    for (int i = 0; i < sizeof(JSON_ALL_METADATA); i += 1) {
-        json_format_meta_key(meta_key, max_size, "", JSON_ALL_METADATA[i]);
-
-        if (json_string_endswith(key, meta_key)) {
-            return true;
-        }
-    }
-
-    return false;
 }

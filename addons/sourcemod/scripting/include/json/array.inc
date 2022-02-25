@@ -58,43 +58,24 @@ methodmap JSON_Array < JSON_Object
     }
 
     /**
-     * The number of elements in the array.
-     */
-    property int Length
-    {
-        public get()
-        {
-            int length = 0;
-            this.Super.GetValue(JSON_ARRAY_INDEX_KEY, length);
-
-            return length;
-        }
-
-        public set(int value)
-        {
-            this.Super.SetValue(JSON_ARRAY_INDEX_KEY, value);
-        }
-    }
-
-    /**
      * The enforced type of the array.
      */
     property JSONCellType Type
     {
         public get()
         {
-            JSONCellType type = JSON_Type_Invalid;
-            this.Super.GetValue(JSON_ARRAY_TYPE_KEY, type);
-
-            return type;
+            return view_as<JSONCellType>(this.Meta.GetOptionalValue(
+                JSON_ENFORCE_TYPE_KEY,
+                JSON_Type_Invalid
+            ));
         }
 
         public set(JSONCellType value)
         {
             if (value == JSON_Type_Invalid) {
-                this.Super.Super.Remove(JSON_ARRAY_TYPE_KEY);
+                this.Meta.Remove(JSON_ENFORCE_TYPE_KEY);
             } else {
-                this.Super.SetValue(JSON_ARRAY_TYPE_KEY, value);
+                this.Meta.SetValue(JSON_ENFORCE_TYPE_KEY, value);
             }
         }
     }
@@ -122,23 +103,17 @@ methodmap JSON_Array < JSON_Object
     }
 
     /**
-     * Outputs an index as a string with optional validation.
+     * Outputs an index as a string.
      *
      * @param index     Index to output.
      * @param output    String buffer to store output.
      * @param max_size  Maximum size of string buffer.
-     * @param validate  Should we check that the index is valid before
-     *                  converting it to a string? [default: true]
      * @return          True if the index is valid, false otherwise.
      */
-    public bool GetIndexAsString(
-        int index,
-        char[] output,
-        int max_size,
-        bool validate = true
-    )
+    public bool GetIndexAsString(int index, char[] output, int max_size)
     {
-        if (validate && ! this.HasKey(index)) {
+        // allow access past last index for intermediary operations
+        if (index < 0 || index > this.Length) {
             return false;
         }
 
@@ -152,61 +127,53 @@ methodmap JSON_Array < JSON_Object
     /**
      * Converts index to a string ('key') and calls the relevant Super method.
      *
-     * @see JSON_Object.GetMetadata
+     * @see MetaStringMap.GetMeta
      */
-    public any GetMetadata(int index, JSONMetaInfo meta, any default_value)
+    public any GetMeta(int index, JSONMetaInfo meta, any default_value)
     {
         char key[JSON_INT_BUFFER_SIZE];
         if (! this.GetIndexAsString(index, key, sizeof(key))) {
             return default_value;
         }
 
-        return this.Super.GetMetadata(key, meta, default_value);
+        return this.Super.GetMeta(key, meta, default_value);
     }
 
     /**
-     * Converts index to a string ('key') and calls the relevant Super method.
+     * Gets the cell type stored at an index.
      *
-     * @see JSON_Object.GetKeyType
+     * @param index     Index to get value type for.
+     * @return          Value type for index provided,
+     *                  or JSON_Type_Invalid if it does not exist.
      */
-    public JSONCellType GetKeyType(int index)
+    public JSONCellType GetType(int index)
     {
-        char key[JSON_INT_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key))) {
-            return JSON_Type_Invalid;
-        }
-
-        return this.Super.GetKeyType(key);
+        return view_as<JSONCellType>(
+            this.GetMeta(index, JSON_Meta_Type, JSON_Type_Invalid)
+        );
     }
 
     /**
-     * Converts index to a string ('key') and calls the relevant Super method.
+     * Gets the length of the string stored at an index.
      *
-     * @see JSON_Object.GetKeyLength
+     * @param index     Index to get string length for.
+     * @return          Length of string at index provided,
+     *                  or -1 if it is not a string/does not exist.
      */
-    public int GetKeyLength(int index)
+    public int GetSize(int index)
     {
-        char key[JSON_INT_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key))) {
-            return -1;
-        }
-
-        return this.Super.GetKeyLength(key);
+        return view_as<int>(this.GetMeta(index, JSON_Meta_Size, -1));
     }
 
     /**
-     * Converts index to a string ('key') and calls the relevant Super method.
+     * Gets whether the index should be hidden from encoding.
      *
-     * @see JSON_Object.GetKeyHidden
+     * @param index     Index to get hidden state for.
+     * @return          Whether or not the index should be hidden.
      */
-    public bool GetKeyHidden(int index)
+    public bool GetHidden(int index)
     {
-        char key[JSON_INT_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key))) {
-            return false;
-        }
-
-        return this.Super.GetKeyHidden(key);
+        return view_as<bool>(this.GetMeta(index, JSON_Meta_Hidden, false));
     }
 
     /**
@@ -216,76 +183,67 @@ methodmap JSON_Array < JSON_Object
     /**
      * Converts index to a string ('key') and calls the relevant Super method.
      *
-     * @see JSON_Object.SetMetadata
+     * @see JSON_Object.SetMeta
      */
-    public bool SetMetadata(int index, JSONMetaInfo meta, any value)
+    public bool SetMeta(int index, JSONMetaInfo meta, any value)
     {
         char key[JSON_INT_BUFFER_SIZE];
         if (! this.GetIndexAsString(index, key, sizeof(key))) {
             return false;
         }
 
-        return this.Super.SetMetadata(key, meta, value);
+        return this.Super.SetMeta(key, meta, value);
     }
 
     /**
      * Converts index to a string ('key') and calls the relevant Super method.
      *
-     * @see JSON_Object.RemoveMetadata
+     * @see JSON_Object.RemoveMeta
      */
-    public bool RemoveMetadata(int index, JSONMetaInfo meta)
+    public bool RemoveMeta(int index, JSONMetaInfo meta)
     {
         char key[JSON_INT_BUFFER_SIZE];
         if (! this.GetIndexAsString(index, key, sizeof(key))) {
             return false;
         }
 
-        return this.Super.RemoveMetadata(key, meta);
+        return this.Super.RemoveMeta(key, meta);
     }
 
     /**
-     * Converts index to a string ('key') and calls the relevant Super method.
+     * Sets the cell type stored at a index.
      *
-     * @see JSON_Object.SetKeyType
+     * @param index     Index to set value type for.
+     * @param type      Type to set index to.
+     * @return          True on success, false otherwise.
      */
-    public bool SetKeyType(int index, JSONCellType type)
+    public bool SetType(int index, JSONCellType type)
     {
-        char key[JSON_INT_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key))) {
-            return false;
-        }
-
-        return this.Super.SetKeyType(key, type);
+        return this.SetMeta(index, JSON_Meta_Type, type);
     }
 
     /**
-     * Converts index to a string ('key') and calls the relevant Super method.
+     * Sets the length of the string stored at a index.
      *
-     * @see JSON_Object.SetKeyLength
+     * @param index     Index to set string length for.
+     * @param length    Length to set string to.
+     * @return          True on success, false otherwise.
      */
-    public bool SetKeyLength(int index, int length)
+    public bool SetSize(int index, int length)
     {
-        char key[JSON_INT_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key))) {
-            return false;
-        }
-
-        return this.Super.SetKeyLength(key, length);
+        return this.SetMeta(index, JSON_Meta_Size, length);
     }
 
     /**
-     * Converts index to a string ('key') and calls the relevant Super method.
+     * Sets whether the index should be hidden from encoding.
      *
-     * @see JSON_Object.SetKeyHidden
+     * @param index     Index to set hidden state for.
+     * @param hidden    Whether or not the index should be hidden.
+     * @return          True on success, false otherwise.
      */
-    public bool SetKeyHidden(int index, bool hidden)
+    public bool SetHidden(int index, bool hidden)
     {
-        char key[JSON_INT_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key))) {
-            return false;
-        }
-
-        return this.Super.SetKeyHidden(key, hidden);
+        return this.SetMeta(index, JSON_Meta_Hidden, hidden);
     }
 
     /**
@@ -295,7 +253,7 @@ methodmap JSON_Array < JSON_Object
     /**
      * Converts index to a string ('key') and calls the relevant Super method.
      *
-     * @see JSON_Object.GetValue
+     * @see MetaStringMap.GetValue
      */
     public bool GetValue(int index, any &value)
     {
@@ -310,7 +268,22 @@ methodmap JSON_Array < JSON_Object
     /**
      * Converts index to a string ('key') and calls the relevant Super method.
      *
-     * @see JSON_Object.GetString
+     * @see MetaStringMap.GetOptionalValue
+     */
+    public bool GetOptionalValue(int index, any &value)
+    {
+        char key[JSON_INT_BUFFER_SIZE];
+        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+            return false;
+        }
+
+        return this.Super.GetOptionalValue(key, value);
+    }
+
+    /**
+     * Converts index to a string ('key') and calls the relevant Super method.
+     *
+     * @see MetaStringMap.GetString
      */
     public bool GetString(int index, char[] value, int max_size, int &size = 0)
     {
@@ -325,7 +298,7 @@ methodmap JSON_Array < JSON_Object
     /**
      * Converts index to a string ('key') and calls the relevant Super method.
      *
-     * @see JSON_Object.GetInt
+     * @see MetaStringMap.GetInt
      */
     public int GetInt(int index, int default_value = -1)
     {
@@ -340,7 +313,7 @@ methodmap JSON_Array < JSON_Object
     /**
      * Converts index to a string ('key') and calls the relevant Super method.
      *
-     * @see JSON_Object.GetFloat
+     * @see MetaStringMap.GetFloat
      */
     public float GetFloat(int index, float default_value = -1.0)
     {
@@ -355,7 +328,7 @@ methodmap JSON_Array < JSON_Object
     /**
      * Converts index to a string ('key') and calls the relevant Super method.
      *
-     * @see JSON_Object.GetBool
+     * @see MetaStringMap.GetBool
      */
     public bool GetBool(int index, bool default_value = false)
     {
@@ -370,7 +343,7 @@ methodmap JSON_Array < JSON_Object
     /**
      * Converts index to a string ('key') and calls the relevant Super method.
      *
-     * @see JSON_Object.GetObject
+     * @see MetaStringMap.GetObject
      */
     public JSON_Object GetObject(int index, JSON_Object default_value = null)
     {
@@ -494,10 +467,7 @@ methodmap JSON_Array < JSON_Object
     public int PushString(const char[] value)
     {
         int index = this.Length;
-        this.Length += 1;
         if (! this.SetString(index, value)) {
-            this.Length -= 1;
-
             return -1;
         }
 
@@ -513,10 +483,7 @@ methodmap JSON_Array < JSON_Object
     public int PushInt(int value)
     {
         int index = this.Length;
-        this.Length += 1;
         if (! this.SetInt(index, value)) {
-            this.Length -= 1;
-
             return -1;
         }
 
@@ -532,10 +499,7 @@ methodmap JSON_Array < JSON_Object
     public int PushFloat(float value)
     {
         int index = this.Length;
-        this.Length += 1;
         if (! this.SetFloat(index, value)) {
-            this.Length -= 1;
-
             return -1;
         }
 
@@ -551,10 +515,7 @@ methodmap JSON_Array < JSON_Object
     public int PushBool(bool value)
     {
         int index = this.Length;
-        this.Length += 1;
         if (! this.SetBool(index, value)) {
-            this.Length -= 1;
-
             return -1;
         }
 
@@ -570,10 +531,7 @@ methodmap JSON_Array < JSON_Object
     public int PushObject(JSON_Object value)
     {
         int index = this.Length;
-        this.Length += 1;
         if (! this.SetObject(index, value)) {
-            this.Length -= 1;
-
             return -1;
         }
 
@@ -613,11 +571,11 @@ methodmap JSON_Array < JSON_Object
     {
         int length = this.Length;
         for (int i = 0; i < length; i += 1) {
-            if (this.GetKeyType(i) != JSON_Type_String) {
+            if (this.GetType(i) != JSON_Type_String) {
                 continue;
             }
 
-            int current_size = this.GetKeyLength(i) + 1;
+            int current_size = this.GetSize(i);
             char[] current = new char[current_size];
             this.GetString(i, current, current_size);
             if (StrEqual(value, current)) {
@@ -651,17 +609,8 @@ methodmap JSON_Array < JSON_Object
     }
 
     /**
-     * @section StringMap Overrides
+     * @section Misc
      */
-
-    /**
-     * Clears all entries and ensures the array index is re-set.
-     */
-    public void Clear()
-    {
-        this.Super.Clear();
-        this.Length = 0;
-    }
 
     /**
      * Removes an index and its related meta-keys from the array,
@@ -677,53 +626,112 @@ methodmap JSON_Array < JSON_Object
             return false;
         }
 
+        int length = this.Length;
+
         // remove existing value at index
         if (! this.Super.Remove(key)) {
             return false;
         }
 
         // shift all following elements down
-        int length = this.Length;
-        for (int i = index + 1; i < length; i += 1) {
-            int target = i - 1;
-            JSONCellType type = this.GetKeyType(i);
+        char current_key[JSON_INT_BUFFER_SIZE];
+        for (int oldIndex = index + 1; oldIndex < length; oldIndex += 1) {
+            int newIndex = oldIndex - 1;
+            JSONCellType type = this.GetType(oldIndex);
 
             switch (type) {
                 case JSON_Type_String: {
-                    int str_length = this.GetKeyLength(i);
+                    int str_length = this.GetSize(oldIndex);
                     char[] str_value = new char[str_length];
 
-                    this.GetString(i, str_value, str_length + 1);
-                    this.SetString(target, str_value);
+                    this.GetString(oldIndex, str_value, str_length);
+                    this.SetString(newIndex, str_value);
                 }
                 case JSON_Type_Int: {
-                    this.SetInt(target, this.GetInt(i));
+                    this.SetInt(newIndex, this.GetInt(oldIndex));
                 }
                 case JSON_Type_Float: {
-                    this.SetFloat(target, this.GetFloat(i));
+                    this.SetFloat(newIndex, this.GetFloat(oldIndex));
                 }
                 case JSON_Type_Bool: {
-                    this.SetBool(target, this.GetBool(i));
+                    this.SetBool(newIndex, this.GetBool(oldIndex));
                 }
                 case JSON_Type_Object: {
-                    this.SetObject(target, this.GetObject(i));
+                    this.SetObject(newIndex, this.GetObject(oldIndex));
                 }
             }
 
-            this.SetKeyHidden(target, this.GetKeyHidden(i));
+            this.SetHidden(newIndex, this.GetHidden(oldIndex));
 
-            char current_key[JSON_INT_BUFFER_SIZE];
             if (this.GetIndexAsString(
-                i,
+                oldIndex,
                 current_key,
-                sizeof(current_key),
-                false
+                sizeof(current_key)
             )) {
                 this.Super.Remove(current_key);
             }
         }
 
-        this.Length -= 1;
+        return true;
+    }
+
+    /**
+     * Concatenates the entries from the specified array
+     * on to the end of this array.
+     *
+     * @param from      Array to concat entries from.
+     * @return          True on success, false otherwise.
+     * @error           If the object being merged is an object or the
+     *                  arrays being merged don't have the same strict
+     *                  type set, an error will be thrown.
+     */
+    public bool Concat(JSON_Array from)
+    {
+        if (! this.IsArray || ! from.IsArray) {
+            LogError("JSON_Array@concat: attempted to concat using object(s)");
+
+            return false;
+        }
+
+        if (this.Type != from.Type) {
+            LogError("JSON_Array@concat: arrays have mismatched strict types");
+
+            return false;
+        }
+
+        int json_size = from.Length;
+        for (int i = 0; i < json_size; i += 1) {
+            JSONCellType type = from.GetType(i);
+            // skip keys of unknown type
+            if (type == JSON_Type_Invalid) {
+                continue;
+            }
+
+            // push value onto array
+            switch (type) {
+                case JSON_Type_String: {
+                    int length = from.GetSize(i);
+                    char[] value = new char[length];
+                    from.GetString(i, value, length);
+
+                    this.PushString(value);
+                }
+                case JSON_Type_Int: {
+                    this.PushInt(from.GetInt(i));
+                }
+                case JSON_Type_Float: {
+                    this.PushFloat(from.GetFloat(i));
+                }
+                case JSON_Type_Bool: {
+                    this.PushBool(from.GetBool(i));
+                }
+                case JSON_Type_Object: {
+                    this.PushObject(from.GetObject(i));
+                }
+            }
+
+            this.SetHidden(json_size + i, from.GetHidden(i));
+        }
 
         return true;
     }
@@ -743,11 +751,11 @@ methodmap JSON_Array < JSON_Object
             int current = -1;
             int length = this.Length;
             for (int i = 0; i < length; i += 1) {
-                if (this.GetKeyType(i) != JSON_Type_String) {
+                if (this.GetType(i) != JSON_Type_String) {
                     continue;
                 }
 
-                current = this.GetKeyLength(i);
+                current = this.GetSize(i);
                 if (current > max) {
                     max = current;
                 }
@@ -765,7 +773,7 @@ methodmap JSON_Array < JSON_Object
      * @param type  Type to enforce.
      * @return      True if the type was enforced successfully, false otherwise.
      */
-    public bool SetType(JSONCellType type)
+    public bool EnforceType(JSONCellType type)
     {
         if (type == JSON_Type_Invalid) {
             this.Type = type;
@@ -775,7 +783,7 @@ methodmap JSON_Array < JSON_Object
 
         int length = this.Length;
         for (int i = 0; i < length; i += 1) {
-            if (this.GetKeyType(i) != type) {
+            if (this.GetType(i) != type) {
                 return false;
             }
         }
@@ -874,7 +882,23 @@ methodmap JSON_Array < JSON_Object
     }
 
     /**
-     * @section Constructor and json.inc Aliases
+     * json.inc Aliases
+     */
+
+    // @see JSON_Object.ShallowCopy
+    public JSON_Array ShallowCopy()
+    {
+        return view_as<JSON_Array>(this.Super.ShallowCopy());
+    }
+
+    // @see JSON_Object.DeepCopy
+    public JSON_Array DeepCopy()
+    {
+        return view_as<JSON_Array>(this.Super.DeepCopy());
+    }
+
+    /**
+     * @section Constructor
      */
 
     /**
@@ -887,34 +911,9 @@ methodmap JSON_Array < JSON_Object
     public JSON_Array(JSONCellType type = JSON_Type_Invalid)
     {
         JSON_Array self = view_as<JSON_Array>(new JSON_Object());
-        self.Length = 0;
-
-        if (type != JSON_Type_Invalid) {
-            self.SetType(type);
-        }
+        self.Meta.SetBool(JSON_ARRAY_KEY, true);
+        self.EnforceType(type);
 
         return self;
-    }
-
-    /**
-     * Calls the json_copy_shallow method, replacing the 'obj' parameter
-     * with this instance and casting the return value to an array.
-     *
-     * @see json_copy_shallow
-     */
-    public JSON_Array ShallowCopy()
-    {
-        return view_as<JSON_Array>(this.Super.ShallowCopy());
-    }
-
-    /**
-     * Calls the json_copy_deep method, replacing the 'obj' parameter
-     * with this instance and casting the return value to an array.
-     *
-     * @see json_copy_deep
-     */
-    public JSON_Array DeepCopy()
-    {
-        return view_as<JSON_Array>(this.Super.DeepCopy());
     }
 };

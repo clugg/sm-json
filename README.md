@@ -1,7 +1,7 @@
 # sm-json
 ![Build Status](https://github.com/clugg/sm-json/workflows/Compile%20with%20SourceMod/badge.svg) [![Latest Release](https://img.shields.io/github/v/release/clugg/sm-json?include_prereleases&sort=semver)](https://github.com/clugg/sm-json/releases)
 
-**This README covers documentation for v3.x. If you're looking for v2.x docs, please use the [v2.x branch](../../tree/v2.x).**
+**This README covers documentation for v4.x. If you're looking for v3.x docs, please use the [v3.x branch](../../tree/v3.x).**
 
 A pure SourcePawn JSON encoder/decoder. Also offers a nice way of implementing pseudo-classes with properties and methods.
 
@@ -26,17 +26,17 @@ Table of Contents
   * [Array Helpers](#array-helpers)
   * [Array Type Enforcement](#array-type-enforcement)
   * [Array Importing](#array-importing)
-  * [Merging](#merging)
+  * [Object Merging](#object-merging)
+  * [Array Concatenation](#array-concatenation)
   * [Copying](#copying)
   * [Working with Unknowns](#working-with-unknowns)
-  * [Accessing Super Methods](#accessing-super-methods)
   * [Global Helper Functions](#global-helper-functions)
 * [Testing](#testing)
 * [Contributing](#contributing)
 * [License](#license)
 
 ## Requirements
-* SourceMod 1.8 or later
+* SourceMod 1.9 or later
 
 ## Installation
 Download the source code for the [latest release](https://github.com/clugg/sm-json/releases/latest) and move all files and directories from the [`addons/sourcemod/scripting/include`](addons/sourcemod/scripting/include) directory to your existing `addons/sourcemod/scripting/include` directory.
@@ -66,8 +66,7 @@ arr.PushObject(new JSON_Object());
 
 arr.Encode(output, sizeof(output));
 // output now contains ["my string",1234,13.37,true,null,[],{}]
-arr.Cleanup();
-delete arr;
+json_cleanup_and_delete(arr);
 ```
 
 #### Objects
@@ -83,8 +82,7 @@ obj.SetObject("object", new JSON_Object());
 
 obj.Encode(output, sizeof(output));
 // output now contains {"object":{},"floatkey":-13.37,"boolkey":false,"intkey":-1234,"array":[],"nullkey":null,"strkey":"your string"}
-obj.Cleanup();
-delete obj;
+json_cleanup_and_delete(obj);
 ```
 
 #### Options
@@ -104,8 +102,7 @@ parent_obj.SetBool("pretty_printing", true);
 parent_obj.SetObject("first_depth", child_obj);
 
 parent_obj.Encode(output, sizeof(output), JSON_ENCODE_PRETTY);
-parent_obj.Cleanup();
-delete parent_obj;
+json_cleanup_and_delete(parent_obj);
 ```
 
 `output` will contain the following:
@@ -148,8 +145,7 @@ Handle nullval = arr.GetObject(4);
 JSON_Array arrval = view_as<JSON_Array>(arr.GetObject(5));
 JSON_Object objval = arr.GetObject(6);
 
-arr.Cleanup();
-delete arr;
+json_cleanup_and_delete(arr);
 ```
 
 #### Objects
@@ -164,8 +160,7 @@ Handle nullval = obj.GetObject("nullkey");
 JSON_Array arrval = view_as<JSON_Array>(obj.GetObject("array"));
 JSON_Object objval = obj.GetObject("object");
 
-obj.Cleanup();
-delete obj;
+json_cleanup_and_delete(obj);
 ```
 
 #### Options
@@ -177,49 +172,37 @@ Options which modify how the parser works can be passed as the second parameter 
 ```c
 int length = arr.Length;
 for (int i = 0; i < length; i += 1) {
-    JSONCellType type = arr.GetKeyType(i);
+    JSONCellType type = arr.GetType(i);
     // do whatever you want with the index and type information
 }
 ```
 
 #### Objects
 ```c
-int length = obj.Length;
+int length = obj.Iterate();
 int key_length = 0;
-StringMapSnapshot snap = obj.Snapshot();
 for (int i = 0; i < length; i += 1) {
-    key_length = snap.KeyBufferSize(i);
+    key_length = obj.GetKeySize(i);
     char[] key = new char[key_length];
+    obj.GetKey(i, key, key_length);
 
-    snap.GetKey(i, key, key_length);
-
-    // skip meta-keys
-    if (json_is_meta_key(key)) {
-        continue;
-    }
-
-    JSONCellType type = obj.GetKeyType(key);
+    JSONCellType type = obj.GetType(key);
     // do whatever you want with the key and type information
 }
-delete snap;
 ```
 
 ### Cleaning Up
-Since this library uses `StringMap` under the hood, you need to make sure you manage your memory properly by cleaning up instances with the `delete` keyword when you're done with them.
+Since this library uses `StringMap` under the hood, you need to make sure you manage your memory properly by cleaning up instances when you're done with them. Using the `delete` keyword is not sufficient with JSON instances due to their underlying structure. A helper function `Cleanup()` has been provided which recursively cleans up and deletes all nested instances before deleting the parent instance.
 
-If an instance contains nested instance(s) (e.g. `[{}]`), they will not be automatically cleaned up upon deletion. A helper function `Cleanup()` has been provided which recursively cleans up and deletes all nested instances before deleting the parent instance.
-
-Additionally, there is a global helper function `json_cleanup_and_delete()` which will first call `Cleanup()`, then `delete`, then set the variable to null.
+Additionally, there is a global helper function `json_cleanup_and_delete()` which will first call `Cleanup()`, then set the passed variable to null.
 
 ```c
 arr.Cleanup();
-delete arr;
 arr = null;
 // or
 json_cleanup_and_delete(arr);
 
 obj.Cleanup();
-delete obj;
 obj = null;
 // or
 json_cleanup_and_delete(obj);
@@ -237,27 +220,22 @@ JSON_Object obj2 = new JSON_Object();
 obj2.SetObject("shared", shared);
 
 // this will clean up the nested "shared" array
-obj1.Cleanup();
-delete obj1;
+json_cleanup_and_delete(obj1);
 
 // this will throw an Invalid Handle exception because "shared" no longer exists
-obj2.Cleanup();
-delete obj2;
+json_cleanup_and_delete(obj2);
 ```
 
 You can avoid this by removing known shared instances from other instances before cleaning them up.
 
 ```c
 obj1.Remove("shared");
-obj1.Cleanup();
-delete obj1;
+json_cleanup_and_delete(obj1);
 
 obj2.Remove("shared");
-obj2.Cleanup();
-delete obj2;
+json_cleanup_and_delete(obj2);
 
-shared.Cleanup();
-delete shared;
+json_cleanup_and_delete(shared);
 ```
 
 ### Pseudo-Classes
@@ -473,33 +451,25 @@ In every case where a method denotes that it accepts a `key/index`, it means the
 
 ### Metadata
 * `obj/arr.HasKey(key/index)`: returns true if the key exists, false otherwise.
-* `obj/arr.GetKeyType(key/index)`: returns the [JSONCellType](addons/sourcemod/scripting/include/json/definitions.inc#LL96-L106) stored at the key.
-* `obj/arr.GetKeyLength(key/index)`: if the key contains a string, returns the exact length of the string (not including NULL terminator). **Example:**
+* `obj/arr.GetType(key/index)`: returns the [JSONCellType](addons/sourcemod/scripting/include/json/definitions.inc#LL96-L106) stored at the key.
+* `obj/arr.GetSize(key/index)`: if the key contains a string, returns the buffer size required for the string. **Example:**
 
 ```c
-int len = arr.GetKeyLength(0) + 1;
+int len = arr.GetSize(0);
 char[] val = new char[len];
 arr.GetString(0, val, len);
 ```
 
-It is possible to mark a key as 'hidden' so that it does not appear in encoder output. **WARNING:** When calling `Clear()` or `Remove()`, the hidden flag will be removed.
-* `obj/arr.SetKeyHidden(key/index, true/false)`: sets the specified key to be hidden (or not hidden).
-* `obj/arr.GetKeyHidden(key/index)`: returns whether or not the key is hidden.
+It is possible to mark a key as 'hidden' so that it does not appear in encoder output. **WARNING:** When calling `Clear()` or `Remove()`, relevant hidden flags will also be removed.
+* `obj/arr.SetHidden(key/index, true/false)`: sets the specified key to be hidden (or not hidden).
+* `obj/arr.GetHidden(key/index)`: returns whether or not the key is hidden.
 **Example:**
 ```c
-obj.SetKeyHidden("secret_key", true);
+obj.SetHidden("secret_key", true);
 obj.SetString("secret_key", "secret_value");
 obj.SetString("public_key", "public_value");
 obj.Encode(output, sizeof(output));
 // output now contains {"public_key":"public_value"}
-
-// Clear() example, assuming key is still hidden
-obj.Clear();
-obj.GetKeyHidden("secret_key"); // returns false
-
-// Remove() example, assuming key is still hidden
-obj.Remove("secret_key");
-obj.GetKeyHidden("secret_key"); // returns false
 ```
 
 ### Renaming Elements
@@ -507,7 +477,7 @@ obj.GetKeyHidden("secret_key"); // returns false
 
 Renames an existing key in an object. Takes an optional third paramater `replace` (default `true`) which, when `false`, will prevent the rename if the to key already exists.
 
-This method maintains the element's metadata (e.g. whether or not it is hidden).
+This method maintains the existing element's metadata (e.g. whether or not it is hidden).
 
 ### Removing Elements
 `obj/arr.Remove(key/index)`
@@ -522,7 +492,7 @@ There are a few functions which make working with `JSON_Array`s a bit nicer.
 * `arr.Contains(value)`: returns true if the value is found in the array, false otherwise.
 * `arr.ContainsString(value)`: as above, but works exclusively with strings.
 
-Please note that due to how the `any` type works in SourcePawn, `Contains` may return false positives for values that are stored the same in memory. For example, `0`, `null` and `false` are all stored as `0` in memory and `1` and `true` are both stored as `1` in memory. Because of this, `view_as<JSON_Array>(json_decode("[0]")).Contains(null)` will return true, and so on. You may use `Contains` in conjunction with `GetKeyType` to typecheck the returned index and ensure it matches what you expected.
+Please note that due to how the `any` type works in SourcePawn, `Contains` may return false positives for values that are stored the same in memory. For example, `0`, `null` and `false` are all stored as `0` in memory and `1` and `true` are both stored as `1` in memory. Because of this, `view_as<JSON_Array>(json_decode("[0]")).Contains(null)` will return true, and so on. You may use `Contains` in conjunction with `GetType(` to typecheck the returned index and ensure it matches what you expected.
 
 ### Array Type Enforcement
 It is possible to enforce an array to only accept a single type. You can either do this when first creating the array, or later on.
@@ -536,14 +506,14 @@ json_cleanup_and_delete(ints);
 JSON_Array values = new JSON_Array();
 values.PushObject(null);
 values.PushInt(1);
-values.SetType(JSON_Type_Int); // fails and returns false, array doesn't only contain ints
+values.EnforceType(JSON_Type_Int); // fails and returns false, array doesn't only contain ints
 values.Remove(0);
-values.SetType(JSON_Type_Int); // returns true
+values.EnforceType(JSON_Type_Int); // returns true
 json_cleanup_and_delete(values);
 ```
 
 ### Array Importing
-It is possible to import any native array of values into a `JSON_Array`. The following code snippet works for every native type except char[]s.
+It is possible to import any native array of values into a `JSON_Array`. The following code snippet works for every native type except `char[]`s.
 
 ```c
 int ints[] = {1, 2, 3};
@@ -566,7 +536,7 @@ json_cleanup_and_delete(arr);
 ```
 
 ### Array Exporting
-It is possible to export a `JSON_Array`'s values to a native array. The following code snippet works for every native type except char[]s. *Note: there is no type checking done during export - it is entirely up to you to ensure that your array only contains the type that you expect (see [Array Type Enforcement](#array-type-enforcement)).*
+It is possible to export a `JSON_Array`'s values to a native array. The following code snippet works for every native type except `char[]`s. *Note: there is no type checking done during export - it is entirely up to you to ensure that your array only contains the type that you expect (see [Array Type Enforcement](#array-type-enforcement)).*
 
 ```c
 JSON_Array arr = view_as<JSON_Array>(json_decode("[1,2,3]"));
@@ -582,15 +552,15 @@ For strings, you need to use a separate function.
 ```c
 JSON_Array arr = view_as<JSON_Array>(json_decode("[\"hello\",\"world\"]"));
 int size = arr.Length;
-int str_length = arr.MaxStringLength + 1;
+int str_length = arr.MaxStringLength;
 char[][] values = new char[size][str_length];
 arr.ExportStrings(values, size, str_length);
 json_cleanup_and_delete(arr);
 // values now contains {"hello", "world"}
 ```
 
-### Merging
-`JSON_Array`s can be merged with one another, and `JSON_Object`s can too. For obvious reasons, an array cannot be merged with an object (and vice versa).
+### Object Merging
+`JSON_Object`s can be merged with one another.
 
 Merging is shallow, which means that if the second object has child objects, the reference will be maintained to the existing object when merged, as opposed to copying the children.
 
@@ -599,20 +569,6 @@ Merged keys will respect their previous hidden state when merged on to the first
 #### Options
 * `JSON_MERGE_REPLACE`: active by default. Tells the merger to replace any existing keys on the first object with the values from the second. For example, if you have two objects both containing key `x`, with replacement on, the value of `x` will be taken from the second object, and with replacement off, from the first object. You can explicitly disable this by passing `JSON_NONE` as an option.
 * `JSON_MERGE_CLEANUP`: tells merge to clean up any nested instances before they are replaced. Since this only has an effect while replacement is enabled, you will need to pass `JSON_MERGE_REPLACE | JSON_MERGE_CLEANUP` as options.
-
-```c
-JSON_Array arr1 = new JSON_Array();
-arr1.PushInt(1);
-arr1.PushInt(2);
-arr1.PushInt(3);
-
-JSON_Array arr2 = new JSON_Array();
-arr2.PushInt(4);
-arr2.PushInt(5);
-arr2.PushInt(6);
-
-arr1.Merge(arr2); // arr1 is now equivocally [1,2,3,4,5,6], arr2 remains unchanged
-```
 
 ```c
 JSON_Object obj1 = new JSON_Object();
@@ -626,6 +582,27 @@ obj2.SetInt("z", 4)
 obj1.Merge(obj2); // obj1 is now equivocally {"x":1,"y":3,"z":4}, obj2 remains unchanged
 // alternatively, without replacement
 obj1.Merge(obj2, JSON_NONE); // obj1 is now equivocally {"x":1,"y":2,"z":4}, obj2 remains unchanged
+```
+
+### Array Concatenation
+`JSON_Array`s can be concatenated to one another.
+
+Concatenation is shallow, which means that if the second array has child objects, the reference will be maintained to the existing object when merged, as opposed to copying the children. If you wish, you can do a `DeepCopy` on the source array before concatenating it.
+
+Concatenated elements will respect their previous hidden state when pushed to the target array.
+
+```
+JSON_Array target = new JSON_Array();
+target.PushInt(1);
+target.PushInt(2);
+target.PushInt(3);
+
+JSON_Array source = new JSON_Array();
+source.PushInt(4);
+source.PushInt(5);
+source.PushInt(6);
+
+target.Concat(source); // target is now equivocally [1,2,3,4,5,6], source remains unchanged
 ```
 
 ### Copying
@@ -690,38 +667,24 @@ if (obj.IsArray) {
 }
 ```
 
-### Accessing Super Methods
-`JSON_Array` inherits `JSON_Object` and `JSON_Object` inherits `StringMap`. There may be rare cases where you need to access an instance's superclass methods. A `Super` property has been provided which views an instance as its superclass.
-
-```c
-JSON_Object arr_super = arr.Super;
-StringMap arr_super_super = arr.Super.Super; // or arr_super.Super
-
-StringMap obj_super = obj.Super;
-```
-
 ### Global Helper Functions
 A few of the examples in this documentation use object-oriented syntax, while in reality, they are wrappers for global functions. A complete list of examples can be found below.
 
 ```c
 obj/arr.Encode(output, sizeof(output) /*, options */);
-// is equivalent to
+// or
 json_encode(obj/arr, output, sizeof(output) /*, options */);
 
-obj/arr.Merge(other /*, options */);
-// is equivalent to
-json_merge(obj/arr, other /*, options */);
-
 obj/arr.ShallowCopy();
-// is equivalent to
+// or
 json_copy_shallow(obj/arr);
 
 obj/arr.DeepCopy();
-// is equivalent to
+// or
 json_copy_deep(obj/arr);
 
 obj/arr.Cleanup();
-// is equivalent to
+// or
 json_cleanup(obj/arr);
 ```
 

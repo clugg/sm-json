@@ -82,10 +82,10 @@ bool check_array_remove(JSON_Array arr, int index)
     Test_Output("Removing element at index %d", index);
 
     // get current value at index
-    JSONCellType type = arr.GetKeyType(index);
+    JSONCellType type = arr.GetType(index);
     int str_size = 0;
     if (type == JSON_Type_String) {
-        str_size = arr.GetKeyLength(index) + 1;
+        str_size = arr.GetSize(index);
     }
 
     any value;
@@ -475,15 +475,15 @@ void it_should_remove_meta_keys_from_arrays()
     arr.PushString("hello");
     arr.PushInt(0);
 
-    Test_AssertEqual("0 type", arr.GetKeyType(0), JSON_Type_String);
-    Test_AssertEqual("0 length", arr.GetKeyLength(0), 5);
-    Test_AssertEqual("1 type", arr.GetKeyType(1), JSON_Type_Int);
+    Test_AssertEqual("0 type", arr.GetType(0), JSON_Type_String);
+    Test_AssertEqual("0 length", arr.GetSize(0), 6);
+    Test_AssertEqual("1 type", arr.GetType(1), JSON_Type_Int);
 
     arr.Remove(0);
 
-    Test_AssertEqual("0 type", arr.GetKeyType(0), JSON_Type_Int);
-    Test_AssertEqual("0 length", arr.GetKeyLength(0), -1);
-    Test_AssertEqual("1 type", arr.GetKeyType(1), JSON_Type_Invalid);
+    Test_AssertEqual("0 type", arr.GetType(0), JSON_Type_Int);
+    Test_AssertEqual("0 length", arr.GetSize(0), -1);
+    Test_AssertEqual("1 type", arr.GetType(1), JSON_Type_Invalid);
 
     json_cleanup_and_delete(arr);
 }
@@ -494,15 +494,15 @@ void it_should_remove_meta_keys_from_objects()
     obj.SetString("hello", "world");
     obj.SetInt("zero", 0);
 
-    Test_AssertEqual("hello type", obj.GetKeyType("hello"), JSON_Type_String);
-    Test_AssertEqual("hello length", obj.GetKeyLength("hello"), 5);
-    Test_AssertEqual("zero type", obj.GetKeyType("zero"), JSON_Type_Int);
+    Test_AssertEqual("hello type", obj.GetType("hello"), JSON_Type_String);
+    Test_AssertEqual("hello length", obj.GetSize("hello"), 6);
+    Test_AssertEqual("zero type", obj.GetType("zero"), JSON_Type_Int);
 
     obj.Remove("hello");
 
-    Test_AssertEqual("hello type", obj.GetKeyType("hello"), JSON_Type_Invalid);
-    Test_AssertEqual("hello length", obj.GetKeyLength("hello"), -1);
-    Test_AssertEqual("zero type", obj.GetKeyType("zero"), JSON_Type_Int);
+    Test_AssertEqual("hello type", obj.GetType("hello"), JSON_Type_Invalid);
+    Test_AssertEqual("hello length", obj.GetSize("hello"), -1);
+    Test_AssertEqual("zero type", obj.GetType("zero"), JSON_Type_Int);
 
     json_cleanup_and_delete(obj);
 }
@@ -528,56 +528,17 @@ void it_should_shift_array_down_after_removed_index()
     json_cleanup_and_delete(arr);
 }
 
-void it_should_not_merge_array_onto_object()
+void it_should_not_merge_using_array()
 {
     JSON_Object obj = new JSON_Object();
     JSON_Array arr = new JSON_Array();
-
-    Test_Assert("merge failed", obj.Merge(arr) == false);
-
-    json_cleanup_and_delete(obj);
-    json_cleanup_and_delete(arr);
-}
-
-void it_should_not_merge_object_onto_array()
-{
-    JSON_Array arr = new JSON_Array();
-    JSON_Object obj = new JSON_Object();
-
-    Test_Assert("merge failed", arr.Merge(obj) == false);
-
-    json_cleanup_and_delete(arr);
-    json_cleanup_and_delete(obj);
-}
-
-void it_should_merge_arrays()
-{
-    JSON_Array arr1 = new JSON_Array();
-    arr1.PushInt(1);
-    arr1.PushBool(true);
-    arr1.SetKeyHidden(1, true);
-
     JSON_Array arr2 = new JSON_Array();
-    arr2.PushInt(2);
-    arr2.PushBool(false);
-    arr2.SetKeyHidden(1, true);
 
-    if (! Test_Assert("merged successfully", arr1.Merge(arr2))) {
-        // if this assertion fails, testing cannot continue
-        return;
-    }
+    Test_Assert("merge failed: obj <- arr", obj.Merge(arr) == false);
+    Test_Assert("merge failed: arr <- arr", arr.Merge(arr2) == false);
 
-    print_json(arr1);
-
-    Test_AssertEqual("merged length", arr1.Length, 4);
-    Test_AssertEqual("merged 2 type", arr1.GetKeyType(2), JSON_Type_Int);
-    Test_AssertEqual("merged 2", arr1.GetInt(2), 2);
-    Test_AssertEqual("merged 3 type", arr1.GetKeyType(3), JSON_Type_Bool);
-    Test_AssertEqual("merged 3", arr1.GetBool(3), false);
-    Test_AssertTrue("merged 1 hidden", arr1.GetKeyHidden(1));
-    Test_AssertTrue("merged 3 hidden", arr1.GetKeyHidden(3));
-
-    json_cleanup_and_delete(arr1);
+    json_cleanup_and_delete(obj);
+    json_cleanup_and_delete(arr);
     json_cleanup_and_delete(arr2);
 }
 
@@ -586,12 +547,12 @@ void it_should_merge_objects_with_replacement()
     JSON_Object obj1 = new JSON_Object();
     obj1.SetInt("key1", 1);
     obj1.SetBool("replaced", false);
-    obj1.SetKeyHidden("replaced", false);
+    obj1.SetHidden("replaced", false);
 
     JSON_Object obj2 = new JSON_Object();
     obj2.SetInt("key2", 2);
     obj2.SetBool("replaced", true);
-    obj2.SetKeyHidden("replaced", true);
+    obj2.SetHidden("replaced", true);
 
     if (! Test_Assert("merged successfully", obj1.Merge(obj2))) {
         // if this assertion fails, testing cannot continue
@@ -601,11 +562,11 @@ void it_should_merge_objects_with_replacement()
     print_json(obj1);
 
     Test_Assert("merged has key2", obj1.HasKey("key2"));
-    Test_AssertEqual("merged key2 type", obj1.GetKeyType("key2"), JSON_Type_Int);
+    Test_AssertEqual("merged key2 type", obj1.GetType("key2"), JSON_Type_Int);
     Test_AssertEqual("merged key2", obj1.GetInt("key2"), 2);
-    Test_AssertEqual("merged replaced type", obj1.GetKeyType("replaced"), JSON_Type_Bool);
+    Test_AssertEqual("merged replaced type", obj1.GetType("replaced"), JSON_Type_Bool);
     Test_AssertTrue("merged replaced", obj1.GetBool("replaced"));
-    Test_AssertTrue("merged replaced hidden", obj1.GetKeyHidden("replaced"));
+    Test_AssertTrue("merged replaced hidden", obj1.GetHidden("replaced"));
 
     json_cleanup_and_delete(obj1);
     json_cleanup_and_delete(obj2);
@@ -616,12 +577,12 @@ void it_should_merge_objects_without_replacement()
     JSON_Object obj1 = new JSON_Object();
     obj1.SetInt("key1", 1);
     obj1.SetBool("replaced", false);
-    obj1.SetKeyHidden("replaced", false);
+    obj1.SetHidden("replaced", false);
 
     JSON_Object obj2 = new JSON_Object();
     obj2.SetInt("key2", 2);
     obj2.SetBool("replaced", true);
-    obj2.SetKeyHidden("replaced", true);
+    obj2.SetHidden("replaced", true);
 
     if (! Test_Assert("merged successfully", obj1.Merge(obj2, JSON_NONE))) {
         // if this assertion fails, testing cannot continue
@@ -631,14 +592,56 @@ void it_should_merge_objects_without_replacement()
     print_json(obj1);
 
     Test_Assert("merged has key2", obj1.HasKey("key2"));
-    Test_AssertEqual("merged key2 type", obj1.GetKeyType("key2"), JSON_Type_Int);
+    Test_AssertEqual("merged key2 type", obj1.GetType("key2"), JSON_Type_Int);
     Test_AssertEqual("merged key2", obj1.GetInt("key2"), 2);
-    Test_AssertEqual("merged replaced type", obj1.GetKeyType("replaced"), JSON_Type_Bool);
+    Test_AssertEqual("merged replaced type", obj1.GetType("replaced"), JSON_Type_Bool);
     Test_AssertFalse("merged replaced", obj1.GetBool("replaced"));
-    Test_AssertFalse("merged replaced hidden", obj1.GetKeyHidden("replaced"));
+    Test_AssertFalse("merged replaced hidden", obj1.GetHidden("replaced"));
 
     json_cleanup_and_delete(obj1);
     json_cleanup_and_delete(obj2);
+}
+
+void it_should_not_concat_using_object()
+{
+    JSON_Array arr = new JSON_Array();
+    JSON_Array obj = view_as<JSON_Array>(new JSON_Object());
+
+    Test_Assert("concat failed: arr <- obj", arr.Concat(obj) == false);
+
+    json_cleanup_and_delete(arr);
+    json_cleanup_and_delete(obj);
+}
+
+void it_should_concat_arrays()
+{
+    JSON_Array arr1 = new JSON_Array();
+    arr1.PushInt(1);
+    arr1.PushBool(true);
+    arr1.SetHidden(1, true);
+
+    JSON_Array arr2 = new JSON_Array();
+    arr2.PushInt(2);
+    arr2.PushBool(false);
+    arr2.SetHidden(1, true);
+
+    if (! Test_Assert("merged successfully", arr1.Concat(arr2))) {
+        // if this assertion fails, testing cannot continue
+        return;
+    }
+
+    print_json(arr1);
+
+    Test_AssertEqual("merged length", arr1.Length, 4);
+    Test_AssertEqual("merged 2 type", arr1.GetType(2), JSON_Type_Int);
+    Test_AssertEqual("merged 2", arr1.GetInt(2), 2);
+    Test_AssertEqual("merged 3 type", arr1.GetType(3), JSON_Type_Bool);
+    Test_AssertEqual("merged 3", arr1.GetBool(3), false);
+    Test_AssertTrue("merged 1 hidden", arr1.GetHidden(1));
+    Test_AssertTrue("merged 3 hidden", arr1.GetHidden(3));
+
+    json_cleanup_and_delete(arr1);
+    json_cleanup_and_delete(arr2);
 }
 
 void it_should_copy_flat_arrays()
@@ -847,12 +850,12 @@ void it_should_enforce_types_in_arrays()
     json_cleanup_and_delete(arr);
 }
 
-void it_should_not_set_type_on_inconsistent_array()
+void it_should_not_enable_strict_type_on_inconsistent_array()
 {
     JSON_Array arr = new JSON_Array();
     arr.PushObject(null);
 
-    Test_Assert("SetType failed", ! arr.SetType(JSON_Type_Int));
+    Test_Assert("EnforceType failed", ! arr.EnforceType(JSON_Type_Int));
 
     json_cleanup_and_delete(arr);
 }
@@ -953,7 +956,7 @@ void it_should_export_strings()
 {
     JSON_Array arr = view_as<JSON_Array>(json_decode("[\"hello\",\"world\"]"));
     int size = arr.Length;
-    int str_length = arr.MaxStringLength + 1;
+    int str_length = arr.MaxStringLength;
     char[][] values = new char[size][str_length];
     arr.ExportStrings(values, size, str_length);
 
@@ -982,7 +985,7 @@ void it_should_support_unicode()
     for (int i = 0; i < length; i += 1) {
         FormatEx(element_name, sizeof(element_name), "arr[%d]", i);
 
-        int element_length = arr.GetKeyLength(i) + 1;
+        int element_length = arr.GetSize(i);
         char[] element = new char[element_length];
         arr.GetString(i, element, element_length);
         Test_AssertStringsEqual(element_name, element, expected_values[i]);
@@ -1001,15 +1004,15 @@ void it_should_rename_object_keys()
     obj.SetInt("key2", 2);
     obj.SetInt("key3", 3);
 
-    Test_AssertFalse("rename existing key with no replace fails", obj.RenameKey("key1", "key2", false));
+    Test_AssertFalse("rename existing key with no replace fails", obj.Rename("key1", "key2", false));
     Test_AssertEqual("key1", obj.GetInt("key1"), 1);
     Test_AssertEqual("key2", obj.GetInt("key2"), 2);
 
-    Test_AssertTrue("rename existing key with replace succeeds", obj.RenameKey("key1", "key2"));
+    Test_AssertTrue("rename existing key with replace succeeds", obj.Rename("key1", "key2"));
     Test_AssertFalse("key1 doesn't exist", obj.HasKey("key1"));
     Test_AssertEqual("key2", obj.GetInt("key2"), 1);
 
-    Test_AssertTrue("rename new key succeeds", obj.RenameKey("key3", "key4"));
+    Test_AssertTrue("rename new key succeeds", obj.Rename("key3", "key4"));
     Test_AssertFalse("key3 doesn't exist", obj.HasKey("key3"));
     Test_AssertEqual("key4", obj.GetInt("key4"), 3);
 
@@ -1020,10 +1023,10 @@ void it_should_maintain_hidden_on_renamed_object_keys()
 {
     JSON_Object obj = new JSON_Object();
     obj.SetInt("key1", 1);
-    obj.SetKeyHidden("key1", true);
+    obj.SetHidden("key1", true);
 
-    obj.RenameKey("key1", "key2");
-    Test_AssertTrue("key2 hidden", obj.GetKeyHidden("key2"));
+    obj.Rename("key1", "key2");
+    Test_AssertTrue("key2 hidden", obj.GetHidden("key2"));
 
     json_cleanup_and_delete(obj);
 }
@@ -1114,11 +1117,11 @@ public void OnPluginStart()
     Test_Run("it_should_remove_meta_keys_from_arrays", it_should_remove_meta_keys_from_arrays);
     Test_Run("it_should_remove_meta_keys_from_objects", it_should_remove_meta_keys_from_objects);
     Test_Run("it_should_shift_array_down_after_removed_index", it_should_shift_array_down_after_removed_index);
-    Test_Run("it_should_not_merge_array_onto_object", it_should_not_merge_array_onto_object);
-    Test_Run("it_should_not_merge_object_onto_array", it_should_not_merge_object_onto_array);
-    Test_Run("it_should_merge_arrays", it_should_merge_arrays);
+    Test_Run("it_should_not_merge_using_array", it_should_not_merge_using_array);
     Test_Run("it_should_merge_objects_with_replacement", it_should_merge_objects_with_replacement);
     Test_Run("it_should_merge_objects_without_replacement", it_should_merge_objects_without_replacement);
+    Test_Run("it_should_not_concat_using_object", it_should_not_concat_using_object);
+    Test_Run("it_should_concat_arrays", it_should_concat_arrays);
     Test_Run("it_should_copy_flat_arrays", it_should_copy_flat_arrays);
     Test_Run("it_should_copy_flat_objects", it_should_copy_flat_objects);
     Test_Run("it_should_shallow_copy_arrays", it_should_shallow_copy_arrays);
@@ -1129,7 +1132,7 @@ public void OnPluginStart()
     Test_Run("it_should_return_default_values_for_missing_elements", it_should_return_default_values_for_missing_elements);
     Test_Run("it_should_autocleanup_merged_objects", it_should_autocleanup_merged_objects);
     Test_Run("it_should_enforce_types_in_arrays", it_should_enforce_types_in_arrays);
-    Test_Run("it_should_not_set_type_on_inconsistent_array", it_should_not_set_type_on_inconsistent_array);
+    Test_Run("it_should_not_enable_strict_type_on_inconsistent_array", it_should_not_enable_strict_type_on_inconsistent_array);
     Test_Run("it_should_import_ints", it_should_import_ints);
     Test_Run("it_should_import_floats", it_should_import_floats);
     Test_Run("it_should_import_bools", it_should_import_bools);

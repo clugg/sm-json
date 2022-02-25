@@ -118,6 +118,13 @@ stock int json_utf8_to_ascii(int c, char[] output, int max_size)
     return i;
 }
 
+/**
+ * Converts bytes to their UTF-8 int representation.
+ *
+ * @param ascii     The ascii/bytes to convert.
+ * @param max_size  Maximum size of ascii.
+ * @return          The UTF-8 int representation.
+ */
 stock int json_ascii_to_utf8(const char[] ascii, int max_size, int &size)
 {
     size = 0;

@@ -44,8 +44,7 @@
  */
 
 /**
- * Checks whether the character at the beginning
- * of the buffer is whitespace.
+ * Checks whether the character at the beginning of the buffer is whitespace.
  *
  * @param buffer    String buffer of data.
  * @return          True if the first character in the buffer
@@ -64,8 +63,7 @@ stock bool json_is_whitespace(const char[] buffer)
  * of the buffer is the start of a string.
  *
  * @param buffer                String buffer of data.
- * @param allow_single_quotes   Should strings wrapped in
- *                              single quotes be accepted?
+ * @param allow_single_quotes   Should strings using single quotes be accepted?
  * @return                      True if the first character in the buffer
  *                              is the start of a string, false otherwise.
  */
@@ -82,13 +80,13 @@ stock bool json_is_string(const char[] buffer, bool allow_single_quotes = false)
  */
 stock bool json_is_int(const char[] buffer)
 {
-    bool starts_with_zero = false;
-    bool has_digit_gt_zero = false;
-
     int length = strlen(buffer);
     if (length == 0) {
         return false;
     }
+
+    bool starts_with_zero = false;
+    bool has_digit_gt_zero = false;
 
     for (int i = 0; i < length; i += 1) {
         // allow minus as first character only
@@ -126,17 +124,17 @@ stock bool json_is_int(const char[] buffer)
  */
 stock bool json_is_float(const char[] buffer)
 {
+    int length = strlen(buffer);
+    if (length == 0) {
+        return false;
+    }
+
     bool starts_with_zero = false;
     bool has_digit_gt_zero = false;
     bool after_decimal = false;
     bool has_digit_after_decimal = false;
     bool after_exponent = false;
     bool has_digit_after_exponent = false;
-
-    int length = strlen(buffer);
-    if (length == 0) {
-        return false;
-    }
 
     for (int i = 0; i < length; i += 1) {
         // allow minus as first character only
@@ -218,27 +216,28 @@ stock bool json_is_float(const char[] buffer)
         return false;
     }
 
-    /* we should have reached an exponent, decimal, or both.
-       otherwise, this number can be handled by the int parser */
+    // we should have reached an exponent, decimal, or both
+    // otherwise this number can be handled by the int parser
     return after_decimal || after_exponent;
 }
 
 /**
  * Checks whether the character at the beginning of the buffer
- * is considered a valid 'end point' for some data, such as a
- * colon (indicating a key), a comma (indicating a new element),
+ * is considered a valid 'end point' for an element,
+ * such as a colon (indicating the end of a key),
+ * a comma (indicating the end of an element),
  * or the end of an object or array.
  *
  * @param buffer    String buffer of data.
+ * @param is_array  Whether the decoder is processing an array.
  * @return          True if the first character in the buffer
- *                  is a valid data end point, false otherwise.
+ *                  is a valid element end point, false otherwise.
  */
 stock bool json_is_at_end(const char[] buffer, bool is_array)
 {
     return buffer[0] == ','
-        || (! is_array && buffer[0] == ':')
-        || buffer[0] == '}'
-        || buffer[0] == ']';
+        || (! is_array && (buffer[0] == ':' || buffer[0] == '}'))
+        || (is_array && buffer[0] == ']');
 }
 
 /**
@@ -299,8 +298,7 @@ stock int json_extract_until_end_size(
 }
 
 /**
- * Extracts a JSON cell from the buffer until
- * a valid end point is reached.
+ * Extracts a JSON cell from the buffer until a valid end point is reached.
  *
  * @param buffer            String buffer of data.
  * @param max_size          Maximum size of string buffer.
@@ -403,8 +401,7 @@ stock int json_extract_string_size(
 }
 
 /**
- * Extracts a JSON string from the buffer until
- * a valid end point is reached.
+ * Extracts a JSON string from the buffer until a valid end point is reached.
  *
  * @param buffer            String buffer of data.
  * @param max_size          Maximum size of string buffer.

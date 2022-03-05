@@ -106,6 +106,11 @@ stock void json_encode(
             case JSON_Type_Int: {
                 cell_length = JSON_INT_BUFFER_SIZE;
             }
+            #if SM_INT64_SUPPORTED
+            case JSON_Type_Int64: {
+                cell_length = JSON_INT64_BUFFER_SIZE;
+            }
+            #endif
             case JSON_Type_Float: {
                 cell_length = JSON_FLOAT_BUFFER_SIZE;
             }
@@ -130,6 +135,13 @@ stock void json_encode(
                 int value = obj.GetInt(key);
                 IntToString(value, cell, cell_length);
             }
+            #if SM_INT64_SUPPORTED
+            case JSON_Type_Int64: {
+                int value[2];
+                obj.GetInt64(key, value);
+                Int64ToString(value, cell, cell_length);
+            }
+            #endif
             case JSON_Type_Float: {
                 float value = obj.GetFloat(key);
                 FloatToString(value, cell, cell_length);
@@ -463,11 +475,30 @@ stock JSON_Object json_decode(
 
                 if (json_is_int(cell)) {
                     int value = StringToInt(cell);
+                    #if SM_INT64_SUPPORTED
+                    if (json_is_int64(cell, value)) {
+                        int values[2];
+                        StringToInt64(cell, values);
+
+                        if (is_array) {
+                            arr.PushInt64(values);
+                        } else {
+                            obj.SetInt64(key, values);
+                        }
+                    } else {
+                        if (is_array) {
+                            arr.PushInt(value);
+                        } else {
+                            obj.SetInt(key, value);
+                        }
+                    }
+                    #else
                     if (is_array) {
                         arr.PushInt(value);
                     } else {
                         obj.SetInt(key, value);
                     }
+                    #endif
                 } else if (json_is_float(cell)) {
                     float value = StringToFloat(cell);
                     if (is_array) {

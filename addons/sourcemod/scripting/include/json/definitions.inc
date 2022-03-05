@@ -39,6 +39,10 @@
 #include <string>
 #include <json/helpers/string>
 
+#define SM_INT64_SUPPORTED SOURCEMOD_V_MAJOR >= 1 \
+    && SOURCEMOD_V_MINOR >= 11 \
+    && SOURCEMOD_V_REV >= 6861
+
 /**
  * @section Settings
  */
@@ -79,6 +83,11 @@ char JSON_PP_NEWLINE[32] = "\n";
 // The longest representable integer ("-2147483648") + NULL terminator
 #define JSON_INT_BUFFER_SIZE 12
 
+#if SM_INT64_SUPPORTED
+// The longest representable int64 ("-9223372036854775808") + NULL terminator
+#define JSON_INT64_BUFFER_SIZE 65//21
+#endif
+
 // You may need to change this if you are working with large floats.
 #define JSON_FLOAT_BUFFER_SIZE 32
 
@@ -104,6 +113,9 @@ enum JSONCellType {
     JSON_Type_Invalid = -1,
     JSON_Type_String = 0,
     JSON_Type_Int,
+    #if SM_INT64_SUPPORTED
+    JSON_Type_Int64,
+    #endif
     JSON_Type_Float,
     JSON_Type_Bool,
     JSON_Type_Object

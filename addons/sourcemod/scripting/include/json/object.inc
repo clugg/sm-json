@@ -389,6 +389,20 @@ methodmap JSON_Object < MetaStringMap
      * @section Getters
      */
 
+    #if SM_INT64_SUPPORTED
+    /**
+     * Retrieves the int64 stored at a key.
+     *
+     * @param key               Key to retrieve int64 value for.
+     * @param default_value     Value to return if the key does not exist.
+     * @return                  Value stored at key.
+     */
+    public bool GetInt64(const char[] key, int value[2])
+    {
+        return this.Data.GetArray(key, value, 2);
+    }
+    #endif
+
     /**
      * Retrieves the JSON object stored at a key.
      *
@@ -436,6 +450,22 @@ methodmap JSON_Object < MetaStringMap
             && this.SetType(key, JSON_Type_Int)
             && this.TrackKeyOrder(key);
     }
+
+    #if SM_INT64_SUPPORTED
+    /**
+     * Sets the int64 stored at a key.
+     *
+     * @param key       Key to set to int64 value.
+     * @param value     Value to set.
+     * @return          True on success, false otherwise.
+     */
+    public bool SetInt64(const char[] key, int value[2])
+    {
+        return this.Data.SetArray(key, value, 2)
+            && this.SetType(key, JSON_Type_Int64)
+            && this.TrackKeyOrder(key);
+    }
+    #endif
 
     /**
      * Sets the float stored at a key.
@@ -544,6 +574,13 @@ methodmap JSON_Object < MetaStringMap
             case JSON_Type_Int: {
                 this.SetInt(to, this.GetInt(from));
             }
+            #if SM_INT64_SUPPORTED
+            case JSON_Type_Int64: {
+                int value[2];
+                this.GetInt64(from, value);
+                this.SetInt64(to, value);
+            }
+            #endif
             case JSON_Type_Float: {
                 this.SetFloat(to, this.GetFloat(from));
             }
@@ -615,6 +652,13 @@ methodmap JSON_Object < MetaStringMap
                 case JSON_Type_Int: {
                     this.SetInt(key, from.GetInt(key));
                 }
+                #if SM_INT64_SUPPORTED
+                case JSON_Type_Int64: {
+                    int value[2];
+                    from.GetInt64(key, value);
+                    this.SetInt64(key, value);
+                }
+                #endif
                 case JSON_Type_Float: {
                     this.SetFloat(key, from.GetFloat(key));
                 }

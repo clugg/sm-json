@@ -310,6 +310,23 @@ methodmap JSON_Array < JSON_Object
         return this.Super.GetInt(key, default_value);
     }
 
+    #if SM_INT64_SUPPORTED
+    /**
+     * Converts index to a string ('key') and calls the relevant Super method.
+     *
+     * @see JSON_Object.GetInt64
+     */
+    public bool GetInt64(int index, int value[2])
+    {
+        char key[JSON_INT_BUFFER_SIZE];
+        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+            return false;
+        }
+
+        return this.Super.GetInt64(key, value);
+    }
+    #endif
+
     /**
      * Converts index to a string ('key') and calls the relevant Super method.
      *
@@ -396,6 +413,27 @@ methodmap JSON_Array < JSON_Object
 
         return this.Super.SetInt(key, value);
     }
+
+    #if SM_INT64_SUPPORTED
+    /**
+     * Converts index to a string ('key') and calls the relevant Super method.
+     *
+     * @see JSON_Object.SetInt64
+     */
+    public bool SetInt64(int index, int value[2])
+    {
+        if (! this.CanUseType(JSON_Type_Int64)) {
+            return false;
+        }
+
+        char key[JSON_INT_BUFFER_SIZE];
+        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+            return false;
+        }
+
+        return this.Super.SetInt64(key, value);
+    }
+    #endif
 
     /**
      * Converts index to a string ('key') and calls the relevant Super method.
@@ -489,6 +527,24 @@ methodmap JSON_Array < JSON_Object
 
         return index;
     }
+
+    #if SM_INT64_SUPPORTED
+    /**
+     * Pushes an int64 to the end of the array.
+     *
+     * @param value     Value to push.
+     * @return          The element's index on success, -1 otherwise.
+     */
+    public int PushInt64(int value[2])
+    {
+        int index = this.Length;
+        if (! this.SetInt64(index, value)) {
+            return -1;
+        }
+
+        return index;
+    }
+    #endif
 
     /**
      * Pushes a float to the end of the array.
@@ -650,6 +706,13 @@ methodmap JSON_Array < JSON_Object
                 case JSON_Type_Int: {
                     this.SetInt(newIndex, this.GetInt(oldIndex));
                 }
+                #if SM_INT64_SUPPORTED
+                case JSON_Type_Int64: {
+                    int value[2];
+                    this.GetInt64(oldIndex, value);
+                    this.SetInt64(newIndex, value);
+                }
+                #endif
                 case JSON_Type_Float: {
                     this.SetFloat(newIndex, this.GetFloat(oldIndex));
                 }
@@ -719,6 +782,13 @@ methodmap JSON_Array < JSON_Object
                 case JSON_Type_Int: {
                     this.PushInt(from.GetInt(i));
                 }
+                #if SM_INT64_SUPPORTED
+                case JSON_Type_Int64: {
+                    int value[2];
+                    from.GetInt64(i, value);
+                    this.PushInt64(value);
+                }
+                #endif
                 case JSON_Type_Float: {
                     this.PushFloat(from.GetFloat(i));
                 }

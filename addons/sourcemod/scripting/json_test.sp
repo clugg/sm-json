@@ -516,6 +516,30 @@ void it_should_trim_floats()
     Test_AssertStringsEqual("output", json_encode_output, "[0.0,1.0,10.01,-0.0,-1.0,-10.01]");
 }
 
+#if SM_INT64_SUPPORTED
+void it_should_support_int64()
+{
+    char[] input = "[-9999999999,-2147483649,-2147483648,-1,0,1,2147483647,4294967295,4294967296,9999999999]";
+
+    JSON_Array arr = view_as<JSON_Array>(json_decode(input));
+    Test_AssertEqual("0 type", arr.GetType(0), JSON_Type_Int64);
+    Test_AssertEqual("1 type", arr.GetType(1), JSON_Type_Int64);
+    Test_AssertEqual("2 type", arr.GetType(2), JSON_Type_Int);
+    Test_AssertEqual("3 type", arr.GetType(3), JSON_Type_Int);
+    Test_AssertEqual("4 type", arr.GetType(4), JSON_Type_Int);
+    Test_AssertEqual("5 type", arr.GetType(5), JSON_Type_Int);
+    Test_AssertEqual("6 type", arr.GetType(6), JSON_Type_Int);
+    Test_AssertEqual("7 type", arr.GetType(7), JSON_Type_Int64);
+    Test_AssertEqual("8 type", arr.GetType(8), JSON_Type_Int64);
+    Test_AssertEqual("9 type", arr.GetType(9), JSON_Type_Int64);
+
+    _json_encode(arr);
+    json_cleanup_and_delete(arr);
+
+    Test_AssertStringsEqual("output", json_encode_output, input);
+}
+#endif
+
 void it_should_remove_meta_keys_from_arrays()
 {
     JSON_Array arr = new JSON_Array();
@@ -1193,6 +1217,9 @@ public void OnPluginStart()
     Test_Run("it_should_support_unicode", it_should_support_unicode);
     Test_Run("it_should_rename_object_keys", it_should_rename_object_keys);
     Test_Run("it_should_maintain_hidden_on_renamed_object_keys", it_should_maintain_hidden_on_renamed_object_keys);
+    #if SM_INT64_SUPPORTED
+    Test_Run("it_should_support_int64", it_should_support_int64);
+    #endif
 
     Test_EndSection();
 }

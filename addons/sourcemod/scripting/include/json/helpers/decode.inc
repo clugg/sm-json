@@ -116,6 +116,39 @@ stock bool json_is_int(const char[] buffer)
     return true;
 }
 
+#if SM_INT64_SUPPORTED
+/**
+ * Checks whether the buffer provided contains an int64, assuming it has
+ * already been validated as an int and attempted to convert to an int32.
+ *
+ * @param buffer    String buffer of data.
+ * @param value     Converted int value to compare with.
+ * @return          True if buffer contains an int64, false otherwise.
+ */
+stock bool json_is_int64(const char[] buffer, int value)
+{
+    if (
+        (value == 0 && ! StrEqual(buffer, "0"))
+        || (value == -1 && ! StrEqual(buffer, "-1"))
+    ) {
+        // failed to produce output of validated int, must be 64bit
+        return true;
+    }
+
+    if (buffer[0] != '-' && value < 0) {
+        // 32-bit unsigned positive int which is incorrectly
+        // interpreted as a negative signed int by sourcepawn
+        return true;
+    }
+
+    if (buffer[0] == '-' && value > 0) {
+        return true;
+    }
+
+    return false;
+}
+#endif
+
 /**
  * Checks whether the buffer provided contains a float.
  *

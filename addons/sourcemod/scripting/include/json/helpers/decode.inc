@@ -400,7 +400,7 @@ stock int json_extract_string_size(
     bool is_array
 )
 {
-    int length = 0;
+    int length = 1; // for NULL terminator
 
     // store initial quote
     char quote = buffer[pos];
@@ -556,7 +556,12 @@ stock bool json_extract_string(
     }
 
     // copy only from start with length end - start + NULL terminator
-    strcopy(output, end - start + 1, buffer[start]);
+    int length = end - start + 1;
+    strcopy(
+        output,
+        length > output_max_size ? output_max_size : length,
+        buffer[start]
+    );
 
     if (quote == '\'') {
         ReplaceString(output, max_size, "\\'", "'");

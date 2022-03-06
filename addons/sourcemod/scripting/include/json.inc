@@ -100,7 +100,10 @@ stock void json_encode(
         switch (type) {
             case JSON_Type_String: {
                 str_length = obj.GetSize(key);
-                cell_length = json_cell_string_size(str_length);
+                char[] value = new char[str_length];
+                obj.GetString(key, value, str_length);
+
+                cell_length = json_cell_string_size(value);
             }
             case JSON_Type_Int: {
                 cell_length = JSON_INT_BUFFER_SIZE;
@@ -169,7 +172,7 @@ stock void json_encode(
         builder_size = cell_length + 1;
         if (! is_array) {
             // get the length of the key and + 1 for :
-            builder_size += json_cell_string_size(strlen(key)) + 1;
+            builder_size += json_cell_string_size(key) + 1;
 
             if (pretty_print) {
                 builder_size += strlen(JSON_PP_AFTER_COLON);

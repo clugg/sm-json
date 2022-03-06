@@ -1102,6 +1102,17 @@ void it_should_maintain_hidden_on_renamed_object_keys()
     json_cleanup_and_delete(obj);
 }
 
+void it_should_calculate_string_sizes_correctly()
+{
+    Test_AssertEqual("input", json_extract_string_size("\"hello world\" junk", 19, 0, false), 12);
+    Test_AssertEqual("output-normal", json_cell_string_size("test"), 7);
+    Test_AssertEqual("output-basic-escapes", json_cell_string_size("tes\n"), 8);
+    Test_AssertEqual("output-basic-escapes", json_cell_string_size("\tes\n"), 9);
+    Test_AssertEqual("output-unicode", json_cell_string_size("test¡"), 13);
+    Test_AssertEqual("output-unicode", json_cell_string_size("tm™"), 11);
+    Test_AssertEqual("output-unicode", json_cell_string_size("star⭐"), 13);
+}
+
 public void OnPluginStart()
 {
     Test_SetBoxWidth(56);
@@ -1217,6 +1228,7 @@ public void OnPluginStart()
     Test_Run("it_should_support_unicode", it_should_support_unicode);
     Test_Run("it_should_rename_object_keys", it_should_rename_object_keys);
     Test_Run("it_should_maintain_hidden_on_renamed_object_keys", it_should_maintain_hidden_on_renamed_object_keys);
+    Test_Run("it_should_calculate_string_sizes_correctly", it_should_calculate_string_sizes_correctly);
     #if SM_INT64_SUPPORTED
     Test_Run("it_should_support_int64", it_should_support_int64);
     #endif

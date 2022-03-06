@@ -430,7 +430,7 @@ stock int json_extract_string_size(
         length += 1;
     }
 
-    return json_cell_string_size(length);
+    return length;
 }
 
 /**

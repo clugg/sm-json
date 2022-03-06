@@ -47,21 +47,34 @@
  * @section Settings
  */
 
+/** Used when no options are desired. */
 #define JSON_NONE 0
 
-/* json_encode settings */
+/**
+ * @section json_encode settings
+ */
+
+/** Should encoded output be pretty printed? */
 #define JSON_ENCODE_PRETTY 1 << 0
 
-/* json_decode settings */
-// During decoding, should strings wrapped in single quotes be accepted?
+/**
+ * @section json_decode settings
+ */
+
+/** Should single quote wrapped strings be accepted during decoding? */
 #define JSON_DECODE_SINGLE_QUOTES 1 << 0
-// During decoding, should objects track order of key insertion?
+
+/** Should objects track order of key insertion during decoding? */
 #define JSON_DECODE_ORDERED_KEYS 1 << 1
 
-/* json_merge settings */
-// During merge, should existing keys be replaced if they exist in both objects?
+/**
+ * @section json_merge settings
+ */
+
+/** During merge, should existing keys be replaced if they exist in both objects? */
 #define JSON_MERGE_REPLACE 1 << 0
-/* During merge, should existing objects be cleaned up if they exist in
+
+/** During merge, should existing objects be cleaned up if they exist in
  * both objects? (only applies when JSON_MERGE_REPLACE is also set) */
 #define JSON_MERGE_CLEANUP 1 << 1
 
@@ -80,21 +93,21 @@ char JSON_PP_NEWLINE[32] = "\n";
  * @section Buffer Size Constants
  */
 
-// The longest representable integer ("-2147483648") + NULL terminator
+/** The longest representable integer ("-2147483648") + NULL terminator */
 #define JSON_INT_BUFFER_SIZE 12
 
 #if SM_INT64_SUPPORTED
-// The longest representable int64 ("-9223372036854775808") + NULL terminator
-#define JSON_INT64_BUFFER_SIZE 65//21
+/** The longest representable int64 ("-9223372036854775808") + NULL terminator */
+#define JSON_INT64_BUFFER_SIZE 21
 #endif
 
-// You may need to change this if you are working with large floats.
+/** You may need to change this if you are working with large floats. */
 #define JSON_FLOAT_BUFFER_SIZE 32
 
-// "true"|"false" + NULL terminator
+/** "true"|"false" + NULL terminator */
 #define JSON_BOOL_BUFFER_SIZE 6
 
-// "null" + NULL terminator
+/** "null" + NULL terminator */
 #define JSON_NULL_BUFFER_SIZE 5
 
 /**
@@ -141,6 +154,7 @@ JSONMetaInfo JSON_ALL_METADATA[4] = {
 /**
  * Calculates the length required to store a meta key
  * for a specified key/metainfo combination.
+ * @internal
  *
  * @param   key
  * @return  The length required to store the meta key.
@@ -153,6 +167,7 @@ stock int json_meta_key_length(const char[] key)
 
 /**
  * Formats the key/metainfo combination into a buffer.
+ * @internal
  *
  * @param output    String buffer to store output.
  * @param max_size  Maximum size of string buffer.

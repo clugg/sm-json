@@ -178,6 +178,7 @@ methodmap JSON_Object < MetaStringMap
 
     /**
      * Gets the requested meta info for a key.
+     * @internal
      *
      * @param key               Key to get meta info for.
      * @param meta              Meta info to get.
@@ -252,6 +253,7 @@ methodmap JSON_Object < MetaStringMap
 
     /**
      * Sets meta info on a key.
+     * @internal
      *
      * @param key       Key to set meta info for.
      * @param meta      Meta info to set.
@@ -269,6 +271,7 @@ methodmap JSON_Object < MetaStringMap
 
     /**
      * Removes meta info from a key.
+     * @internal
      *
      * @param key   Key to remove meta info from.
      * @param meta  Meta info to remove.
@@ -285,6 +288,7 @@ methodmap JSON_Object < MetaStringMap
 
     /**
      * Sets the cell type stored at a key.
+     * @internal
      *
      * @param key   Key to set value type for.
      * @param type  Type to set key to.
@@ -297,6 +301,7 @@ methodmap JSON_Object < MetaStringMap
 
     /**
      * Sets the length of the string stored at a key.
+     * @internal
      *
      * @param key       Key to set string length for.
      * @param length    Length to set string to.
@@ -323,6 +328,9 @@ methodmap JSON_Object < MetaStringMap
         return this.SetMeta(key, JSON_Meta_Hidden, hidden);
     }
 
+    /**
+     * @internal
+     */
     public bool TrackKeyOrder(const char[] key, int index = -1)
     {
         if (! this.OrderedKeys) {
@@ -345,6 +353,9 @@ methodmap JSON_Object < MetaStringMap
             && this.SetMeta(key, JSON_Meta_Index, index);
     }
 
+    /**
+     * @internal
+     */
     public bool RemoveKeyFromOrder(const char[] key)
     {
         int index = this.GetIndex(key);
@@ -604,8 +615,7 @@ methodmap JSON_Object < MetaStringMap
      * optionally replacing existing entries with the same key.
      *
      * @param from      Object to merge entries from.
-     * @param options   Bitwise combination of JSON_MERGE_* options.
-     *                  [default: JSON_MERGE_REPLACE]
+     * @param options   Bitwise combination of `JSON_MERGE_*` options.
      * @return          True on success, false otherwise.
      * @error           If the object being merged is an array,
      *                  an error will be thrown.

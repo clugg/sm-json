@@ -77,7 +77,7 @@ methodmap MetaStringMap < TypedStringMap
         }
     }
 
-    // @see TypedStringMap.Length
+    /** @see TypedStringMap.Length */
     property int Length {
         public get()
         {
@@ -89,19 +89,22 @@ methodmap MetaStringMap < TypedStringMap
      * @section Getters
      */
 
-    // @see StringMap.GetValue
+    /** @see StringMap.GetValue */
     public bool GetValue(const char[] key, any &value)
     {
         return this.Data.GetValue(key, value);
     }
 
-    // @see TypedStringMap.GetOptionalValue
+    /**
+     * @see TypedStringMap.GetOptionalValue
+     * @internal
+     */
     public any GetOptionalValue(const char[] key, any default_value = -1)
     {
         return this.Data.GetOptionalValue(key, default_value);
     }
 
-    // @see StringMap.GetString
+    /** @see StringMap.GetString */
 	public bool GetString(
         const char[] key,
         char[] value,
@@ -112,25 +115,25 @@ methodmap MetaStringMap < TypedStringMap
         return this.Data.GetString(key, value, max_size, size);
     }
 
-    // @see TypedStringMap.GetInt
+    /** @see TypedStringMap.GetInt */
     public int GetInt(const char[] key, int default_value = -1)
     {
         return this.Data.GetInt(key, default_value);
     }
 
-    // @see TypedStringMap.GetFloat
+    /** @see TypedStringMap.GetFloat */
     public float GetFloat(const char[] key, float default_value = -1.0)
     {
         return this.Data.GetFloat(key, default_value);
     }
 
-    // @see TypedStringMap.GetBool
+    /** @see TypedStringMap.GetBool */
     public bool GetBool(const char[] key, bool default_value = false)
     {
         return this.Data.GetBool(key, default_value);
     }
 
-    // @see TypedStringMap.GetHandle
+    /** @see TypedStringMap.GetHandle */
     public Handle GetHandle(const char[] key, Handle default_value = null)
     {
         return this.Data.GetHandle(key, default_value);
@@ -140,43 +143,43 @@ methodmap MetaStringMap < TypedStringMap
      * @section Setters
      */
 
-    // @see StringMap.SetValue
+    /** @see StringMap.SetValue */
     public bool SetValue(const char[] key, any value)
     {
         return this.Data.SetValue(key, value);
     }
 
-    // @see StringMap.SetString
+    /** @see StringMap.SetString */
     public bool SetString(const char[] key, const char[] value)
     {
         return this.Data.SetString(key, value);
     }
 
-    // @see TypedStringMap.SetInt
+    /** @see TypedStringMap.SetInt */
     public bool SetInt(const char[] key, int value)
     {
         return this.Data.SetInt(key, value);
     }
 
-    // @see TypedStringMap.SetFloat
+    /** @see TypedStringMap.SetFloat */
     public bool SetFloat(const char[] key, float value)
     {
         return this.Data.SetFloat(key, value);
     }
 
-    // @see TypedStringMap.SetBool
+    /** @see TypedStringMap.SetBool */
     public bool SetBool(const char[] key, bool value)
     {
         return this.Data.SetBool(key, value);
     }
 
-    // @see TypedStringMap.SetHandle
+    /** @see TypedStringMap.SetHandle */
     public bool SetHandle(const char[] key, Handle value)
     {
         return this.Data.SetHandle(key, value);
     }
 
-    // @see StringMap.Remove
+    /** @see StringMap.Remove */
     public bool Remove(const char[] key)
     {
         return this.Data.Remove(key);
@@ -186,13 +189,13 @@ methodmap MetaStringMap < TypedStringMap
      * @section Misc
      */
 
-    // @see TypedStringMap.HasKey
+    /** @see TypedStringMap.HasKey */
     public bool HasKey(const char[] key)
     {
         return this.Data.HasKey(key);
     }
 
-    // @see StringMap.Clear
+    /** @see StringMap.Clear */
     public void Clear()
     {
         TypedStringMap data = this.Data;
@@ -210,7 +213,7 @@ methodmap MetaStringMap < TypedStringMap
         delete this;
     }
 
-    // @see StringMap.Snapshot
+    /** @see StringMap.Snapshot */
     public StringMapSnapshot Snapshot()
     {
         return this.Data.Snapshot();

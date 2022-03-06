@@ -52,7 +52,7 @@ methodmap TypedStringMap < StringMap
      * @section Properies
      */
 
-    // @see StringMap.Size
+    /** @see StringMap.Size */
     property int Length {
         public get()
         {
@@ -64,7 +64,7 @@ methodmap TypedStringMap < StringMap
      * @section Misc
      */
 
-    // @see StringMap.ContainsKey
+    /** @see StringMap.ContainsKey */
     public bool HasKey(const char[] key)
     {
         #if TRIE_SUPPORTS_CONTAINSKEY
@@ -86,6 +86,7 @@ methodmap TypedStringMap < StringMap
 
     /**
      * Retrieves the value stored at a key.
+     * @internal
      *
      * @param key               Key to retrieve value for.
      * @param default_value     Value to return if the key does not exist.

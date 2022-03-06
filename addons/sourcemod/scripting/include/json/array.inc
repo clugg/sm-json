@@ -126,6 +126,7 @@ methodmap JSON_Array < JSON_Object
 
     /**
      * Converts index to a string ('key') and calls the relevant Super method.
+     * @internal
      *
      * @see MetaStringMap.GetMeta
      */
@@ -182,6 +183,7 @@ methodmap JSON_Array < JSON_Object
 
     /**
      * Converts index to a string ('key') and calls the relevant Super method.
+     * @internal
      *
      * @see JSON_Object.SetMeta
      */
@@ -197,6 +199,7 @@ methodmap JSON_Array < JSON_Object
 
     /**
      * Converts index to a string ('key') and calls the relevant Super method.
+     * @internal
      *
      * @see JSON_Object.RemoveMeta
      */
@@ -212,6 +215,7 @@ methodmap JSON_Array < JSON_Object
 
     /**
      * Sets the cell type stored at a index.
+     * @internal
      *
      * @param index     Index to set value type for.
      * @param type      Type to set index to.
@@ -224,6 +228,7 @@ methodmap JSON_Array < JSON_Object
 
     /**
      * Sets the length of the string stored at a index.
+     * @internal
      *
      * @param index     Index to set string length for.
      * @param length    Length to set string to.
@@ -267,6 +272,7 @@ methodmap JSON_Array < JSON_Object
 
     /**
      * Converts index to a string ('key') and calls the relevant Super method.
+     * @internal
      *
      * @see MetaStringMap.GetOptionalValue
      */
@@ -915,7 +921,7 @@ methodmap JSON_Array < JSON_Object
      * Exports the instance's values into a native array.
      *
      * @param values    Array to export to.
-     * @param size      Size of array.
+     * @param max_size  Maximum size of array.
      */
     public void ExportValues(any[] values, int max_size)
     {
@@ -932,8 +938,9 @@ methodmap JSON_Array < JSON_Object
     /**
      * Exports the instance's strings into a native array.
      *
-     * @param values    Array to export to.
-     * @param size      Size of array.
+     * @param values            Array to export to.
+     * @param max_size          Maximum size of array.
+     * @param max_string_size   Maximum size of array elements.
      */
     public void ExportStrings(
         char[][] values,
@@ -955,13 +962,13 @@ methodmap JSON_Array < JSON_Object
      * json.inc Aliases
      */
 
-    // @see JSON_Object.ShallowCopy
+    /** @see JSON_Object.ShallowCopy */
     public JSON_Array ShallowCopy()
     {
         return view_as<JSON_Array>(this.Super.ShallowCopy());
     }
 
-    // @see JSON_Object.DeepCopy
+    /** @see JSON_Object.DeepCopy */
     public JSON_Array DeepCopy()
     {
         return view_as<JSON_Array>(this.Super.DeepCopy());

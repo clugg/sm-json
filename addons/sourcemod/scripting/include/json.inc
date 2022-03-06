@@ -49,9 +49,8 @@
  * @param obj       Object to encode.
  * @param output    String buffer to store output.
  * @param max_size  Maximum size of string buffer.
- * @param options   Bitwise combination of JSON_ENCODE_* options.
- *                  [default: JSON_NONE]
- * @param depth     The current depth of the encoder. [default: 0]
+ * @param options   Bitwise combination of `JSON_ENCODE_*` options.
+ * @param depth     The current depth of the encoder.
  */
 stock void json_encode(
     JSON_Object obj,
@@ -229,8 +228,7 @@ stock void json_encode(
  * Decodes a JSON string into a JSON instance.
  *
  * @param buffer    Buffer to decode.
- * @param options   Bitwise combination of JSON_DECODE_* options.
- *                  [default: JSON_NONE]
+ * @param options   Bitwise combination of `JSON_DECODE_*` options.
  * @param pos       Current position of the decoder as bytes
  *                  offset into the buffer.
  * @param depth     Current nested depth of the decoder.

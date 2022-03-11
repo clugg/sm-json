@@ -1,0 +1,5 @@
+#! Signature
+
+```c
+StringMapSnapshot Snapshot()
+```

@@ -12,6 +12,7 @@ Table of Contents
 
 * [Requirements](#requirements)
 * [Installation](#installation)
+* [API Reference](#api-reference)
 * [Usage](#usage)
   * [Creating & Encoding](#creating--encoding)
   * [Decoding](#decoding)
@@ -40,6 +41,10 @@ Table of Contents
 
 ## Installation
 Download the source code for the [latest release](https://github.com/clugg/sm-json/releases/latest) and move all files and directories from the [`addons/sourcemod/scripting/include`](addons/sourcemod/scripting/include) directory to your existing `addons/sourcemod/scripting/include` directory.
+
+## API Reference
+
+A comprehensive API reference is available [here](https://clugg.github.io/sm-json/). Certain internal methods which are not intended for outside use are not documented in this API and are subject to breaking changes within the same major version.
 
 ## Usage
 All of the following examples implicitly begin with the following code snippet.

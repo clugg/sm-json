@@ -668,6 +668,60 @@ stock JSON_Object json_decode(
 }
 
 /**
+ * Encodes the object with the options provided and writes
+ * the output to the file at the path specified.
+ *
+ * @param obj         Object to encode/write to file.
+ * @param path        Path of file to write to.
+ * @param options     Options to pass to `json_encode`.
+ * @return            True on success, false otherwise.
+ */
+stock bool json_write_to_file(
+    JSON_Object obj,
+    const char[] path,
+    int options = JSON_NONE
+)
+{
+    File f = OpenFile(path, "wb");
+    if (f == null) {
+        return false;
+    }
+
+    int size = json_encode_size(obj, options);
+    char[] buffer = new char[size];
+    json_encode(obj, buffer, size, options);
+
+    bool success = f.WriteString(buffer, false);
+    delete f;
+
+    return success;
+}
+
+/**
+ * Reads and decodes the contents of a JSON file.
+ *
+ * @param path        Path of file to read from.
+ * @param options     Options to pass to `json_decode`.
+ * @return            The decoded object on success, null otherwise.
+ */
+stock JSON_Object json_read_from_file(const char[] path, int options = JSON_NONE)
+{
+    File f = OpenFile(path, "rb");
+    if (f == null) {
+        return null;
+    }
+
+    f.Seek(0, SEEK_END);
+    int size = f.Position + 1;
+    char[] buffer = new char[size];
+
+    f.Seek(0, SEEK_SET);
+    f.ReadString(buffer, size);
+
+    return json_decode(buffer, options);
+}
+
+/**
  * Creates a shallow copy of the specified object.
  *
  * @param obj   Object to copy.

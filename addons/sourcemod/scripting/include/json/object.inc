@@ -718,7 +718,18 @@ methodmap JSON_Object < MetaStringMap
      */
     public void Encode(char[] output, int max_size, int options = JSON_NONE)
     {
-        json_encode(this, output, max_size, options, depth);
+        json_encode(this, output, max_size, options);
+    }
+
+    /**
+     * Makes a global call with this
+     * instance passed as the object.
+     *
+     * @see json_write_to_file
+     */
+    public bool WriteToFile(const char[] path, int options = JSON_NONE)
+    {
+        return json_write_to_file(this, path, options);
     }
 
     /**

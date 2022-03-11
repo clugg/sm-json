@@ -1118,6 +1118,24 @@ void it_should_calculate_string_sizes_correctly()
     Test_AssertEqual("output-unicode", json_cell_string_size("star⭐"), 13);
 }
 
+void it_should_read_and_write_files()
+{
+    char[] file = "test.json";
+    char[] input = "[1,2,3,4,5]";
+    JSON_Array original = view_as<JSON_Array>(json_decode(input));
+    Test_Assert("write to file", original.WriteToFile(file));
+
+    JSON_Object read = json_read_from_file(file);
+    Test_Assert("read from file", read != null);
+    _json_encode(read);
+
+    Test_AssertStringsEqual("input matches output", input, json_encode_output);
+
+    json_cleanup_and_delete(original);
+    json_cleanup_and_delete(read);
+    DeleteFile(file);
+}
+
 public void OnPluginStart()
 {
     Test_SetBoxWidth(56);
@@ -1237,6 +1255,7 @@ public void OnPluginStart()
     #if SM_INT64_SUPPORTED
     Test_Run("it_should_support_int64", it_should_support_int64);
     #endif
+    Test_Run("it_should_read_and_write_files", it_should_read_and_write_files);
 
     Test_EndSection();
 }

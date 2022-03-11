@@ -703,14 +703,20 @@ methodmap JSON_Object < MetaStringMap
      * Makes a global call with this
      * instance passed as the object.
      *
+     * @see json_encode_size
+     */
+    public int EncodeSize(int options = JSON_NONE)
+    {
+        return json_encode_size(this, options);
+    }
+
+    /**
+     * Makes a global call with this
+     * instance passed as the object.
+     *
      * @see json_encode
      */
-    public void Encode(
-        char[] output,
-        int max_size,
-        int options = JSON_NONE,
-        int depth = 0
-    )
+    public void Encode(char[] output, int max_size, int options = JSON_NONE)
     {
         json_encode(this, output, max_size, options, depth);
     }

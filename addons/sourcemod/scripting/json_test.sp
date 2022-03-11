@@ -62,6 +62,11 @@ char json_encode_output[1024];
 void _json_encode(JSON_Object obj, int options = JSON_NONE)
 {
     obj.Encode(json_encode_output, sizeof(json_encode_output), options);
+
+    Test_Assert(
+        "calculated buffer size fits output",
+        json_encode_size(obj, options) > strlen(json_encode_output)
+    );
 }
 
 /**

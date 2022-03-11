@@ -43,6 +43,114 @@
 #include <json/object>
 #include <json/array>
 
+
+/**
+ * Calculates the buffer size required to store an encoded JSON instance.
+ *
+ * @param obj       Object to encode.
+ * @param options   Bitwise combination of `JSON_ENCODE_*` options.
+ * @param depth     The current depth of the encoder.
+ * @return          The required buffer size.
+ */
+stock int json_encode_size(JSON_Object obj, int options = JSON_NONE, int depth = 0)
+{
+    bool pretty_print = (options & JSON_ENCODE_PRETTY) != 0;
+
+    bool is_array = obj.IsArray;
+
+    int size = 1; // for opening bracket
+
+    // used in key iterator
+    int json_size = obj.Iterate();
+    JSON_Object child = null;
+    bool is_empty = true;
+    int str_length = 0;
+
+    int key_length = 0;
+    for (int i = 0; i < json_size; i += 1) {
+        key_length = is_array ? JSON_INT_BUFFER_SIZE : obj.GetKeySize(i);
+        char[] key = new char[key_length];
+
+        if (is_array) {
+            IntToString(i, key, key_length);
+        } else {
+            obj.GetKey(i, key, key_length);
+        }
+
+        // skip keys that are marked as hidden
+        if (obj.GetHidden(key)) {
+            continue;
+        }
+
+        JSONCellType type = obj.GetType(key);
+        // skip keys of unknown type
+        if (type == JSON_Type_Invalid) {
+            continue;
+        }
+
+        if (pretty_print) {
+            size += strlen(JSON_PP_NEWLINE);
+            size += (depth + 1) * strlen(JSON_PP_INDENT);
+        }
+
+        if (! is_array) {
+            // add the size of the key and + 1 for :
+            size += json_cell_string_size(key) + 1;
+
+            if (pretty_print) {
+                size += strlen(JSON_PP_AFTER_COLON);
+            }
+        }
+
+        switch (type) {
+            case JSON_Type_String: {
+                str_length = obj.GetSize(key);
+                char[] value = new char[str_length];
+                obj.GetString(key, value, str_length);
+
+                size += json_cell_string_size(value);
+            }
+            case JSON_Type_Int: {
+                size += JSON_INT_BUFFER_SIZE;
+            }
+            #if SM_INT64_SUPPORTED
+            case JSON_Type_Int64: {
+                size += JSON_INT64_BUFFER_SIZE;
+            }
+            #endif
+            case JSON_Type_Float: {
+                size += JSON_FLOAT_BUFFER_SIZE;
+            }
+            case JSON_Type_Bool: {
+                size += JSON_BOOL_BUFFER_SIZE;
+            }
+            case JSON_Type_Object: {
+                child = obj.GetObject(key);
+                size += child != null ? json_encode_size(child, options, depth + 1) : JSON_NULL_BUFFER_SIZE;
+            }
+        }
+
+        // increment for comma
+        size += 1;
+
+        is_empty = false;
+    }
+
+    if (! is_empty) {
+        // remove the final comma
+        size -= 1;
+
+        if (pretty_print) {
+            size += strlen(JSON_PP_NEWLINE);
+            size += depth * strlen(JSON_PP_INDENT);
+        }
+    }
+
+    size += 2; // closing bracket + NULL
+
+    return size;
+}
+
 /**
  * Encodes a JSON instance into its string representation.
  *

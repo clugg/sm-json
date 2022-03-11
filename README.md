@@ -37,7 +37,7 @@ Table of Contents
 * [License](#license)
 
 ## Requirements
-* SourceMod 1.9 or later
+* SourceMod 1.10 or later
 
 ## Installation
 Download the source code for the [latest release](https://github.com/clugg/sm-json/releases/latest) and move all files and directories from the [`addons/sourcemod/scripting/include`](addons/sourcemod/scripting/include) directory to your existing `addons/sourcemod/scripting/include` directory.

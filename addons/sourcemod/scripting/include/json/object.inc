@@ -38,6 +38,7 @@
 
 #include <string>
 #include <json/definitions>
+#include <json/helpers/errors>
 #include <json/helpers/metastringmap>
 
 methodmap JSON_Object < MetaStringMap
@@ -623,7 +624,7 @@ methodmap JSON_Object < MetaStringMap
     public bool Merge(JSON_Object from, int options = JSON_MERGE_REPLACE)
     {
         if (this.IsArray || from.IsArray) {
-            LogError("json_merge: attempting to merge using an array");
+            json_set_last_error("attempted to merge using an array");
 
             return false;
         }

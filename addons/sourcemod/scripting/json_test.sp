@@ -219,6 +219,13 @@ void it_should_not_decode(char[] data)
 
         json_cleanup_and_delete(obj);
     }
+
+    char error[1024];
+    Test_Assert(
+        "last error is not empty",
+        json_get_last_error(error, sizeof(error))
+    );
+    Test_Output("%s", error);
 }
 
 void it_should_encode_empty_objects()

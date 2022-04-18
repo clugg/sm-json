@@ -38,6 +38,7 @@
 
 #include <string>
 #include <json/definitions>
+#include <json/helpers/errors>
 #include <json/object>
 
 methodmap JSON_Array < JSON_Object
@@ -757,13 +758,15 @@ methodmap JSON_Array < JSON_Object
     public bool Concat(JSON_Array from)
     {
         if (! this.IsArray || ! from.IsArray) {
-            LogError("JSON_Array@concat: attempted to concat using object(s)");
+            json_set_last_error("attempted to concat using object(s)");
 
             return false;
         }
 
         if (this.Type != from.Type) {
-            LogError("JSON_Array@concat: arrays have mismatched strict types");
+            json_set_last_error(
+                "attempted to concat arrays with mismatched strict types"
+            );
 
             return false;
         }

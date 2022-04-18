@@ -19,6 +19,7 @@ Table of Contents
   * [Iteration](#iteration)
   * [Cleaning Up](#cleaning-up)
   * [Pseudo-Classes](#pseudo-classes)
+  * [Error Handling](#error-handling)
 * [API](#api)
   * [Getters & Setters](#getters--setters)
   * [Metadata](#metadata)
@@ -418,6 +419,10 @@ Weapon weapon = view_as<Weapon>(json_decode("{\"id\":1,\"owner\":{\"score\":9001
 weapon.Owner.IncrementScore();
 int score = weapon.Owner.Score; // 9002
 ```
+
+### Error Handling
+
+Prior to v4.1, unrecoverable errors (usually during decoding) were logged using SourceMod's native `LogError` method. From v4.1 onwards, errors are stored in a buffer and the last error that was encountered can be fetched using `json_get_last_error`.
 
 ## API
 All of the following examples assume access to an existing `JSON_Array` and `JSON_Object` instance.

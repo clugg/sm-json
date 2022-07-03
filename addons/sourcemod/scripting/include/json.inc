@@ -712,6 +712,7 @@ stock JSON_Object json_read_from_file(const char[] path, int options = JSON_NONE
 
     f.Seek(0, SEEK_SET);
     f.ReadString(buffer, size);
+    delete f;
 
     return json_decode(buffer, options);
 }

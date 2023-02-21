@@ -733,6 +733,9 @@ stock JSON_Object json_copy_shallow(JSON_Object obj)
     if (isArray) {
         view_as<JSON_Array>(result).Concat(view_as<JSON_Array>(obj));
     } else {
+        if (obj.OrderedKeys) {
+            result.EnableOrderedKeys();
+        }
         result.Merge(obj);
     }
 

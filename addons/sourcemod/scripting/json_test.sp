@@ -42,7 +42,7 @@ public Plugin myinfo = {
     name = "JSON Tester",
     author = "clug",
     description = "Tests dumping and loading JSON objects.",
-    version = "4.1.0",
+    version = "4.1.2",
     url = "https://github.com/clugg/sm-json"
 };
 
@@ -799,6 +799,38 @@ void it_should_shallow_copy_objects()
     json_cleanup_and_delete(copy);
 }
 
+void it_should_preserve_ordered_keys_on_shallow_copy()
+{
+    JSON_Object obj = new JSON_Object();
+    obj.EnableOrderedKeys();
+    obj.SetInt("key1", 1);
+    obj.SetInt("key2", 2);
+
+    JSON_Object copy = obj.ShallowCopy();
+    Test_AssertTrue("copy has ordered keys", copy.OrderedKeys);
+
+    int length = obj.Iterate();
+    int original_key_length = 0;
+    int copy_key_length = 0;
+    char key_assert_desc[16];
+    for (int i = 0; i < length; i += 1) {
+        FormatEx(key_assert_desc, sizeof(key_assert_desc), "copy key %d", i);
+
+        original_key_length = obj.GetKeySize(i);
+        char[] original_key = new char[original_key_length];
+        obj.GetKey(i, original_key, original_key_length);
+
+        copy_key_length = copy.GetKeySize(i);
+        char[] copy_key = new char[copy_key_length];
+        copy.GetKey(i, copy_key, copy_key_length);
+
+        Test_AssertStringsEqual(key_assert_desc, original_key, copy_key);
+    }
+
+    json_cleanup_and_delete(obj);
+    json_cleanup_and_delete(copy);
+}
+
 void it_should_deep_copy_arrays()
 {
     JSON_Array arr = new JSON_Array();
@@ -1240,6 +1272,7 @@ public void OnPluginStart()
     Test_Run("it_should_copy_flat_objects", it_should_copy_flat_objects);
     Test_Run("it_should_shallow_copy_arrays", it_should_shallow_copy_arrays);
     Test_Run("it_should_shallow_copy_objects", it_should_shallow_copy_objects);
+    Test_Run("it_should_preserve_ordered_keys_on_shallow_copy", it_should_preserve_ordered_keys_on_shallow_copy);
     Test_Run("it_should_deep_copy_arrays", it_should_deep_copy_arrays);
     Test_Run("it_should_deep_copy_objects", it_should_deep_copy_objects);
     Test_Run("it_should_allow_single_quotes", it_should_allow_single_quotes);

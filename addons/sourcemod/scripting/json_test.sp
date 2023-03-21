@@ -439,6 +439,25 @@ void it_should_support_arrays_nested_in_arrays()
     json_cleanup_and_delete(arr);
 }
 
+void it_should_copy_null_keys()
+{
+    JSON_Object original = new JSON_Object();
+    original.SetObject("null_key", null);
+    original.SetString("non_null_key", "test_value");
+
+    JSON_Object copy = original.DeepCopy();
+    copy.SetString("non_null_key", "test_value_2");
+
+    _json_encode(original, JSON_ENCODE_PRETTY);
+    Test_AssertStringsEqual("output null copy original", json_encode_output, "{\"non_null_key\":\"test_value\",\"null_key\":null}");
+
+    _json_encode(copy, JSON_ENCODE_PRETTY);
+    Test_AssertStringsEqual("output null copy copy", json_encode_output, "{\"non_null_key\":\"test_value_2\",\"null_key\":null}");
+
+    json_cleanup_and_delete(original);
+    json_cleanup_and_delete(copy);
+}
+
 void it_should_support_basic_methodmaps()
 {
     Player player = new Player();
@@ -1273,6 +1292,7 @@ public void OnPluginStart()
     Test_Run("it_should_concat_arrays", it_should_concat_arrays);
     Test_Run("it_should_copy_flat_arrays", it_should_copy_flat_arrays);
     Test_Run("it_should_copy_flat_objects", it_should_copy_flat_objects);
+    Test_Run("it_should_copy_null_keys", it_should_copy_null_keys);
     Test_Run("it_should_shallow_copy_arrays", it_should_shallow_copy_arrays);
     Test_Run("it_should_shallow_copy_objects", it_should_shallow_copy_objects);
     Test_Run("it_should_preserve_ordered_keys_on_shallow_copy", it_should_preserve_ordered_keys_on_shallow_copy);

@@ -175,7 +175,7 @@ stock void json_encode(
     strcopy(output, max_size, is_array ? "[" : "{");
 
     // used in key iterator
-    int json_size = obj.Iterate();
+    int json_size = is_array ? obj.Length : obj.Iterate();
     int builder_size = 0;
     int str_length = 1;
     JSON_Object child = null;
@@ -751,23 +751,68 @@ stock JSON_Object json_copy_shallow(JSON_Object obj)
  */
 stock JSON_Object json_copy_deep(JSON_Object obj)
 {
-    JSON_Object result = json_copy_shallow(obj);
+    bool isArray = obj.IsArray;
+    JSON_Object result = isArray
+        ? view_as<JSON_Object>(new JSON_Array())
+        : new JSON_Object();
 
-    int length = obj.Iterate();
-    int key_length = 0;
-    for (int i = 0; i < length; i += 1) {
-        key_length = obj.GetKeySize(i);
-        char[] key = new char[key_length];
-        obj.GetKey(i, key, key_length);
-
-        // only deep copy objects
-        JSONCellType type = obj.GetType(key);
-        if (type != JSON_Type_Object) {
-            continue;
+    if (isArray) {
+        view_as<JSON_Array>(result).Concat(view_as<JSON_Array>(obj));
+    } else {
+        if (obj.OrderedKeys) {
+            result.EnableOrderedKeys();
         }
+    }
 
-        JSON_Object value = obj.GetObject(key);
-        result.SetObject(key, value != null ? json_copy_deep(value) : null);
+    if (result.IsArray) {
+        JSON_Array arr = view_as<JSON_Array>(result);
+        JSON_Array objA = view_as<JSON_Array>(obj);
+        int length = arr.Length;
+        for (int i = 0; i < length; i++) {
+            JSONCellType type = objA.GetType(i);
+            if (type != JSON_Type_Object) {
+              continue;
+            }
+            JSON_Object value = objA.GetObject(i);
+            arr.SetObject(i, value != null ? value.DeepCopy() : null);
+        }
+    } else {
+        int length = obj.Iterate();
+        int key_length = 0;
+        for (int i = 0; i < length; i += 1) {
+            key_length = obj.GetKeySize(i);
+            char[] key = new char[key_length];
+            obj.GetKey(i, key, key_length);
+            JSONCellType type = obj.GetType(key);
+            switch (type) {
+                case JSON_Type_String: {
+                    int kl = obj.GetSize(key);
+                    char[] value = new char[kl];
+                    obj.GetString(key, value, kl);
+                    result.SetString(key, value);
+                }
+                case JSON_Type_Int: {
+                    result.SetInt(key, obj.GetInt(key));
+                }
+                #if SM_INT64_SUPPORTED
+                case JSON_Type_Int64: {
+                    int value[2];
+                    obj.GetInt64(key, value);
+                    result.SetInt64(key, value);
+                }
+                #endif
+                case JSON_Type_Float: {
+                    result.SetFloat(key, obj.GetFloat(key));
+                }
+                case JSON_Type_Bool: {
+                    result.SetBool(key, obj.GetBool(key));
+                }
+                case JSON_Type_Object: {
+                    JSON_Object value = obj.GetObject(key);
+                    result.SetObject(key, value != null ? json_copy_deep(value) : null);
+                }
+            }
+        }
     }
 
     return result;
@@ -784,22 +829,39 @@ stock void json_cleanup(JSON_Object obj)
         return;
     }
 
-    int length = obj.Iterate();
-    int key_length = 0;
-    for (int i = 0; i < length; i += 1) {
-        key_length = obj.GetKeySize(i);
-        char[] key = new char[key_length];
-        obj.GetKey(i, key, key_length);
+    if (obj.IsArray) {
+        JSON_Array arr = view_as<JSON_Array>(obj);
+        int length = arr.Length;
+        for (int i = 0; i < length; i++) {
 
-        // only clean up objects
-        JSONCellType type = obj.GetType(key);
-        if (type != JSON_Type_Object) {
-            continue;
+            JSONCellType type = arr.GetType(i);
+            if (type != JSON_Type_Object) {
+              continue;
+            }
+
+            JSON_Object value = arr.GetObject(i);
+            if (value != null) {
+              json_cleanup(value);
+            }
         }
+    } else {
+        int length = obj.Iterate();
+        int key_length = 0;
+        for (int i = 0; i < length; i += 1) {
+            key_length = obj.GetKeySize(i);
+            char[] key = new char[key_length];
+            obj.GetKey(i, key, key_length);
 
-        JSON_Object value = obj.GetObject(key);
-        if (value != null) {
-            json_cleanup(value);
+            // only clean up objects
+            JSONCellType type = obj.GetType(key);
+            if (type != JSON_Type_Object) {
+                continue;
+            }
+
+            JSON_Object value = obj.GetObject(key);
+            if (value != null) {
+                json_cleanup(value);
+            }
         }
     }
 

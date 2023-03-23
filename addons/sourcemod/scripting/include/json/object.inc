@@ -106,7 +106,7 @@ methodmap JSON_Object < MetaStringMap
      */
     public int Iterate()
     {
-        if (! this.OrderedKeys) {
+        if (! this.OrderedKeys && ! this.IsArray) {
             if (this.Snap != null) {
                 delete this.Snap;
                 this.Snap = null;

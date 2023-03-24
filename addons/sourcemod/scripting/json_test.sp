@@ -449,10 +449,10 @@ void it_should_copy_null_keys()
     copy.SetString("non_null_key", "test_value_2");
 
     _json_encode(original, JSON_ENCODE_PRETTY);
-    Test_AssertStringsEqual("output null copy original", json_encode_output, "{\"non_null_key\":\"test_value\",\"null_key\":null}");
+    Test_AssertStringsEqual("output null copy original", json_encode_output, "{ \"non_null_key\": \"test_value\", \"null_key\": null }");
 
     _json_encode(copy, JSON_ENCODE_PRETTY);
-    Test_AssertStringsEqual("output null copy copy", json_encode_output, "{\"non_null_key\":\"test_value_2\",\"null_key\":null}");
+    Test_AssertStringsEqual("output null copy copy", json_encode_output, "{ \"non_null_key\": \"test_value_2\", \"null_key\": null }");
 
     json_cleanup_and_delete(original);
     json_cleanup_and_delete(copy);
@@ -715,7 +715,7 @@ void it_should_not_concat_using_object()
     json_cleanup_and_delete(obj);
 }
 
-void it_should_concat_arrays()
+void it_should_shallow_concat_arrays()
 {
     JSON_Array arr1 = new JSON_Array();
     arr1.PushInt(1);
@@ -726,6 +726,7 @@ void it_should_concat_arrays()
     arr2.PushInt(2);
     arr2.PushBool(false);
     arr2.SetHidden(1, true);
+    arr2.PushObject(new JSON_Object());
 
     if (! Test_Assert("merged successfully", arr1.Concat(arr2))) {
         // if this assertion fails, testing cannot continue
@@ -734,13 +735,37 @@ void it_should_concat_arrays()
 
     print_json(arr1);
 
-    Test_AssertEqual("merged length", arr1.Length, 4);
+    Test_AssertEqual("merged length", arr1.Length, 5);
     Test_AssertEqual("merged 2 type", arr1.GetType(2), JSON_Type_Int);
     Test_AssertEqual("merged 2", arr1.GetInt(2), 2);
     Test_AssertEqual("merged 3 type", arr1.GetType(3), JSON_Type_Bool);
     Test_AssertEqual("merged 3", arr1.GetBool(3), false);
     Test_AssertTrue("merged 1 hidden", arr1.GetHidden(1));
     Test_AssertTrue("merged 3 hidden", arr1.GetHidden(3));
+    Test_AssertEqual("merged objects equal", arr1.GetObject(4), arr2.GetObject(2));
+    Test_AssertTrue("merged remove concat duplicate", arr2.Remove(2)); // prevents invalid handle on cleanup
+
+    json_cleanup_and_delete(arr1);
+    json_cleanup_and_delete(arr2);
+}
+
+void it_should_deep_concat_arrays()
+{
+    JSON_Array arr1 = new JSON_Array();
+    arr1.PushObject(new JSON_Object());
+    JSON_Array arr2 = new JSON_Array();
+    arr2.PushObject(new JSON_Object());
+
+    if (! Test_Assert("merged deep successfully", arr1.Concat(arr2, true))) {
+        // if this assertion fails, testing cannot continue
+        return;
+    }
+
+    print_json(arr1);
+    print_json(arr2);
+
+    Test_AssertEqual("merged length", arr1.Length, 2);
+    Test_AssertNotEqual("merged objects not equal", arr1.GetObject(0), arr2.GetObject(0));
 
     json_cleanup_and_delete(arr1);
     json_cleanup_and_delete(arr2);
@@ -1289,7 +1314,8 @@ public void OnPluginStart()
     Test_Run("it_should_merge_objects_with_replacement", it_should_merge_objects_with_replacement);
     Test_Run("it_should_merge_objects_without_replacement", it_should_merge_objects_without_replacement);
     Test_Run("it_should_not_concat_using_object", it_should_not_concat_using_object);
-    Test_Run("it_should_concat_arrays", it_should_concat_arrays);
+    Test_Run("it_should_shallow_concat_arrays", it_should_shallow_concat_arrays);
+    Test_Run("it_should_deep_concat_arrays", it_should_deep_concat_arrays);
     Test_Run("it_should_copy_flat_arrays", it_should_copy_flat_arrays);
     Test_Run("it_should_copy_flat_objects", it_should_copy_flat_objects);
     Test_Run("it_should_copy_null_keys", it_should_copy_null_keys);

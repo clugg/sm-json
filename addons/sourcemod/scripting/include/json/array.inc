@@ -750,12 +750,13 @@ methodmap JSON_Array < JSON_Object
      * on to the end of this array.
      *
      * @param from      Array to concat entries from.
+     * @param deepCopy  Whether objects should be deep copied from the source array.
      * @return          True on success, false otherwise.
      * @error           If the object being merged is an object or the
      *                  arrays being merged don't have the same strict
      *                  type set, an error will be thrown.
      */
-    public bool Concat(JSON_Array from)
+    public bool Concat(JSON_Array from, bool deepCopy = false)
     {
         if (! this.IsArray || ! from.IsArray) {
             json_set_last_error("attempted to concat using object(s)");
@@ -772,6 +773,7 @@ methodmap JSON_Array < JSON_Object
         }
 
         int json_size = from.Length;
+        int current_size = this.Length;
         for (int i = 0; i < json_size; i += 1) {
             JSONCellType type = from.GetType(i);
             // skip keys of unknown type
@@ -805,11 +807,11 @@ methodmap JSON_Array < JSON_Object
                     this.PushBool(from.GetBool(i));
                 }
                 case JSON_Type_Object: {
-                    this.PushObject(from.GetObject(i));
+                    this.PushObject(deepCopy ? from.GetObject(i).DeepCopy() : from.GetObject(i));
                 }
             }
 
-            this.SetHidden(json_size + i, from.GetHidden(i));
+            this.SetHidden(current_size + i, from.GetHidden(i));
         }
 
         return true;

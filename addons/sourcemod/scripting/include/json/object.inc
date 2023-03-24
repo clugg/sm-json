@@ -406,7 +406,7 @@ methodmap JSON_Object < MetaStringMap
      * Retrieves the int64 stored at a key.
      *
      * @param key               Key to retrieve int64 value for.
-     * @param default_value     Value to return if the key does not exist.
+     * @param value             Value to store the int array in.
      * @return                  Value stored at key.
      */
     public bool GetInt64(const char[] key, int value[2])

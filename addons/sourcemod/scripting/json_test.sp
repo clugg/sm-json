@@ -387,6 +387,18 @@ void it_should_support_decoding_objects_with_ordered_keys()
     json_cleanup_and_delete(obj);
 }
 
+void it_should_support_decoding_objects_with_duplicate_keys()
+{
+    JSON_Object obj = json_decode("{\"third\":1,\"second\":2,\"third\":\"hello\"}", JSON_DECODE_ORDERED_KEYS);
+    Test_AssertEqual("key type", obj.GetType("third"), JSON_Type_String);
+
+    _json_encode(obj);
+
+    Test_AssertStringsEqual("decode -> encode output", json_encode_output, "{\"second\":2,\"third\":\"hello\"}");
+
+    json_cleanup_and_delete(obj);
+}
+
 void it_should_support_arrays()
 {
     JSON_Array arr = new JSON_Array();
@@ -1240,6 +1252,7 @@ public void OnPluginStart()
     Test_Run("it_should_support_objects", it_should_support_objects);
     Test_Run("it_should_support_objects_with_ordered_keys", it_should_support_objects_with_ordered_keys);
     Test_Run("it_should_support_decoding_objects_with_ordered_keys", it_should_support_decoding_objects_with_ordered_keys);
+    Test_Run("it_should_support_decoding_objects_with_duplicate_keys", it_should_support_decoding_objects_with_duplicate_keys);
     Test_Run("it_should_support_arrays", it_should_support_arrays);
     Test_Run("it_should_support_objects_nested_in_objects", it_should_support_objects_nested_in_objects);
     Test_Run("it_should_support_objects_nested_in_arrays", it_should_support_objects_nested_in_arrays);

@@ -495,6 +495,10 @@ stock JSON_Object json_decode(
             );
         }
 
+        if (! is_array && obj.HasKey(key)) {
+            obj.Remove(key);
+        }
+
         char[] cell = new char[cell_length];
         switch (cell_type) {
             case JSON_Type_Object: {

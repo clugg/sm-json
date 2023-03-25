@@ -745,6 +745,7 @@ methodmap JSON_Array < JSON_Object
             return false;
         }
 
+        int current_length = this.Length;
         int json_size = from.Length;
         for (int i = 0; i < json_size; i += 1) {
             JSONCellType type = from.GetType(i);
@@ -783,7 +784,7 @@ methodmap JSON_Array < JSON_Object
                 }
             }
 
-            this.SetHidden(json_size + i, from.GetHidden(i));
+            this.SetHidden(current_length + i, from.GetHidden(i));
         }
 
         return true;

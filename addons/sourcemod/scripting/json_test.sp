@@ -764,13 +764,13 @@ void it_should_concat_arrays()
 {
     JSON_Array arr1 = new JSON_Array();
     arr1.PushInt(1);
-    arr1.PushBool(true);
-    arr1.SetHidden(1, true);
+    arr1.SetHidden(0, true);
 
     JSON_Array arr2 = new JSON_Array();
     arr2.PushInt(2);
-    arr2.PushBool(false);
-    arr2.SetHidden(1, true);
+    arr2.PushInt(3);
+    arr2.PushInt(4);
+    arr2.SetHidden(2, true);
 
     if (! Test_Assert("merged successfully", arr1.Concat(arr2))) {
         // if this assertion fails, testing cannot continue
@@ -780,12 +780,7 @@ void it_should_concat_arrays()
     print_json(arr1);
 
     Test_AssertEqual("merged length", arr1.Length, 4);
-    Test_AssertEqual("merged 2 type", arr1.GetType(2), JSON_Type_Int);
-    Test_AssertEqual("merged 2", arr1.GetInt(2), 2);
-    Test_AssertEqual("merged 3 type", arr1.GetType(3), JSON_Type_Bool);
-    Test_AssertEqual("merged 3", arr1.GetBool(3), false);
-    Test_AssertTrue("merged 1 hidden", arr1.GetHidden(1));
-    Test_AssertTrue("merged 3 hidden", arr1.GetHidden(3));
+    Test_AssertStringsEqual("output", json_encode_output, "[2,3]");
 
     json_cleanup_and_delete(arr1);
     json_cleanup_and_delete(arr2);

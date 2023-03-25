@@ -190,8 +190,7 @@ methodmap JSON_Object < MetaStringMap
         const char[] key,
         JSONMetaInfo meta,
         any default_value
-    )
-    {
+    ) {
         int max_size = json_meta_key_length(key);
         char[] meta_key = new char[max_size];
         json_format_meta_key(meta_key, max_size, key, meta);
@@ -556,8 +555,7 @@ methodmap JSON_Object < MetaStringMap
         const char[] from,
         const char[] to,
         bool replace = true
-    )
-    {
+    ) {
         JSONCellType type = this.GetType(from);
         if (type == JSON_Type_Invalid) {
             return false;

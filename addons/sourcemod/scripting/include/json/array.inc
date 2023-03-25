@@ -949,8 +949,7 @@ methodmap JSON_Array < JSON_Object
         char[][] values,
         int max_size,
         int max_string_size
-    )
-    {
+    ) {
         int length = this.Length;
         if (length < max_size) {
             max_size = length;

@@ -44,7 +44,6 @@
 #include <json/object>
 #include <json/array>
 
-
 /**
  * Calculates the buffer size required to store an encoded JSON instance.
  *

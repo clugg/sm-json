@@ -126,6 +126,38 @@ bool check_array_remove(JSON_Array arr, int index)
     return true;
 }
 
+void check_key_at_index(JSON_Object obj, const char[] key, int index)
+{
+    Test_AssertEqual("key -> index", index, obj.GetIndex(key));
+
+    int max_size = JSON_INT_BUFFER_SIZE + 8;
+    char[] index_size_key = new char[max_size];
+    FormatEx(index_size_key, max_size, "%d:len", index);
+
+    int key_size = obj.Meta.GetInt(index_size_key);
+    char[] real_key = new char[key_size];
+
+    char[] index_key = new char[JSON_INT_BUFFER_SIZE];
+    IntToString(index, index_key, JSON_INT_BUFFER_SIZE);
+    obj.Meta.GetString(index_key, real_key, key_size);
+
+    Test_AssertStringsEqual("keys match", key, real_key);
+}
+
+void check_no_key_at_index(JSON_Object obj, int index)
+{
+    int max_size = JSON_INT_BUFFER_SIZE + 8;
+    char[] index_size_key = new char[max_size];
+    FormatEx(index_size_key, max_size, "%d:len", index);
+
+    Test_AssertFalse("no key length tracked for index", obj.Meta.HasKey(index_size_key));
+
+    char[] index_key = new char[JSON_INT_BUFFER_SIZE];
+    IntToString(index, index_key, JSON_INT_BUFFER_SIZE);
+
+    Test_AssertFalse("no key tracked for index", obj.Meta.HasKey(index_key));
+}
+
 /**
  * @section Methodmaps
  */
@@ -293,34 +325,54 @@ void it_should_support_objects_with_ordered_keys()
     JSON_Object obj = new JSON_Object();
     obj.EnableOrderedKeys();
     obj.SetInt("first", 1);
-    Test_AssertEqual("first index", obj.GetMeta("first", JSON_Meta_Index, -1), 0);
+    check_key_at_index(obj, "first", 0);
     obj.SetInt("second", 2);
-    Test_AssertEqual("second index", obj.GetMeta("second", JSON_Meta_Index, -1), 1);
+    check_key_at_index(obj, "second", 1);
     obj.SetInt("third", 3);
-    Test_AssertEqual("third index", obj.GetMeta("third", JSON_Meta_Index, -1), 2);
+    check_key_at_index(obj, "third", 2);
+
+    check_no_key_at_index(obj, 3);
 
     _json_encode(obj);
     Test_AssertStringsEqual("output upon insert", json_encode_output, "{\"first\":1,\"second\":2,\"third\":3}");
 
     obj.Remove("second");
-    Test_AssertEqual("first index", obj.GetMeta("first", JSON_Meta_Index, -1), 0);
-    Test_AssertEqual("third index", obj.GetMeta("third", JSON_Meta_Index, -1), 1);
+    check_key_at_index(obj, "first", 0);
+    check_key_at_index(obj, "third", 1);
+
+    check_no_key_at_index(obj, 2);
     obj.SetBool("last", true);
-    Test_AssertEqual("last index", obj.GetMeta("last", JSON_Meta_Index, -1), 2);
+    check_key_at_index(obj, "last", 2);
+
+    check_no_key_at_index(obj, 3);
 
     _json_encode(obj);
     Test_AssertStringsEqual("output after removing second and adding", json_encode_output, "{\"first\":1,\"third\":3,\"last\":true}");
 
     obj.Remove("first");
-    Test_AssertEqual("third index", obj.GetMeta("third", JSON_Meta_Index, -1), 0);
-    Test_AssertEqual("last index", obj.GetMeta("last", JSON_Meta_Index, -1), 1);
+    check_key_at_index(obj, "third", 0);
+    check_key_at_index(obj, "last", 1);
+
+    check_no_key_at_index(obj, 2);
 
     _json_encode(obj);
     Test_AssertStringsEqual("output after removing first", json_encode_output, "{\"third\":3,\"last\":true}");
 
     obj.Remove("last");
+    check_key_at_index(obj, "third", 0);
+
+    check_no_key_at_index(obj, 1);
+
     _json_encode(obj);
     Test_AssertStringsEqual("output after removing last", json_encode_output, "{\"third\":3}");
+
+
+    obj.Remove("third");
+
+    check_no_key_at_index(obj, 0);
+
+    _json_encode(obj);
+    Test_AssertStringsEqual("output after removing third", json_encode_output, "{}");
 
     json_cleanup_and_delete(obj);
 }

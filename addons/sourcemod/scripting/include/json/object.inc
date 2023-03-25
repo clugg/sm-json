@@ -312,6 +312,10 @@ methodmap JSON_Object < MetaStringMap
         }
 
         if (index == -1) {
+            if (this.GetIndex(key) != -1) {
+                return true;
+            }
+
             index = this.Length - 1;
         }
 

@@ -911,11 +911,13 @@ void it_should_deep_copy_objects()
 {
     JSON_Object obj = new JSON_Object();
     obj.SetObject("nested", new JSON_Object());
+    obj.SetObject("null", null);
 
     JSON_Object copy = obj.DeepCopy();
 
     Test_AssertEqual("copy length", copy.Length, obj.Length);
     Test_Assert("copy nested != obj nested", copy.GetObject("nested") != obj.GetObject("nested"));
+    Test_Assert("null is still null", copy.GetObject("null") == obj.GetObject("null"));
 
     json_cleanup_and_delete(obj);
     json_cleanup_and_delete(copy);

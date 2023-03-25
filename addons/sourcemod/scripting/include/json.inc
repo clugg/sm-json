@@ -770,7 +770,7 @@ stock JSON_Object json_copy_deep(JSON_Object obj)
         }
 
         JSON_Object value = obj.GetObject(key);
-        result.SetObject(key, json_copy_deep(value));
+        result.SetObject(key, value != null ? json_copy_deep(value) : null);
     }
 
     return result;

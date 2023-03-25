@@ -251,14 +251,14 @@ methodmap JSON_Array < JSON_Object
      *
      * @see MetaStringMap.GetOptionalValue
      */
-    public bool GetOptionalValue(int index, any &value)
+    public any GetOptionalValue(int index, any default_value = -1)
     {
         char key[JSON_INT_BUFFER_SIZE];
         if (! this.GetIndexAsString(index, key, sizeof(key))) {
             return false;
         }
 
-        return this.Super.GetOptionalValue(key, value);
+        return this.Super.GetOptionalValue(key, default_value);
     }
 
     /**

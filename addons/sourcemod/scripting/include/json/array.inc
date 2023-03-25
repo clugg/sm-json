@@ -215,32 +215,6 @@ methodmap JSON_Array < JSON_Object
     }
 
     /**
-     * Sets the cell type stored at a index.
-     * @internal
-     *
-     * @param index     Index to set value type for.
-     * @param type      Type to set index to.
-     * @return          True on success, false otherwise.
-     */
-    public bool SetType(int index, JSONCellType type)
-    {
-        return this.SetMeta(index, JSON_Meta_Type, type);
-    }
-
-    /**
-     * Sets the length of the string stored at a index.
-     * @internal
-     *
-     * @param index     Index to set string length for.
-     * @param length    Length to set string to.
-     * @return          True on success, false otherwise.
-     */
-    public bool SetSize(int index, int length)
-    {
-        return this.SetMeta(index, JSON_Meta_Size, length);
-    }
-
-    /**
      * Sets whether the index should be hidden from encoding.
      *
      * @param index     Index to set hidden state for.

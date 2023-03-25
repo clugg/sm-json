@@ -287,32 +287,6 @@ methodmap JSON_Object < MetaStringMap
     }
 
     /**
-     * Sets the cell type stored at a key.
-     * @internal
-     *
-     * @param key   Key to set value type for.
-     * @param type  Type to set key to.
-     * @return      True on success, false otherwise.
-     */
-    public bool SetType(const char[] key, JSONCellType type)
-    {
-        return this.SetMeta(key, JSON_Meta_Type, type);
-    }
-
-    /**
-     * Sets the length of the string stored at a key.
-     * @internal
-     *
-     * @param key       Key to set string length for.
-     * @param length    Length to set string to.
-     * @return          True on success, false otherwise.
-     */
-    public bool SetSize(const char[] key, int length)
-    {
-        return this.SetMeta(key, JSON_Meta_Size, length);
-    }
-
-    /**
      * Sets whether the key should be hidden from encoding.
      *
      * @param key       Key to set hidden state for.
@@ -443,8 +417,8 @@ methodmap JSON_Object < MetaStringMap
     public bool SetString(const char[] key, const char[] value)
     {
         return this.Super.SetString(key, value)
-            && this.SetType(key, JSON_Type_String)
-            && this.SetSize(key, strlen(value) + 1)
+            && this.SetMeta(key, JSON_Meta_Type, JSON_Type_String)
+            && this.SetMeta(key, JSON_Meta_Size, strlen(value) + 1)
             && this.TrackKeyOrder(key);
     }
 
@@ -458,7 +432,7 @@ methodmap JSON_Object < MetaStringMap
     public bool SetInt(const char[] key, int value)
     {
         return this.Super.SetInt(key, value)
-            && this.SetType(key, JSON_Type_Int)
+            && this.SetMeta(key, JSON_Meta_Type, JSON_Type_Int)
             && this.TrackKeyOrder(key);
     }
 
@@ -473,7 +447,7 @@ methodmap JSON_Object < MetaStringMap
     public bool SetInt64(const char[] key, int value[2])
     {
         return this.Data.SetArray(key, value, 2)
-            && this.SetType(key, JSON_Type_Int64)
+            && this.SetMeta(key, JSON_Meta_Type, JSON_Type_Int64)
             && this.TrackKeyOrder(key);
     }
     #endif
@@ -488,7 +462,7 @@ methodmap JSON_Object < MetaStringMap
     public bool SetFloat(const char[] key, float value)
     {
         return this.Super.SetFloat(key, value)
-            && this.SetType(key, JSON_Type_Float)
+            && this.SetMeta(key, JSON_Meta_Type, JSON_Type_Float)
             && this.TrackKeyOrder(key);
     }
 
@@ -502,7 +476,7 @@ methodmap JSON_Object < MetaStringMap
     public bool SetBool(const char[] key, bool value)
     {
         return this.Super.SetBool(key, value)
-            && this.SetType(key, JSON_Type_Bool)
+            && this.SetMeta(key, JSON_Meta_Type, JSON_Type_Bool)
             && this.TrackKeyOrder(key);
     }
 
@@ -516,7 +490,7 @@ methodmap JSON_Object < MetaStringMap
     public bool SetObject(const char[] key, JSON_Object value)
     {
         return this.Super.SetHandle(key, value)
-            && this.SetType(key, JSON_Type_Object)
+            && this.SetMeta(key, JSON_Meta_Type, JSON_Type_Object)
             && this.TrackKeyOrder(key);
     }
 

@@ -8,8 +8,8 @@ Retrieves the int64 stored at a key.
 - key `const char[]`
 - Key to retrieve int64 value for.
 - value `int[2]`
-- 
+- Int buffer to store output.
 
 #- Returns
 - `bool`
-- Value stored at key.
+- True on success, false otherwise.

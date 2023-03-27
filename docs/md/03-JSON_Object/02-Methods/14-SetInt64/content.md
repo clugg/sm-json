@@ -8,7 +8,7 @@ Sets the int64 stored at a key.
 - key `const char[]`
 - Key to set to int64 value.
 - value `int[2]`
-- 
+- Value to set.
 
 #- Returns
 - `bool`

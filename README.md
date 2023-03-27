@@ -103,7 +103,7 @@ obj.SetObject("array", new JSON_Array());
 obj.SetObject("object", new JSON_Object());
 
 obj.Encode(output, sizeof(output));
-// output now contains {"object":{},"floatkey":-13.37,"boolkey":false,"intkey":-1234,"array":[],"nullkey":null,"strkey":"your string"}
+// output now contains {"strkey":"your string","intkey":-1234,"floatkey":-13.37,"boolkey":false,"nullkey":null,"array":[],"object":{}}
 json_cleanup_and_delete(obj);
 ```
 
@@ -132,13 +132,13 @@ json_cleanup_and_delete(parent_obj);
 `output` will contain the following:
 ```json
 {
+    "pretty_printing": true,
     "first_depth": {
         "im_indented": null,
         "second_depth": [
             1
         ]
-    },
-    "pretty_printing": true
+    }
 }
 ```
 
@@ -153,7 +153,7 @@ parent_obj.Encode(output, sizeof(output), JSON_ENCODE_PRETTY);
 
 `output` will contain the following:
 ```json
-{ "first_depth": { "im_indented": null, "second_depth": [ 1, [] ] }, "pretty_printing": true }
+{ "pretty_printing": true, "first_depth": { "im_indented": null, "second_depth": [ 1, [] ] } }
 ```
 
 ### Decoding
@@ -377,7 +377,7 @@ methodmap Player < JSON_Object
 
 Player player = new Player();
 player.Encode(output, sizeof(output));
-// output now contains {"score":9001,"alive":true,"object":{},"handle":null,"height":1.8,"alias":"clug","array":[]}
+// output now contains {"alias":"clug","score":9001,"height":1.8,"alive":true,"handle":null,"object":{},"array":[]}
 ```
 
 You are also free to nest classes within one another (a continuation from the previous snippet).
@@ -414,8 +414,8 @@ methodmap Weapon < JSON_Object
     public Weapon()
     {
         Weapon self = view_as<Weapon>(new JSON_Object());
-        self.Owner = new Player();
         self.Id = 1;
+        self.Owner = new Player();
 
         return self;
     }
@@ -423,7 +423,7 @@ methodmap Weapon < JSON_Object
 
 Weapon weapon = new Weapon();
 weapon.Encode(output, sizeof(output));
-// output now contains {"id":1,"owner":{"score":9001,"alive":true,"object":{},"handle":null,"height":1.8,"alias":"clug","array":[]}}
+// output now contains {"id":1,"owner":{"alias":"clug","score":9001,"height":1.8,"alive":true,"handle":null,"object":{},"array":[]}}
 ```
 
 #### Decoding

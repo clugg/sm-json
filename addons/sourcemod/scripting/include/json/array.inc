@@ -104,24 +104,6 @@ methodmap JSON_Array < JSON_Object
     }
 
     /**
-     * Outputs an index as a string.
-     *
-     * @param index     Index to output.
-     * @param output    String buffer to store output.
-     * @param max_size  Maximum size of string buffer.
-     * @return          True if the index is valid, false otherwise.
-     */
-    public bool GetIndexAsString(int index, char[] output, int max_size)
-    {
-        // allow access past last index for intermediary operations
-        if (index < 0 || index > this.Length) {
-            return false;
-        }
-
-        return IntToString(index, output, max_size) > 0;
-    }
-
-    /**
      * @section Metadata Getters
      */
 
@@ -134,7 +116,7 @@ methodmap JSON_Array < JSON_Object
     public any GetMeta(int index, JSONMetaInfo meta, any default_value)
     {
         char key[JSON_INT_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+        if (! this.GetKey(index, key, sizeof(key))) {
             return default_value;
         }
 
@@ -191,7 +173,7 @@ methodmap JSON_Array < JSON_Object
     public bool SetMeta(int index, JSONMetaInfo meta, any value)
     {
         char key[JSON_INT_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+        if (! this.GetKey(index, key, sizeof(key))) {
             return false;
         }
 
@@ -207,7 +189,7 @@ methodmap JSON_Array < JSON_Object
     public bool RemoveMeta(int index, JSONMetaInfo meta)
     {
         char key[JSON_INT_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+        if (! this.GetKey(index, key, sizeof(key))) {
             return false;
         }
 
@@ -238,7 +220,7 @@ methodmap JSON_Array < JSON_Object
     public bool GetValue(int index, any &value)
     {
         char key[JSON_INT_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+        if (! this.GetKey(index, key, sizeof(key))) {
             return false;
         }
 
@@ -254,7 +236,7 @@ methodmap JSON_Array < JSON_Object
     public any GetOptionalValue(int index, any default_value = -1)
     {
         char key[JSON_INT_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+        if (! this.GetKey(index, key, sizeof(key))) {
             return false;
         }
 
@@ -269,7 +251,7 @@ methodmap JSON_Array < JSON_Object
     public bool GetString(int index, char[] value, int max_size, int &size = 0)
     {
         char key[JSON_INT_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+        if (! this.GetKey(index, key, sizeof(key))) {
             return false;
         }
 
@@ -284,7 +266,7 @@ methodmap JSON_Array < JSON_Object
     public int GetInt(int index, int default_value = -1)
     {
         char key[JSON_INT_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+        if (! this.GetKey(index, key, sizeof(key))) {
             return default_value;
         }
 
@@ -300,7 +282,7 @@ methodmap JSON_Array < JSON_Object
     public bool GetInt64(int index, int value[2])
     {
         char key[JSON_INT_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+        if (! this.GetKey(index, key, sizeof(key))) {
             return false;
         }
 
@@ -316,7 +298,7 @@ methodmap JSON_Array < JSON_Object
     public float GetFloat(int index, float default_value = -1.0)
     {
         char key[JSON_INT_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+        if (! this.GetKey(index, key, sizeof(key))) {
             return default_value;
         }
 
@@ -331,7 +313,7 @@ methodmap JSON_Array < JSON_Object
     public bool GetBool(int index, bool default_value = false)
     {
         char key[JSON_INT_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+        if (! this.GetKey(index, key, sizeof(key))) {
             return default_value;
         }
 
@@ -346,7 +328,7 @@ methodmap JSON_Array < JSON_Object
     public JSON_Object GetObject(int index, JSON_Object default_value = null)
     {
         char key[JSON_INT_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+        if (! this.GetKey(index, key, sizeof(key))) {
             return default_value;
         }
 
@@ -369,7 +351,7 @@ methodmap JSON_Array < JSON_Object
         }
 
         char key[JSON_INT_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+        if (! this.GetKey(index, key, sizeof(key))) {
             return false;
         }
 
@@ -388,7 +370,7 @@ methodmap JSON_Array < JSON_Object
         }
 
         char key[JSON_INT_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+        if (! this.GetKey(index, key, sizeof(key))) {
             return false;
         }
 
@@ -408,7 +390,7 @@ methodmap JSON_Array < JSON_Object
         }
 
         char key[JSON_INT_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+        if (! this.GetKey(index, key, sizeof(key))) {
             return false;
         }
 
@@ -428,7 +410,7 @@ methodmap JSON_Array < JSON_Object
         }
 
         char key[JSON_INT_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+        if (! this.GetKey(index, key, sizeof(key))) {
             return false;
         }
 
@@ -447,7 +429,7 @@ methodmap JSON_Array < JSON_Object
         }
 
         char key[JSON_INT_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+        if (! this.GetKey(index, key, sizeof(key))) {
             return false;
         }
 
@@ -466,7 +448,7 @@ methodmap JSON_Array < JSON_Object
         }
 
         char key[JSON_INT_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+        if (! this.GetKey(index, key, sizeof(key))) {
             return false;
         }
 
@@ -659,7 +641,7 @@ methodmap JSON_Array < JSON_Object
     public bool Remove(int index)
     {
         char key[JSON_INT_BUFFER_SIZE];
-        if (! this.GetIndexAsString(index, key, sizeof(key))) {
+        if (! this.GetKey(index, key, sizeof(key))) {
             return false;
         }
 
@@ -707,7 +689,7 @@ methodmap JSON_Array < JSON_Object
 
             this.SetHidden(newIndex, this.GetHidden(oldIndex));
 
-            if (this.GetIndexAsString(
+            if (this.GetKey(
                 oldIndex,
                 current_key,
                 sizeof(current_key)

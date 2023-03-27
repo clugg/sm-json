@@ -61,7 +61,7 @@ stock int json_encode_size(JSON_Object obj, int options = JSON_NONE, int depth =
     int size = 1; // for opening bracket
 
     // used in key iterator
-    int json_size = obj.Iterate();
+    int json_size = obj.Length;
     JSON_Object child = null;
     bool is_empty = true;
     int str_length = 0;
@@ -174,7 +174,7 @@ stock void json_encode(
     strcopy(output, max_size, is_array ? "[" : "{");
 
     // used in key iterator
-    int json_size = obj.Iterate();
+    int json_size = obj.Length;
     int builder_size = 0;
     int str_length = 1;
     JSON_Object child = null;
@@ -369,10 +369,6 @@ stock JSON_Object json_decode(
     if (buffer[pos] == '{') {
         is_array = false;
         obj = new JSON_Object();
-
-        if ((options & JSON_DECODE_ORDERED_KEYS) > 0) {
-            obj.EnableOrderedKeys();
-        }
     } else if (buffer[pos] == '[') {
         is_array = true;
         arr = new JSON_Array();
@@ -736,10 +732,6 @@ stock JSON_Object json_copy_shallow(JSON_Object obj)
     if (isArray) {
         view_as<JSON_Array>(result).Concat(view_as<JSON_Array>(obj));
     } else {
-        if (obj.OrderedKeys) {
-            result.EnableOrderedKeys();
-        }
-
         result.Merge(obj);
     }
 
@@ -756,7 +748,7 @@ stock JSON_Object json_copy_deep(JSON_Object obj)
 {
     JSON_Object result = json_copy_shallow(obj);
 
-    int length = obj.Iterate();
+    int length = obj.Length;
     int key_length = 0;
     for (int i = 0; i < length; i += 1) {
         key_length = obj.GetKeySize(i);
@@ -787,7 +779,7 @@ stock void json_cleanup(JSON_Object obj)
         return;
     }
 
-    int length = obj.Iterate();
+    int length = obj.Length;
     int key_length = 0;
     for (int i = 0; i < length; i += 1) {
         key_length = obj.GetKeySize(i);
@@ -806,7 +798,6 @@ stock void json_cleanup(JSON_Object obj)
         }
     }
 
-    delete obj.Snap;
     obj.Super.Cleanup();
 }
 

@@ -323,7 +323,6 @@ void it_should_support_objects()
 void it_should_support_objects_with_ordered_keys()
 {
     JSON_Object obj = new JSON_Object();
-    obj.EnableOrderedKeys();
     obj.SetInt("first", 1);
     check_key_at_index(obj, "first", 0);
     obj.SetInt("second", 2);
@@ -379,7 +378,7 @@ void it_should_support_objects_with_ordered_keys()
 
 void it_should_support_decoding_objects_with_ordered_keys()
 {
-    JSON_Object obj = json_decode("{\"first\":1,\"second\":2,\"third\":3}", JSON_DECODE_ORDERED_KEYS);
+    JSON_Object obj = json_decode("{\"first\":1,\"second\":2,\"third\":3}");
     _json_encode(obj);
 
     Test_AssertStringsEqual("decode -> encode output", json_encode_output, "{\"first\":1,\"second\":2,\"third\":3}");
@@ -389,7 +388,7 @@ void it_should_support_decoding_objects_with_ordered_keys()
 
 void it_should_support_decoding_objects_with_duplicate_keys()
 {
-    JSON_Object obj = json_decode("{\"third\":1,\"second\":2,\"third\":\"hello\"}", JSON_DECODE_ORDERED_KEYS);
+    JSON_Object obj = json_decode("{\"third\":1,\"second\":2,\"third\":\"hello\"}");
     Test_AssertEqual("key type", obj.GetType("third"), JSON_Type_String);
 
     _json_encode(obj);
@@ -564,7 +563,7 @@ void it_should_pretty_print()
 
     _json_encode(parent_obj, JSON_ENCODE_PRETTY);
 
-    Test_AssertStringsEqual("output", json_encode_output, "{\n    \"first_depth\": {\n        \"im_indented\": null,\n        \"second_depth\": [\n            1,\n            []\n        ]\n    },\n    \"pretty_printing\": true\n}");
+    Test_AssertStringsEqual("output", json_encode_output, "{\n    \"pretty_printing\": true,\n    \"first_depth\": {\n        \"im_indented\": null,\n        \"second_depth\": [\n            1,\n            []\n        ]\n    }\n}");
 
     strcopy(JSON_PP_AFTER_COLON, sizeof(JSON_PP_AFTER_COLON), " ");
     strcopy(JSON_PP_INDENT, sizeof(JSON_PP_INDENT), "");
@@ -573,7 +572,7 @@ void it_should_pretty_print()
     _json_encode(parent_obj, JSON_ENCODE_PRETTY);
     json_cleanup_and_delete(parent_obj);
 
-    Test_AssertStringsEqual("output", json_encode_output, "{ \"first_depth\": { \"im_indented\": null, \"second_depth\": [ 1, [] ] }, \"pretty_printing\": true }");
+    Test_AssertStringsEqual("output", json_encode_output, "{ \"pretty_printing\": true, \"first_depth\": { \"im_indented\": null, \"second_depth\": [ 1, [] ] } }");
 }
 
 void it_should_trim_floats()
@@ -861,17 +860,14 @@ void it_should_shallow_copy_objects()
 void it_should_preserve_ordered_keys_on_shallow_copy()
 {
     JSON_Object obj = new JSON_Object();
-    obj.EnableOrderedKeys();
     obj.SetInt("keyA", 1);
     obj.SetInt("key2", 2);
     obj.SetInt("keyC", 3);
     obj.SetInt("key4", 4);
 
     JSON_Object copy = obj.ShallowCopy();
-    Test_AssertTrue("copy has ordered keys", copy.OrderedKeys);
 
-    int length = obj.Iterate();
-    copy.Iterate(); // to ensure a snapshot is loaded
+    int length = obj.Length;
     int original_key_length = 0;
     int copy_key_length = 0;
     char key_assert_desc[16];

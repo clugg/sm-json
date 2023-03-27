@@ -107,7 +107,7 @@ obj.Encode(output, sizeof(output));
 json_cleanup_and_delete(obj);
 ```
 
-**Note:** By default, JSON is unordered. This means that your encoded output may not necessarily display keys in the same order that they were inserted. If you would prefer your keys be 'ordered', you may use `obj.EnableOrderedKeys()` after creating an object but before setting any data.
+**Note:** This library will automatically keep track of the order in which keys are seen and respect this ordering when encoding output.
 
 #### Options
 Options which modify how the encoder works can be passed as the third parameter (or fourth in `json_encode`).
@@ -190,7 +190,6 @@ json_cleanup_and_delete(obj);
 #### Options
 Options which modify how the parser works can be passed as the second parameter (e.g. `json_decode("[]", JSON_DECODE_SINGLE_QUOTES)`).
 * `JSON_DECODE_SINGLE_QUOTES`: accepts `'single quote strings'` as valid. A mixture of single and double quoted strings can be used in a structure (e.g. `['single', "double"]`) as long as quotes are matched correctly. *Note: encoded output will still use double quotes, and unescaping of single quotes in double quoted strings does not occur.*
-* `JSON_DECODE_ORDERED_KEYS`: effectively the same as `EnableOrderedKeys`, this will ensure that key insertion order tracking is enabled before decoding begins.
 
 ### Iteration
 #### Arrays
@@ -204,7 +203,7 @@ for (int i = 0; i < length; i += 1) {
 
 #### Objects
 ```c
-int length = obj.Iterate();
+int length = obj.Length;
 int key_length = 0;
 for (int i = 0; i < length; i += 1) {
     key_length = obj.GetKeySize(i);

@@ -111,7 +111,7 @@ json_cleanup_and_delete(obj);
 
 #### Options
 Options which modify how the encoder works can be passed as the third parameter (or fourth in `json_encode`).
-* `JSON_ENCODE_PRETTY`: enables pretty printing. You can customise pretty printing by overriding (i.e. strcopy) the `JSON_PP_*` strings which are declared in [`addons/sourcemod/scripting/include/json/definitions.inc`](addons/sourcemod/scripting/include/json/definitions.inc#L62-L71). Please do note that these are `char[32]`s. **Example:**
+* `JSON_ENCODE_PRETTY`: enables pretty printing. You can customise pretty printing by overriding (i.e. strcopy) the `JSON_PP_*` strings which are declared in [`addons/sourcemod/scripting/include/json/definitions.inc`](addons/sourcemod/scripting/include/json/definitions.inc#L85-L87). Please do note that these are `char[32]`s. **Example:**
 
 ```c
 JSON_Array child_arr = new JSON_Array();
@@ -480,7 +480,7 @@ In every case where a method denotes that it accepts a `key/index`, it means the
 
 ### Metadata
 * `obj/arr.HasKey(key/index)`: returns true if the key exists, false otherwise.
-* `obj/arr.GetType(key/index)`: returns the [JSONCellType](addons/sourcemod/scripting/include/json/definitions.inc#LL96-L106) stored at the key.
+* `obj/arr.GetType(key/index)`: returns the [JSONCellType](https://clugg.github.io/sm-json/#content-global-enums-jsoncelltype) stored at the key.
 * `obj/arr.GetSize(key/index)`: if the key contains a string, returns the buffer size required for the string. **Example:**
 
 ```c

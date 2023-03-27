@@ -1,5 +1,0 @@
-#! Signature
-
-```c
-bool EnableOrderedKeys()
-```

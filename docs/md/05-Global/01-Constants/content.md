@@ -11,8 +11,6 @@ Title: Constants
 - Should encoded output be pretty printed?
 - `JSON_DECODE_SINGLE_QUOTES` = `1 << 0`
 - Should single quote wrapped strings be accepted during decoding?
-- `JSON_DECODE_ORDERED_KEYS` = `1 << 1`
-- Should objects track order of key insertion during decoding?
 - `JSON_MERGE_REPLACE` = `1 << 0`
 - During merge, should existing keys be replaced if they exist in both objects?
 - `JSON_MERGE_CLEANUP` = `1 << 1`
@@ -30,10 +28,6 @@ Title: Constants
 - `JSON_ARRAY_KEY` = `"is_array"`
 - 
 - `JSON_ENFORCE_TYPE_KEY` = `"enforce_type"`
-- 
-- `JSON_ORDERED_KEYS_KEY` = `"ordered_keys"`
-- 
-- `JSON_SNAP_KEY` = `"snap"`
 - 
 - `TRIE_SUPPORTS_CONTAINSKEY` = `SOURCEMOD_V_MAJOR >= 1 && SOURCEMOD_V_MINOR >= 11 && SOURCEMOD_V_REV >= 6646`
 - For more information, see [StringMap.ContainsKey](https://sm.alliedmods.net/new-api/adt_trie/StringMap/ContainsKey).

@@ -1,5 +1,0 @@
-#! Signature
-
-```c
-int Iterate()
-```

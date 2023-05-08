@@ -191,6 +191,9 @@ json_cleanup_and_delete(obj);
 Options which modify how the parser works can be passed as the second parameter (e.g. `json_decode("[]", JSON_DECODE_SINGLE_QUOTES)`).
 * `JSON_DECODE_SINGLE_QUOTES`: accepts `'single quote strings'` as valid. A mixture of single and double quoted strings can be used in a structure (e.g. `['single', "double"]`) as long as quotes are matched correctly. *Note: encoded output will still use double quotes, and unescaping of single quotes in double quoted strings does not occur.*
 
+#### From file
+See: https://clugg.github.io/sm-json/#global-methods-json-read-from-file
+
 ### Iteration
 #### Arrays
 ```c

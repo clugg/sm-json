@@ -423,12 +423,7 @@ stock JSON_Object json_decode(
                 return null;
             }
 
-            key_length = json_extract_string_size(
-                buffer,
-                length,
-                pos,
-                is_array
-            );
+            key_length = json_extract_string_size(buffer, length, pos);
         }
 
         char[] key = new char[key_length];
@@ -474,12 +469,7 @@ stock JSON_Object json_decode(
             cell_type = JSON_Type_Object;
         } else if (json_is_string(buffer[pos], allow_single_quotes)) {
             cell_type = JSON_Type_String;
-            cell_length = json_extract_string_size(
-                buffer,
-                length,
-                pos,
-                is_array
-            );
+            cell_length = json_extract_string_size(buffer, length, pos);
         } else {
             // in this particular instance, we use JSON_Type_Invalid to
             // represent any type that isn't an object or string

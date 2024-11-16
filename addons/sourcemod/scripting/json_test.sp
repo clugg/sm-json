@@ -1208,7 +1208,7 @@ void it_should_maintain_hidden_on_renamed_object_keys()
 
 void it_should_calculate_string_sizes_correctly()
 {
-    Test_AssertEqual("input", json_extract_string_size("\"hello world\" junk", 19, 0, false), 12);
+    Test_AssertEqual("input", json_extract_string_size("\"hello world\" junk", 19, 0), 12);
     Test_AssertEqual("output-normal", json_cell_string_size("test"), 7);
     Test_AssertEqual("output-basic-escapes", json_cell_string_size("tes\n"), 8);
     Test_AssertEqual("output-basic-escapes", json_cell_string_size("\tes\n"), 9);

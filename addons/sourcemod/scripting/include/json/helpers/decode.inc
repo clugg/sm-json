@@ -390,15 +390,9 @@ stock bool json_extract_until_end(
  * @param buffer            String buffer of data.
  * @param max_size          Maximum size of string buffer.
  * @param pos               Position to increment.
- * @param is_array          Whether the decoder is processing an array.
  * @return                  The size of the buffer required to store the string.
  */
-stock int json_extract_string_size(
-    const char[] buffer,
-    int max_size,
-    int pos,
-    bool is_array
-)
+stock int json_extract_string_size(const char[] buffer, int max_size, int pos)
 {
     int length = 1; // for NULL terminator
 

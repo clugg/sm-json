@@ -535,20 +535,26 @@ void it_should_support_nested_methodmaps()
     json_cleanup_and_delete(player);
 }
 
-void it_should_pretty_print()
+void it_should_pretty_print_an_empty_array()
 {
     JSON_Array empty_arr = new JSON_Array();
     _json_encode(empty_arr, JSON_ENCODE_PRETTY);
     json_cleanup_and_delete(empty_arr);
 
     Test_AssertStringsEqual("output", json_encode_output, "[]");
+}
 
+void it_should_pretty_print_an_empty_object()
+{
     JSON_Object empty_obj = new JSON_Object();
     _json_encode(empty_obj, JSON_ENCODE_PRETTY);
     json_cleanup_and_delete(empty_obj);
 
     Test_AssertStringsEqual("output", json_encode_output, "{}");
+}
 
+void it_should_pretty_print_with_nesting()
+{
     JSON_Array child_arr = new JSON_Array();
     child_arr.PushInt(1);
     child_arr.PushObject(new JSON_Array());
@@ -562,8 +568,24 @@ void it_should_pretty_print()
     parent_obj.SetObject("first_depth", child_obj);
 
     _json_encode(parent_obj, JSON_ENCODE_PRETTY);
+    json_cleanup_and_delete(parent_obj);
 
     Test_AssertStringsEqual("output", json_encode_output, "{\n    \"pretty_printing\": true,\n    \"first_depth\": {\n        \"im_indented\": null,\n        \"second_depth\": [\n            1,\n            []\n        ]\n    }\n}");
+}
+
+void it_should_pretty_print_with_custom_formatting()
+{
+    JSON_Array child_arr = new JSON_Array();
+    child_arr.PushInt(1);
+    child_arr.PushObject(new JSON_Array());
+
+    JSON_Object child_obj = new JSON_Object();
+    child_obj.SetObject("im_indented", null);
+    child_obj.SetObject("second_depth", child_arr);
+
+    JSON_Object parent_obj = new JSON_Object();
+    parent_obj.SetBool("pretty_printing", true);
+    parent_obj.SetObject("first_depth", child_obj);
 
     strcopy(JSON_PP_AFTER_COLON, sizeof(JSON_PP_AFTER_COLON), " ");
     strcopy(JSON_PP_INDENT, sizeof(JSON_PP_INDENT), "");
@@ -1319,7 +1341,10 @@ public void OnPluginStart()
         Test_AfterRun();
     }
 
-    Test_Run("it_should_pretty_print", it_should_pretty_print);
+    Test_Run("it_should_pretty_print_an_empty_array", it_should_pretty_print_an_empty_array);
+    Test_Run("it_should_pretty_print_an_empty_object", it_should_pretty_print_an_empty_object);
+    Test_Run("it_should_pretty_print_with_nesting", it_should_pretty_print_with_nesting);
+    Test_Run("it_should_pretty_print_with_custom_formatting", it_should_pretty_print_with_custom_formatting);
     Test_Run("it_should_trim_floats", it_should_trim_floats);
     Test_Run("it_should_remove_meta_keys_from_arrays", it_should_remove_meta_keys_from_arrays);
     Test_Run("it_should_remove_meta_keys_from_objects", it_should_remove_meta_keys_from_objects);

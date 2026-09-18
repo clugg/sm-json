@@ -555,37 +555,45 @@ void it_should_pretty_print_an_empty_object()
 
 void it_should_pretty_print_with_nesting()
 {
-    JSON_Array child_arr = new JSON_Array();
-    child_arr.PushInt(1);
-    child_arr.PushObject(new JSON_Array());
-
-    JSON_Object child_obj = new JSON_Object();
-    child_obj.SetObject("im_indented", null);
-    child_obj.SetObject("second_depth", child_arr);
-
     JSON_Object parent_obj = new JSON_Object();
     parent_obj.SetBool("pretty_printing", true);
-    parent_obj.SetObject("first_depth", child_obj);
+
+    JSON_Object nested_obj = new JSON_Object();
+    nested_obj.SetObject("im_indented", null);
+
+    JSON_Array sub_nested_arr = new JSON_Array();
+    sub_nested_arr.PushInt(1);
+
+    JSON_Object sub_sub_nested_obj = new JSON_Object();
+    sub_sub_nested_obj.SetBool("shallow", false);
+
+    sub_nested_arr.PushObject(sub_sub_nested_obj);
+    nested_obj.SetObject("second_depth", sub_nested_arr);
+    parent_obj.SetObject("first_depth", nested_obj);
 
     _json_encode(parent_obj, JSON_ENCODE_PRETTY);
     json_cleanup_and_delete(parent_obj);
 
-    Test_AssertStringsEqual("output", json_encode_output, "{\n    \"pretty_printing\": true,\n    \"first_depth\": {\n        \"im_indented\": null,\n        \"second_depth\": [\n            1,\n            []\n        ]\n    }\n}");
+    Test_AssertStringsEqual("output", json_encode_output, "{\n    \"pretty_printing\": true,\n    \"first_depth\": {\n        \"im_indented\": null,\n        \"second_depth\": [\n            1,\n            {\n                \"shallow\": false\n            }\n        ]\n    }\n}");
 }
 
 void it_should_pretty_print_with_custom_formatting()
 {
-    JSON_Array child_arr = new JSON_Array();
-    child_arr.PushInt(1);
-    child_arr.PushObject(new JSON_Array());
-
-    JSON_Object child_obj = new JSON_Object();
-    child_obj.SetObject("im_indented", null);
-    child_obj.SetObject("second_depth", child_arr);
-
     JSON_Object parent_obj = new JSON_Object();
     parent_obj.SetBool("pretty_printing", true);
-    parent_obj.SetObject("first_depth", child_obj);
+
+    JSON_Object nested_obj = new JSON_Object();
+    nested_obj.SetObject("im_indented", null);
+
+    JSON_Array sub_nested_arr = new JSON_Array();
+    sub_nested_arr.PushInt(1);
+
+    JSON_Object sub_sub_nested_obj = new JSON_Object();
+    sub_sub_nested_obj.SetBool("shallow", false);
+
+    sub_nested_arr.PushObject(sub_sub_nested_obj);
+    nested_obj.SetObject("second_depth", sub_nested_arr);
+    parent_obj.SetObject("first_depth", nested_obj);
 
     strcopy(JSON_PP_AFTER_COLON, sizeof(JSON_PP_AFTER_COLON), " ");
     strcopy(JSON_PP_INDENT, sizeof(JSON_PP_INDENT), "");
@@ -594,7 +602,7 @@ void it_should_pretty_print_with_custom_formatting()
     _json_encode(parent_obj, JSON_ENCODE_PRETTY);
     json_cleanup_and_delete(parent_obj);
 
-    Test_AssertStringsEqual("output", json_encode_output, "{ \"pretty_printing\": true, \"first_depth\": { \"im_indented\": null, \"second_depth\": [ 1, [] ] } }");
+    Test_AssertStringsEqual("output", json_encode_output, "{ \"pretty_printing\": true, \"first_depth\": { \"im_indented\": null, \"second_depth\": [ 1, { \"shallow\": false } ] } }");
 
     // reset to defaults
     strcopy(JSON_PP_AFTER_COLON, sizeof(JSON_PP_AFTER_COLON), " ");

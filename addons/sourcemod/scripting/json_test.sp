@@ -595,6 +595,11 @@ void it_should_pretty_print_with_custom_formatting()
     json_cleanup_and_delete(parent_obj);
 
     Test_AssertStringsEqual("output", json_encode_output, "{ \"pretty_printing\": true, \"first_depth\": { \"im_indented\": null, \"second_depth\": [ 1, [] ] } }");
+
+    // reset to defaults
+    strcopy(JSON_PP_AFTER_COLON, sizeof(JSON_PP_AFTER_COLON), " ");
+    strcopy(JSON_PP_INDENT, sizeof(JSON_PP_INDENT), "    ");
+    strcopy(JSON_PP_NEWLINE, sizeof(JSON_PP_NEWLINE), "\n");
 }
 
 void it_should_trim_floats()
